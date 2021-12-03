@@ -2,25 +2,25 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.image.ImageView;
 
 /**
- * Pawn class which extends the abstract Piece class. 
+ * King class which extends the abstract Piece class. 
  */
-public class Pawn extends Piece {
-    public Pawn(Byte id) {
+public class King extends Piece{
+
+    public King(Byte id) {
         this.id = id;
         this.color = (byte) (id / 16);
         this.sprite = new ImageView(App.getSpritesheet());
         if (this.color == 0) {
             // if the colour is black put a black pawn
-            this.sprite.setViewport(new Rectangle2D(Constants.SpriteSheetDimensions.PAWN_X,
+            this.sprite.setViewport(new Rectangle2D(Constants.SpriteSheetDimensions.KING_X,
                     Constants.SpriteSheetDimensions.BLACK_PIECE_Y, Constants.SpriteSheetDimensions.PIECE_WIDTH,
                     Constants.SpriteSheetDimensions.PIECE_HEIGHT));
         } else {
-            this.sprite.setViewport(new Rectangle2D(Constants.SpriteSheetDimensions.PAWN_X,
+            this.sprite.setViewport(new Rectangle2D(Constants.SpriteSheetDimensions.KING_X,
                     Constants.SpriteSheetDimensions.WHITE_PIECE_Y, Constants.SpriteSheetDimensions.PIECE_WIDTH,
                     Constants.SpriteSheetDimensions.PIECE_HEIGHT));
         }
     }
-
     /**
      * {@inheritDoc}
      */
@@ -30,6 +30,5 @@ public class Pawn extends Piece {
 
         return possibleMoves;
     }
-
-
+    
 }

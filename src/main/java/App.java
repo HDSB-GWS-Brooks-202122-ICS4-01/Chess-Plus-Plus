@@ -3,6 +3,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -13,10 +14,10 @@ import java.io.IOException;
 public class App extends Application {
 
     private static Scene scene;
+    private static Image SPRITESHEET = new Image(App.class.getResource("assets\\chess_spritesheet.png").toString());
 
     @Override
     public void start(Stage stage) throws IOException {
-        //scene = new Scene(loadFXML("primary"), 640, 480);
         stage.setScene(scene);
         stage.show();
     }
@@ -32,6 +33,10 @@ public class App extends Application {
 
     public static void main(String[] args) {
         launch();
+    }
+
+    public static Image getSpritesheet(){
+        return SPRITESHEET;
     }
 
 }

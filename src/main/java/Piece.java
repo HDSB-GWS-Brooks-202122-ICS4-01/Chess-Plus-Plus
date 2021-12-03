@@ -1,13 +1,15 @@
 import javafx.scene.image.ImageView;
 
+/**
+ * Abstract class for pieces. 
+ */
 public abstract class Piece {
     protected ImageView sprite;
-    protected int id;
-    protected int color;
+    protected byte id;
+    protected byte color;
     protected int gridX;
     protected int gridY;
 
-    public abstract ImageView getSprite();
 
     /**
      * Method for getting the possible moves of this piece based on the positions of the piece on the board. 
@@ -17,30 +19,56 @@ public abstract class Piece {
     public abstract int[][] getPossibleMoves(int[][] boardPositions);
 
     /**
+     * Method for getting the sprite object to be added into javafx.animation
+     * 
+     * @return an ImageView object representing the sprite. 
+     */
+    public ImageView getSprite(){
+        return this.sprite;
+    }
+
+    /**
+     * Method for getting the id of a piece.
+     * 
+     * @return a byte representing the id of the piece.
+     */
+    public byte getId(){
+        return this.id;
+    }
+
+    /**
      * Method for getting the grid x value.
      * @return
      */
-    public abstract int getGridX();
+    public int getGridX(){
+        return this.gridX;
+    }
 
     /**
      * Method for getting the grid y value.
      * @return
      */
-    public abstract int getGridY();
+    public int getGridY(){
+        return this.gridY;
+    }
 
     /**
      * Method for setting the gridX attribute.
      * 
-     * @param x new value for gridX
+     * @param x new value for gridX.
      */
-    public abstract void setGridX(int x);
+    public void setGridX(int x){
+        this.gridX = x;
+    }
     
 
     /**
      * Method for setting the gridY attribute.
      * 
-     * @param y new value for gridY
+     * @param y new value for gridY.
      */
-    public abstract void setGridY(int y);
+    public void setGridY(int y){
+        this.gridY = y;
+    }
 
 }

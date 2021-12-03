@@ -48,6 +48,23 @@ public class Constants {
             {pieceIDs.BLACK_KINGS_BISHOP, pieceIDs.BLACK_PAWN_FIVE, pieceIDs.EMPTY_CELL, pieceIDs.EMPTY_CELL, pieceIDs.EMPTY_CELL, pieceIDs.EMPTY_CELL, pieceIDs.WHITE_PAWN_FIVE, pieceIDs.WHITE_KINGS_BISHOP}, 
             {pieceIDs.BLACK_KINGS_HORSE, pieceIDs.BLACK_PAWN_SIX, pieceIDs.EMPTY_CELL, pieceIDs.EMPTY_CELL, pieceIDs.EMPTY_CELL, pieceIDs.EMPTY_CELL, pieceIDs.WHITE_PAWN_SIX, pieceIDs.WHITE_KINGS_HORSE}, 
             {pieceIDs.BLACK_KINGS_ROOK, pieceIDs.BLACK_PAWN_SEVEN, pieceIDs.EMPTY_CELL, pieceIDs.EMPTY_CELL, pieceIDs.EMPTY_CELL, pieceIDs.EMPTY_CELL, pieceIDs.WHITE_PAWN_SEVEN, pieceIDs.WHITE_KINGS_ROOK}
-    };
-    }
+    };}
+
+    public static final class SpriteSheetDimensions{
+        public static final double PIECE_WIDTH = 800;
+        public static final double PIECE_HEIGHT = 800;
+
+
+        public static final double WHITE_PIECE_Y = 0;
+
+
+        public static final double BLACK_PIECE_Y = 800;
+
+        public static final double KING_X = 0;
+        public static final double QUEEN_X = 800;
+        public static final double BISHOP_X = 1600;
+        public static final double KNIGHT_X = 2400;
+        public static final double ROOK_X = 3200;
+        public static final double PAWN_X=  4000;
+    } 
 }
