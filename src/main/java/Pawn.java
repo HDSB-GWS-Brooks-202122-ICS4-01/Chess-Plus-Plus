@@ -7,40 +7,54 @@ public class Pawn extends Piece{
     public Pawn(int id){
         this.id = id;
         this.color = (int) (id / 16);
-
-
         this.sprite = new ImageView();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ImageView getSprite() {
-        // TODO Auto-generated method stub
         return sprite;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int[][] getPossibleMoves(int[][] boardPositions) {
-        // TODO Auto-generated method stub
-        return null;
+        int[][] possibleMoves = new int[8][8];
+
+        return possibleMoves;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getGridX() {
-        // TODO Auto-generated method stub
-        return 0;
+        return this.gridX;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getGridY() {
-        // TODO Auto-generated method stub
-        return 0;
+        return this.gridY;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setGridX(int x) {
         this.gridX = x;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setGridY(int y) {
         this.gridY = y;

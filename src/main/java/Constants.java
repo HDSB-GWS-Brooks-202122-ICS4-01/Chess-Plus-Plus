@@ -1,6 +1,6 @@
 public class Constants {
 
-    public static final class pieceIDs{
+    public static final class PieceIDs{
         
         public static final int BLACK_KING = 0;
         public static final int BLACK_QUEEN = 1;
@@ -36,6 +36,11 @@ public class Constants {
         public static final int WHITE_PAWN_FIVE = 29;
         public static final int WHITE_PAWN_SIX = 30;
         public static final int WHITE_PAWN_SEVEN = 31;
+    }
+
+    public static final class SpriteSheetDimensions{
+
+        public static final double KING_X
     }
     
 }
