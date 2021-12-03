@@ -21,6 +21,9 @@ public class Rook extends Piece{
                     Constants.SpriteSheetDimensions.WHITE_PIECE_Y, Constants.SpriteSheetDimensions.PIECE_WIDTH,
                     Constants.SpriteSheetDimensions.PIECE_HEIGHT));
         }
+
+        this.sprite.setFitWidth(Constants.SpriteSheetDimensions.PIECE_FIT_WIDTH);
+        this.sprite.setFitHeight(Constants.SpriteSheetDimensions.PIECE_FIT_HEIGHT);
     }
     /**
      * {@inheritDoc}

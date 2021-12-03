@@ -2,7 +2,7 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.image.ImageView;
 
 /**
- * Pawn class which extends the abstract Piece class. 
+ * Pawn class which extends the abstract Piece class.
  */
 public class Pawn extends Piece {
     public Pawn(Byte id) {
@@ -14,11 +14,15 @@ public class Pawn extends Piece {
             this.sprite.setViewport(new Rectangle2D(Constants.SpriteSheetDimensions.PAWN_X,
                     Constants.SpriteSheetDimensions.BLACK_PIECE_Y, Constants.SpriteSheetDimensions.PIECE_WIDTH,
                     Constants.SpriteSheetDimensions.PIECE_HEIGHT));
+
         } else {
             this.sprite.setViewport(new Rectangle2D(Constants.SpriteSheetDimensions.PAWN_X,
                     Constants.SpriteSheetDimensions.WHITE_PIECE_Y, Constants.SpriteSheetDimensions.PIECE_WIDTH,
                     Constants.SpriteSheetDimensions.PIECE_HEIGHT));
         }
+
+        this.sprite.setFitWidth(Constants.SpriteSheetDimensions.PIECE_FIT_WIDTH);
+        this.sprite.setFitHeight(Constants.SpriteSheetDimensions.PIECE_FIT_HEIGHT);
     }
 
     /**
@@ -30,6 +34,5 @@ public class Pawn extends Piece {
 
         return possibleMoves;
     }
-
 
 }

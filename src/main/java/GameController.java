@@ -8,10 +8,12 @@ public class GameController {
    @FXML
    GridPane gp_board;
 
-   private final Board BOARD = new Board(this, gp_board);
+   private Board board;
 
    @FXML
    public void initialize() {
       System.out.println(true);
+
+      board = new Board(this, gp_board);
    }
 }
