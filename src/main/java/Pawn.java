@@ -7,6 +7,9 @@ public class Pawn extends Piece{
     public Pawn(int id){
         this.id = id;
         this.color = (int) (id / 16);
+
+
+        this.sprite = new ImageView();
     }
 
     @Override
