@@ -1,0 +1,15 @@
+.cell-1 {
+   -fx-background-color: #FFDACB;
+}
+
+.cell-2 {
+   -fx-background-color: #6F4125;
+}
+
+.board-edge {
+   -fx-background-color: black;
+}
+
+.root {
+   -fx-background-color: #2F1000;
+}
