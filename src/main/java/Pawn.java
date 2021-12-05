@@ -38,8 +38,8 @@ public class Pawn extends Piece {
         if (color == Constants.pieceIDs.BLACK) {
             // if the pawn can move forward
             if (boardPositions[gridX][gridY + 1] == Constants.pieceIDs.EMPTY_CELL && gridY + 1 < 8) {
-                byte[] pos = { gridX, (byte) (gridY + 1) };
-                possibleMoves.add(pos);
+                byte[] forwardMove = {gridX, (byte) (gridY+1)};
+                possibleMoves.add(forwardMove);
                 // if the pawn is at its starting position on the board.
                 if (gridX == Constants.boardData.INITIAL_POSITIONS[id][0] && gridY == Constants.boardData.INITIAL_POSITIONS[this.id][1] && gridY + 2 < 8 && boardPositions[gridX][gridY + 2] == Constants.pieceIDs.EMPTY_CELL) {
                     byte[] doubleForwardMove = { gridX, (byte) (gridY + 2) };
@@ -47,6 +47,16 @@ public class Pawn extends Piece {
 
                 }
 
+            }
+
+
+            if(gridX-1 > -1 && gridY + 1 < 8 && (byte) boardPositions[gridX-1][gridY+1]/16 == Constants.pieceIDs.WHITE){
+                byte[] attackLeft = {(byte) (gridX-1), (byte) (gridY+1)};
+                possibleMoves.add(attackLeft);
+            }
+            if(gridX+1 <8 && gridY + 1 < 8 && (byte) boardPositions[gridX+1][gridY+1]/16 == Constants.pieceIDs.WHITE){
+                byte[] attackRight = {(byte) (gridX+1), (byte) (gridY+1)};
+                possibleMoves.add(attackRight);
             }
 
         } else {
@@ -61,6 +71,10 @@ public class Pawn extends Piece {
             }
 
         }
+
+
+
+
 
         byte[][] moves = new byte[possibleMoves.size()][];
 
