@@ -2,6 +2,10 @@ public class Constants {
 
     public static final class pieceIDs {
         public static final byte EMPTY_CELL = -1;
+        
+        public static final byte BLACK = 0;
+        public static final byte WHITE = 1;
+
 
         public static final byte BLACK_KING = 0;
         public static final byte BLACK_QUEEN = 1;
@@ -48,7 +52,48 @@ public class Constants {
             {pieceIDs.BLACK_KINGS_BISHOP, pieceIDs.BLACK_PAWN_FIVE, pieceIDs.EMPTY_CELL, pieceIDs.EMPTY_CELL, pieceIDs.EMPTY_CELL, pieceIDs.EMPTY_CELL, pieceIDs.WHITE_PAWN_FIVE, pieceIDs.WHITE_KINGS_BISHOP}, 
             {pieceIDs.BLACK_KINGS_HORSE, pieceIDs.BLACK_PAWN_SIX, pieceIDs.EMPTY_CELL, pieceIDs.EMPTY_CELL, pieceIDs.EMPTY_CELL, pieceIDs.EMPTY_CELL, pieceIDs.WHITE_PAWN_SIX, pieceIDs.WHITE_KINGS_HORSE}, 
             {pieceIDs.BLACK_KINGS_ROOK, pieceIDs.BLACK_PAWN_SEVEN, pieceIDs.EMPTY_CELL, pieceIDs.EMPTY_CELL, pieceIDs.EMPTY_CELL, pieceIDs.EMPTY_CELL, pieceIDs.WHITE_PAWN_SEVEN, pieceIDs.WHITE_KINGS_ROOK}
-    };}
+        };
+        
+
+        //first index represents the id, second index has the position
+        public static final byte[][] INITIAL_POSITIONS= {
+            //Black positions
+            {3,7},
+            {4,7},
+            {2,7},
+            {5,7},
+            {1,7},
+            {6,7},
+            {0,7},
+            {7,7},
+            {0,6},
+            {1,6},
+            {2,6},
+            {3,6},
+            {4,6},
+            {5,6},
+            {6,6},
+            {7,6},
+
+            //White positions
+            {3,0},
+            {4,0},
+            {2,0},
+            {5,0},
+            {1,0},
+            {6,0},
+            {0,0},
+            {7,0},
+            {0,1},
+            {1,1},
+            {2,1},
+            {3,1},
+            {4,1},
+            {5,1},
+            {6,1},
+            {7,1},
+        };
+    }
 
     public static final class SpriteSheetDimensions{
         public static final double PIECE_WIDTH = 200;

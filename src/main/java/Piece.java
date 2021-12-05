@@ -7,8 +7,8 @@ public abstract class Piece {
     protected ImageView sprite;
     protected byte id;
     protected byte color;
-    protected int gridX;
-    protected int gridY;
+    protected byte gridX;
+    protected byte gridY;
 
 
     /**
@@ -16,7 +16,7 @@ public abstract class Piece {
      * @param boardPositions
      * @return a 2d array containing all the possible moves based on this board. 
      */
-    public abstract int[][] getPossibleMoves(int[][] boardPositions);
+    public abstract byte[][] getPossibleMoves(byte[][] boardPositions);
 
     /**
      * Method for getting the sprite object to be added into javafx.animation
@@ -40,7 +40,7 @@ public abstract class Piece {
      * Method for getting the grid x value.
      * @return
      */
-    public int getGridX(){
+    public byte getGridX(){
         return this.gridX;
     }
 
@@ -48,7 +48,7 @@ public abstract class Piece {
      * Method for getting the grid y value.
      * @return
      */
-    public int getGridY(){
+    public byte getGridY(){
         return this.gridY;
     }
 
@@ -57,7 +57,7 @@ public abstract class Piece {
      * 
      * @param x new value for gridX.
      */
-    public void setGridX(int x){
+    public void setGridX(byte x){
         this.gridX = x;
     }
     
@@ -67,7 +67,7 @@ public abstract class Piece {
      * 
      * @param y new value for gridY.
      */
-    public void setGridY(int y){
+    public void setGridY(byte y){
         this.gridY = y;
     }
 

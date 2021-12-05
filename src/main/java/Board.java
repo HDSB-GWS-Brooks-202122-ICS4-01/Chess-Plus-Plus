@@ -1,10 +1,6 @@
 import java.util.ArrayList;
-
-import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 
 public class Board {
    final GameController GAME;
