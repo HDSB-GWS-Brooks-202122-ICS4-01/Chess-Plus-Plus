@@ -54,8 +54,8 @@ public class Constants {
         public static final double PIECE_WIDTH = 200;
         public static final double PIECE_HEIGHT = 200;
 
-        public static final double PIECE_FIT_WIDTH = 100;
-        public static final double PIECE_FIT_HEIGHT = 100;
+        public static final double PIECE_FIT_WIDTH = 80;
+        public static final double PIECE_FIT_HEIGHT = 80;
 
 
         public static final double WHITE_PIECE_Y = 0;

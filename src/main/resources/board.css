@@ -6,6 +6,17 @@
    -fx-background-color: #6F4125;
 }
 
+.cell-hover {
+   -fx-background-color: #212F3D;
+   -fx-border-width: 4px;
+   -fx-border-color: black;
+   -fx-cursor: hand;
+}
+
+.cell-selected {
+   -fx-background-color: #148F77;
+}
+
 .board-edge {
    -fx-background-color: black;
 }

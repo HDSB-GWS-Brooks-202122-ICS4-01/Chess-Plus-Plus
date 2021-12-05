@@ -28,6 +28,15 @@ public abstract class Piece {
     }
 
     /**
+     * Method for getting the color of a piece.
+     * 
+     * @return a byte representing the color of the piece.
+     */
+    public byte getColor() {
+        return color;
+    }
+
+    /**
      * Method for getting the id of a piece.
      * 
      * @return a byte representing the id of the piece.
@@ -50,6 +59,17 @@ public abstract class Piece {
      */
     public int getGridY(){
         return this.gridY;
+    }
+
+    /**
+     * Method for setting both the gridX and gridY attributes.
+     * 
+     * @param x new value for gridX.
+     * @param y new Value for girdY.
+     */
+    public void setGridPos(int x, int y) {
+        this.gridX = x;
+        this.gridY = y;
     }
 
     /**

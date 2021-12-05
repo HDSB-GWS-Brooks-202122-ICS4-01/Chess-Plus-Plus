@@ -74,7 +74,7 @@
             <StackPane styleClass="cell-1" stylesheets="@board.css" GridPane.columnIndex="5" GridPane.rowIndex="3" />
             <StackPane styleClass="cell-2" stylesheets="@board.css" GridPane.columnIndex="6" GridPane.rowIndex="3" />
             <StackPane styleClass="cell-1" stylesheets="@board.css" GridPane.columnIndex="7" GridPane.rowIndex="3" />
-            <StackPane styleClass="cell-1" stylesheets="@board.css" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+            <StackPane style="-fx-translate-z: 0;" styleClass="cell-1" stylesheets="@board.css" GridPane.columnIndex="2" GridPane.rowIndex="4" />
             <StackPane styleClass="cell-2" stylesheets="@board.css" GridPane.columnIndex="3" GridPane.rowIndex="4" />
             <StackPane styleClass="cell-1" stylesheets="@board.css" GridPane.columnIndex="4" GridPane.rowIndex="4" />
             <StackPane styleClass="cell-2" stylesheets="@board.css" GridPane.columnIndex="5" GridPane.rowIndex="4" />
