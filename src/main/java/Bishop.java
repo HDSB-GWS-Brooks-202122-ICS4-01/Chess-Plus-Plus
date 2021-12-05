@@ -24,14 +24,14 @@ public class Bishop extends Piece{
         this.sprite.setFitWidth(Constants.SpriteSheetDimensions.PIECE_FIT_WIDTH);
         this.sprite.setFitHeight(Constants.SpriteSheetDimensions.PIECE_FIT_HEIGHT);
     }
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public int[][] getPossibleMoves(int[][] boardPositions) {
-        int[][] possibleMoves = new int[8][8];
-
-        return possibleMoves;
+    public byte[][] getPossibleMoves(byte[][] boardPositions) {
+        // TODO Auto-generated method stub
+        return null;
     }
     
 }
