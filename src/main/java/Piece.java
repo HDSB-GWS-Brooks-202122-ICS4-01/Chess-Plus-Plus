@@ -67,7 +67,7 @@ public abstract class Piece {
      * @param x new value for gridX.
      * @param y new Value for girdY.
      */
-    public void setGridPos(int x, int y) {
+    public void setGridPos(byte x, byte y) {
         this.gridX = x;
         this.gridY = y;
     }

@@ -17,6 +17,10 @@
    -fx-background-color: #148F77;
 }
 
+.cell-move {
+   -fx-background-color: #3498DB;
+}
+
 .board-edge {
    -fx-background-color: black;
 }

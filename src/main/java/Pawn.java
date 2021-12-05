@@ -23,6 +23,9 @@ public class Pawn extends Piece {
                     Constants.SpriteSheetDimensions.WHITE_PIECE_Y, Constants.SpriteSheetDimensions.PIECE_WIDTH,
                     Constants.SpriteSheetDimensions.PIECE_HEIGHT));
         }
+
+        this.sprite.setFitWidth(Constants.SpriteSheetDimensions.PIECE_FIT_WIDTH);
+        this.sprite.setFitHeight(Constants.SpriteSheetDimensions.PIECE_FIT_HEIGHT);
     }
 
     /**
@@ -33,23 +36,43 @@ public class Pawn extends Piece {
         ArrayList<byte[]> possibleMoves = new ArrayList<byte[]>();
 
         if (color == Constants.pieceIDs.BLACK) {
-            //if the pawn can move forward
-            if (boardPositions[gridX][gridY - 1] == Constants.pieceIDs.EMPTY_CELL && gridY - 1 > -1) {
-                byte[] pos = {gridX, (byte) (gridY - 1)};
+            // if the pawn can move forward
+            if (boardPositions[gridX][gridY + 1] == Constants.pieceIDs.EMPTY_CELL && gridY + 1 < 8) {
+                byte[] pos = { gridX, (byte) (gridY + 1) };
                 possibleMoves.add(pos);
-                //if the pawn is at its starting position on the board. 
-                if (gridX == Constants.boardData.INITIAL_POSITIONS[id][0]
-                        && gridY == Constants.boardData.INITIAL_POSITIONS[this.id][1] && gridY - 2 > -1 && boardPositions[gridX][gridY-2] == Constants.pieceIDs.EMPTY_CELL){
-                            byte[] doubleForwardMove = {gridX, (byte) (gridY-2)};
-                            possibleMoves.add(pos);
+                // if the pawn is at its starting position on the board.
+                if (gridX == Constants.boardData.INITIAL_POSITIONS[id][0] && gridY == Constants.boardData.INITIAL_POSITIONS[this.id][1] && gridY + 2 < 8 && boardPositions[gridX][gridY + 2] == Constants.pieceIDs.EMPTY_CELL) {
+                    byte[] doubleForwardMove = { gridX, (byte) (gridY + 2) };
+                    possibleMoves.add(doubleForwardMove);
 
                 }
 
             }
 
+        } else {
+            if (boardPositions[gridX][gridY - 1] == Constants.pieceIDs.EMPTY_CELL && gridY - 1 > -1) {
+                byte[] pos = { gridX, (byte) (gridY - 1) };
+                possibleMoves.add(pos);
+                // if the pawn is at its starting position on the board.
+                if (gridX == Constants.boardData.INITIAL_POSITIONS[id][0] && gridY == Constants.boardData.INITIAL_POSITIONS[this.id][1] && gridY - 2 > -1 && boardPositions[gridX][gridY - 2] == Constants.pieceIDs.EMPTY_CELL) {
+                    byte[] doubleForwardMove = { gridX, (byte) (gridY - 2) };
+                    possibleMoves.add(doubleForwardMove);
+                }
+            }
+
         }
 
-        return (byte[][]) possibleMoves.toArray();
+        byte[][] moves = new byte[possibleMoves.size()][];
+
+        for (int i = 0; i < possibleMoves.size(); i++) {
+            moves[i] = new byte[2];
+
+            moves[i][0] = possibleMoves.get(i)[0];
+            moves[i][1] = possibleMoves.get(i)[1];
+        }
+
+        // Object[] moves = ;
+        return moves;
     }
 
 }
