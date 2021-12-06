@@ -70,6 +70,16 @@ public class Pawn extends Piece {
                 }
             }
 
+   
+            if(gridX-1 > -1 && gridY - 1 > -1 && (byte) boardPositions[gridX-1][gridY-1] != Constants.pieceIDs.EMPTY_CELL && boardPositions[gridX-1][gridY-1]/16 == Constants.pieceIDs.BLACK){
+                byte[] attackLeft = {(byte) (gridX-1), (byte) (gridY-1)};
+                possibleMoves.add(attackLeft);
+            }
+            if(gridX+1 <8 && gridY - 1 > -1 && (byte) boardPositions[gridX+1][gridY-1] != Constants.pieceIDs.EMPTY_CELL && boardPositions[gridX+1][gridY-1]/16 == Constants.pieceIDs.BLACK){
+                byte[] attackRight = {(byte) (gridX+1), (byte) (gridY-1)};
+                possibleMoves.add(attackRight);
+            }
+
         }
 
 

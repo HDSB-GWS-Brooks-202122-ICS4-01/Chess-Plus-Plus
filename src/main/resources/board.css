@@ -7,10 +7,10 @@
 }
 
 .cell-hover {
-   -fx-background-color: #212F3D;
-   -fx-border-width: 4px;
-   -fx-border-color: black;
-   -fx-cursor: hand;
+   -fx-background-color: #212F3D !important;
+   -fx-border-width: 4px !important;
+   -fx-border-color: black !important;
+   -fx-cursor: hand !important;
 }
 
 .cell-selected {
@@ -19,6 +19,9 @@
 
 .cell-move {
    -fx-background-color: #3498DB;
+   -fx-border-width: 2px;
+   -fx-border-color: black;
+
 }
 
 .board-edge {
