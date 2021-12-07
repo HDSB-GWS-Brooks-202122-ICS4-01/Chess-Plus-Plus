@@ -24,6 +24,12 @@
 
 }
 
+.cell-enemy {
+   -fx-background-color: #EC7063;
+   -fx-border-width: 2px;
+   -fx-border-color: black;
+}
+
 .board-edge {
    -fx-background-color: black;
 }
@@ -42,4 +48,9 @@
    -fx-background-color: black;
    -fx-border-width: 2.5px;
    -fx-border-color: grey;
+}
+
+.lbl-board-coords {
+   -fx-text-fill: rgb(161, 161, 161);
+   -fx-font-size: 35px;
 }

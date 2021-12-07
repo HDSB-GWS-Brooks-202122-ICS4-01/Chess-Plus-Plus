@@ -7,6 +7,7 @@ import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Label;
+import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
 public class PlayerTimer {
@@ -31,9 +32,10 @@ public class PlayerTimer {
       tracker.setCycleCount(Timeline.INDEFINITE);
       
 
-      if (isRunning)
+      if (isRunning) {
          tracker.play();
-      else
+         reference.setTextFill(Color.LIGHTGREEN);
+      } else
          tracker.pause();
    }
 
@@ -45,9 +47,9 @@ public class PlayerTimer {
             isDone = true;
             this.duration = 0;
          }
-      }
 
-      lbl_timer.setText(getStringFormat());
+         lbl_timer.setText(getStringFormat());
+      }
 
       timeSince = System.currentTimeMillis();
    }
@@ -78,10 +80,14 @@ public class PlayerTimer {
    }
 
    public void playTimer() {
+      lbl_timer.setTextFill(Color.LIGHTGREEN);
+
       tracker.play();
    }
 
    public void pauseTimer() {
+      lbl_timer.setTextFill(Color.WHITE);
+
       timeSince = -1;
       tracker.pause();
    }

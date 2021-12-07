@@ -33,6 +33,8 @@ public class Board {
    private final PlayerTimer TIMER_BLACK;
    private final PlayerTimer TIMER_WHITE;
 
+   private final ArrayList<String> TRANSCRIPT = new ArrayList<String>(); 
+
    /**
     * Constructor for the Board class
     * 
@@ -313,7 +315,11 @@ public class Board {
          // Get instance of CELLS at specified indexes
          StackPane sp_move = CELLS[moves[i][0]][moves[i][1]];
          // Add a css style class
-         sp_move.getStyleClass().add("cell-move");
+         if (sp_move.getChildren().size() == 0) {
+            sp_move.getStyleClass().add("cell-move");
+         } else {
+            sp_move.getStyleClass().add("cell-enemy");
+         }
 
          // Add mouse click event handler
          setPossibleMoveMouseClicked(sp_move, piece, x, y);
@@ -329,6 +335,7 @@ public class Board {
    private void resetPossibleMoves() {
       for (StackPane pm : POSSIBLE_MOVES) {
          pm.getStyleClass().remove("cell-move");
+         pm.getStyleClass().remove("cell-enemy");
          pm.setOnMouseClicked(null);
 
          byte[] pos = getStackPanePosOnGrid(pm);
@@ -358,7 +365,7 @@ public class Board {
 
             LIVE_PIECES.remove(p);
             DEAD_PIECES.add(p);
-            
+
             displayDeadPiece(p);
             break;
          }
