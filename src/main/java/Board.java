@@ -11,10 +11,18 @@ import javafx.scene.layout.StackPane;
 public class Board {
    private final GameController GAME;
    private final GridPane gp_CHESS_BOARD;
+   private final GridPane gp_DEAD_WHITE_CELLS;
+   private final GridPane gp_DEAD_BLACK_CELLS;
+
+   // Current black dead cell and current white dead cell
+   private byte cbdc = 0;
+   private byte cwdc = 0;
+
    private final byte[][] GRID = Constants.boardData.DEFAULT_GAME_SETUP;
 
    private final StackPane[][] CELLS = new StackPane[8][8];
 
+   private final ArrayList<Piece> GAME_PIECES = new ArrayList<Piece>();
    private final ArrayList<Piece> LIVE_PIECES = new ArrayList<Piece>();
    private final ArrayList<Piece> DEAD_PIECES = new ArrayList<Piece>();
 
@@ -22,6 +30,8 @@ public class Board {
    private final ArrayList<StackPane> POSSIBLE_MOVES = new ArrayList<StackPane>();
 
    private byte turn = Constants.pieceIDs.WHITE;
+   private final PlayerTimer TIMER_BLACK;
+   private final PlayerTimer TIMER_WHITE;
 
    /**
     * Constructor for the Board class
@@ -30,9 +40,11 @@ public class Board {
     * @param chessBoard GridPane element containing the rows, and columns of
     *                   StackPane.
     */
-   public Board(GameController game, GridPane chessBoard) {
+   public Board(GameController game, GridPane[] cells) {
       GAME = game;
-      gp_CHESS_BOARD = chessBoard;
+      gp_CHESS_BOARD = cells[0];
+      gp_DEAD_BLACK_CELLS = cells[1];
+      gp_DEAD_WHITE_CELLS = cells[2];
 
       // Loop through chess board nodes to find find stackpanes.
       for (Node node : gp_CHESS_BOARD.getChildren()) {
@@ -102,9 +114,25 @@ public class Board {
 
             piece.setGridPos(x, y);
             LIVE_PIECES.add(piece);
+            GAME_PIECES.add(piece);
             CELLS[x][y].getChildren().add(piece.getSprite());
          }
       }
+
+      // Loop through all game pieces and sort by ID as per Akil's wishes
+      for (int i = 0; i < GAME_PIECES.size() - 1; i++) {
+         for (int j = 0; j < GAME_PIECES.size(); j++) {
+            if (GAME_PIECES.get(j).getId() < GAME_PIECES.get(i).getId()) {
+               Piece temp = GAME_PIECES.get(j);
+
+               GAME_PIECES.set(j, GAME_PIECES.get(i));
+               GAME_PIECES.set(i, temp);
+            }
+         }
+      }
+
+      TIMER_BLACK = new PlayerTimer(GAME.getTimeReference(Constants.pieceIDs.BLACK), 600000, false);
+      TIMER_WHITE = new PlayerTimer(GAME.getTimeReference(Constants.pieceIDs.WHITE), 600000, true);
    }
 
    /**
@@ -189,7 +217,7 @@ public class Board {
    }
 
    /**
-    * This method will return an array list containing all the live pieces
+    * This method will return an array list containing all the live pieces.
     * 
     * @return ArrayList containing pieces
     */
@@ -198,12 +226,22 @@ public class Board {
    }
 
    /**
-    * This method will return an array list containing all the dead pieces
+    * This method will return an array list containing all the dead pieces.
     * 
     * @return ArrayList containing pieces
     */
    public ArrayList<Piece> getDeadPieces() {
       return DEAD_PIECES;
+   }
+
+   /**
+    * This method will return an array list containing all the game pieces dead or
+    * alive.
+    * 
+    * @return ArrayList containing pieces
+    */
+   public ArrayList<Piece> getGamePieces() {
+      return GAME_PIECES;
    }
 
    /**
@@ -222,7 +260,6 @@ public class Board {
     * This method will cycle to the next player's turn
     */
    public void nextMove() {
-      System.out.println(true);
       resetPossibleMoves();
       if (sp_selected != null)
          sp_selected.getStyleClass().remove("cell-selected");
@@ -230,9 +267,14 @@ public class Board {
       sp_selected = null;
 
       if (turn == Constants.pieceIDs.WHITE) {
+         TIMER_WHITE.pauseTimer();
+         TIMER_BLACK.playTimer();
 
          turn = Constants.pieceIDs.BLACK;
       } else {
+         TIMER_BLACK.pauseTimer();
+         TIMER_WHITE.playTimer();
+
          turn = Constants.pieceIDs.WHITE;
       }
    }
@@ -310,6 +352,18 @@ public class Board {
       from.getChildren().clear();
 
       StackPane to = CELLS[toX][toY];
+      for (Node tChild : to.getChildren()) {
+         if (tChild instanceof ImageView) {
+            Piece p = getPieceOnGrid(toX, toY);
+
+            LIVE_PIECES.remove(p);
+            DEAD_PIECES.add(p);
+            
+            displayDeadPiece(p);
+            break;
+         }
+      }
+      to.getChildren().clear();
       to.getChildren().add(piece.getSprite());
 
       System.out.println("(" + toX + ", " + toY + ")");
@@ -320,6 +374,24 @@ public class Board {
       GRID[toX][toY] = piece.id;
 
       nextMove();
+   }
+
+   private void displayDeadPiece(Piece target) {
+      ImageView img = target.getSprite();
+      img.setFitWidth(30);
+      img.setFitHeight(30);
+
+      StackPane sp;
+
+      if (target.getColor() == Constants.pieceIDs.BLACK) {
+         sp = (StackPane) gp_DEAD_BLACK_CELLS.getChildren().get(cbdc);
+         cbdc++;
+      } else {
+         sp = (StackPane) gp_DEAD_WHITE_CELLS.getChildren().get(cwdc);
+         cwdc++;
+      }
+
+      sp.getChildren().add(img);
    }
 
    /**

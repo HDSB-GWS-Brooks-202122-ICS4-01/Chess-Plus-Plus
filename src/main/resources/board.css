@@ -31,3 +31,15 @@
 .root {
    -fx-background-color: #2F1000;
 }
+
+.black-dead-piece-cell {
+   -fx-background-color: white;
+   -fx-border-width: 2.5px;
+   -fx-border-color: grey;
+}
+
+.white-dead-piece-cell {
+   -fx-background-color: black;
+   -fx-border-width: 2.5px;
+   -fx-border-color: grey;
+}
