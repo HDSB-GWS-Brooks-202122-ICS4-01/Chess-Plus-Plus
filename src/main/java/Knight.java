@@ -51,7 +51,9 @@ public class Knight extends Piece{
 
         for(byte[] move : moveList){
             if(inBoardRange(move) && (boardPositions[move[0]][move[1]] == Constants.pieceIDs.EMPTY_CELL || boardPositions[move[0]][move[1]]/16 != color)){
-                possibleMoves.add(move);
+                if(isNotUnderCheck(boardPositions, move,false)){
+                    possibleMoves.add(move);
+                }
             }
         }
 
@@ -64,16 +66,6 @@ public class Knight extends Piece{
             moves[i][1] = possibleMoves.get(i)[1];
         }
         return moves;
-    }
-
-
-    /**
-     * Checks to see if this position is in the board.
-     * @param pos
-     * @return true if the position is in the board, false if not.
-     */
-    public boolean inBoardRange(byte[] pos){
-        return (pos[0] > -1 && pos[0] < 8) && (pos[1] > -1 && pos[1] < 8);
     }
 
 }

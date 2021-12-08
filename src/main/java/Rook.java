@@ -72,11 +72,15 @@ public class Rook extends Piece {
             byte upSquare = boardPositions[possibleMove[0]][possibleMove[1]];
 
             if (upSquare == Constants.pieceIDs.EMPTY_CELL) {
-                possibleMoves.add(possibleMove);
+                if(isNotUnderCheck(boardPositions, possibleMove, false)){
+                    possibleMoves.add(possibleMove);
+                }
                 return upMoves(possibleMoves, boardPositions, possibleMove);
             } else {
                 if (upSquare / 16 != color) {
-                    possibleMoves.add(possibleMove);
+                    if(isNotUnderCheck(boardPositions, possibleMove, false)){
+                        possibleMoves.add(possibleMove);
+                    }
                 }
                 return possibleMoves;
             }
@@ -101,11 +105,15 @@ public class Rook extends Piece {
             byte upSquare = boardPositions[possibleMove[0]][possibleMove[1]];
 
             if (upSquare == Constants.pieceIDs.EMPTY_CELL) {
-                possibleMoves.add(possibleMove);
+                if(isNotUnderCheck(boardPositions, possibleMove, false)){
+                    possibleMoves.add(possibleMove);
+                }
                 return downMoves(possibleMoves, boardPositions, possibleMove);
             } else {
                 if (upSquare / 16 != color) {
-                    possibleMoves.add(possibleMove);
+                    if(isNotUnderCheck(boardPositions, possibleMove, false)){
+                        possibleMoves.add(possibleMove);
+                    }
                 }
                 return possibleMoves;
             }
@@ -129,11 +137,15 @@ public class Rook extends Piece {
             byte upSquare = boardPositions[possibleMove[0]][possibleMove[1]];
 
             if (upSquare == Constants.pieceIDs.EMPTY_CELL) {
-                possibleMoves.add(possibleMove);
+                if(isNotUnderCheck(boardPositions, possibleMove, false)){
+                    possibleMoves.add(possibleMove);
+                }
                 return leftMoves(possibleMoves, boardPositions, possibleMove);
             } else {
                 if (upSquare / 16 != color) {
-                    possibleMoves.add(possibleMove);
+                    if(isNotUnderCheck(boardPositions, possibleMove, false)){
+                        possibleMoves.add(possibleMove);
+                    }
                 }
                 return possibleMoves;
             }
@@ -157,11 +169,15 @@ public class Rook extends Piece {
             byte upSquare = boardPositions[possibleMove[0]][possibleMove[1]];
 
             if (upSquare == Constants.pieceIDs.EMPTY_CELL) {
-                possibleMoves.add(possibleMove);
+                if(isNotUnderCheck(boardPositions, possibleMove, false)){
+                    possibleMoves.add(possibleMove);
+                }
                 return rightMoves(possibleMoves, boardPositions, possibleMove);
             } else {
                 if (upSquare / 16 != color) {
-                    possibleMoves.add(possibleMove);
+                    if(isNotUnderCheck(boardPositions, possibleMove, false)){
+                        possibleMoves.add(possibleMove);
+                    }
                 }
                 return possibleMoves;
             }

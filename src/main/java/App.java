@@ -17,6 +17,8 @@ public class App extends Application {
 
     private static Scene scene;
     private static Image SPRITESHEET = new Image(App.class.getResource("assets\\chess_spritesheet.png").toString());
+    public static King blackKing;
+    public static King whiteKing;
 
     @Override
     public void start(Stage stage) throws IOException {

@@ -72,11 +72,15 @@ public class Bishop extends Piece{
 
             if(upRightSquare == Constants.pieceIDs.EMPTY_CELL){
                 //if the square one up and to the right is empty, add that square and repeat process for  that square
-                possibleMoves.add(possibleMove);
+                if(isNotUnderCheck(boardPositions, possibleMove, false)){
+                    possibleMoves.add(possibleMove);
+                }
                 return upRightDiagonalMoves(possibleMoves, boardPositions, possibleMove);
             } else {
                 if(upRightSquare/16 != color){
-                    possibleMoves.add(possibleMove);
+                    if(isNotUnderCheck(boardPositions, possibleMove, false)){
+                        possibleMoves.add(possibleMove);
+                    }
                 }
                 return possibleMoves;
             }
@@ -103,11 +107,15 @@ public class Bishop extends Piece{
 
             if(upRightSquare == Constants.pieceIDs.EMPTY_CELL){
                 //if the square one up and to the right is empty, add that square and repeat process for  that square
-                possibleMoves.add(possibleMove);
+                if(isNotUnderCheck(boardPositions, possibleMove, false)){
+                    possibleMoves.add(possibleMove);
+                }
                 return upLeftDiagonalMoves(possibleMoves, boardPositions, possibleMove);
             } else {
                 if(upRightSquare/16 != color){
-                    possibleMoves.add(possibleMove);
+                    if(isNotUnderCheck(boardPositions, possibleMove, false)){
+                        possibleMoves.add(possibleMove);
+                    }
                 }
                 return possibleMoves;
             }
@@ -133,11 +141,15 @@ public class Bishop extends Piece{
 
             if(upRightSquare == Constants.pieceIDs.EMPTY_CELL){
                 //if the square one up and to the right is empty, add that square and repeat process for  that square
-                possibleMoves.add(possibleMove);
+                if(isNotUnderCheck(boardPositions, possibleMove, false)){
+                    possibleMoves.add(possibleMove);
+                }
                 return downRightDiagonalMoves(possibleMoves, boardPositions, possibleMove);
             } else {
                 if(upRightSquare/16 != color){
-                    possibleMoves.add(possibleMove);
+                    if(isNotUnderCheck(boardPositions, possibleMove, false)){
+                        possibleMoves.add(possibleMove);
+                    }
                 }
                 return possibleMoves;
             }
@@ -163,11 +175,15 @@ public class Bishop extends Piece{
 
             if(upRightSquare == Constants.pieceIDs.EMPTY_CELL){
                 //if the square one up and to the right is empty, add that square and repeat process for  that square
-                possibleMoves.add(possibleMove);
+                if(isNotUnderCheck(boardPositions, possibleMove, false)){
+                    possibleMoves.add(possibleMove);
+                }
                 return downLeftDiagonalMoves(possibleMoves, boardPositions, possibleMove);
             } else {
                 if(upRightSquare/16 != color){
-                    possibleMoves.add(possibleMove);
+                    if(isNotUnderCheck(boardPositions, possibleMove, false)){
+                        possibleMoves.add(possibleMove);
+                    }
                 }
                 return possibleMoves;
             }

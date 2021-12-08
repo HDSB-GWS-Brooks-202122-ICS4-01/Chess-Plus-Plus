@@ -47,7 +47,9 @@ public class King extends Piece{
 
         for(byte[] move : moveList){
             if(inBoardRange(move) && (boardPositions[move[0]][move[1]] == Constants.pieceIDs.EMPTY_CELL || boardPositions[move[0]][move[1]]/16 != color)){
-                possibleMoves.add(move);
+                if(isNotUnderCheck(boardPositions, move, true)){
+                    possibleMoves.add(move);
+                }
             }
         }
 

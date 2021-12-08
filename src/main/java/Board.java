@@ -99,6 +99,11 @@ public class Board {
 
             if (id == Constants.pieceIDs.BLACK_KING || id == Constants.pieceIDs.WHITE_KING) {
                piece = new King(id);
+               if(id == Constants.pieceIDs.BLACK_KING){
+                  App.blackKing = (King) piece;
+               } else {
+                  App.whiteKing = (King) piece;
+               }
             } else if (id == Constants.pieceIDs.BLACK_QUEEN || id == Constants.pieceIDs.WHITE_QUEEN) {
                piece = new Queen(id);
             } else if (id == Constants.pieceIDs.BLACK_KINGS_BISHOP || id == Constants.pieceIDs.BLACK_QUEENS_BISHOP

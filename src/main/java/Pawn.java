@@ -11,7 +11,7 @@ public class Pawn extends Piece {
 
         // 0 if the color is black, 1 if the color isn't black
         this.color = (byte) (id / 16);
-
+        
         this.sprite = new ImageView(App.getSpritesheet());
         if (this.color == 0) {
             // if the colour is black put a black pawn
@@ -39,12 +39,15 @@ public class Pawn extends Piece {
             // if the pawn can move forward
             if (boardPositions[gridX][gridY + 1] == Constants.pieceIDs.EMPTY_CELL && gridY + 1 < 8) {
                 byte[] forwardMove = {gridX, (byte) (gridY+1)};
-                possibleMoves.add(forwardMove);
+                if(isNotUnderCheck(boardPositions, forwardMove, false)){
+                    possibleMoves.add(forwardMove);
+                }
                 // if the pawn is at its starting position on the board.
                 if (gridX == Constants.boardData.INITIAL_POSITIONS[id][0] && gridY == Constants.boardData.INITIAL_POSITIONS[this.id][1] && gridY + 2 < 8 && boardPositions[gridX][gridY + 2] == Constants.pieceIDs.EMPTY_CELL) {
                     byte[] doubleForwardMove = { gridX, (byte) (gridY + 2) };
-                    possibleMoves.add(doubleForwardMove);
-
+                    if(isNotUnderCheck(boardPositions, doubleForwardMove, false)){
+                        possibleMoves.add(doubleForwardMove);
+                    }      
                 }
 
             }
@@ -52,32 +55,44 @@ public class Pawn extends Piece {
 
             if(gridX-1 > -1 && gridY + 1 < 8 && (byte) boardPositions[gridX-1][gridY+1]/16 == Constants.pieceIDs.WHITE){
                 byte[] attackLeft = {(byte) (gridX-1), (byte) (gridY+1)};
-                possibleMoves.add(attackLeft);
+                if(isNotUnderCheck(boardPositions, attackLeft, false)){
+                    possibleMoves.add(attackLeft);
+                }
             }
             if(gridX+1 <8 && gridY + 1 < 8 && (byte) boardPositions[gridX+1][gridY+1]/16 == Constants.pieceIDs.WHITE){
                 byte[] attackRight = {(byte) (gridX+1), (byte) (gridY+1)};
-                possibleMoves.add(attackRight);
+                if(isNotUnderCheck(boardPositions, attackRight, false)){
+                    possibleMoves.add(attackRight);
+                }
             }
 
         } else {
             if (boardPositions[gridX][gridY - 1] == Constants.pieceIDs.EMPTY_CELL && gridY - 1 > -1) {
-                byte[] pos = { gridX, (byte) (gridY - 1) };
-                possibleMoves.add(pos);
+                byte[] forwardMove = { gridX, (byte) (gridY - 1) };
+                if(isNotUnderCheck(boardPositions, forwardMove, false)){
+                    possibleMoves.add(forwardMove);
+                }
                 // if the pawn is at its starting position on the board.
                 if (gridX == Constants.boardData.INITIAL_POSITIONS[id][0] && gridY == Constants.boardData.INITIAL_POSITIONS[this.id][1] && gridY - 2 > -1 && boardPositions[gridX][gridY - 2] == Constants.pieceIDs.EMPTY_CELL) {
                     byte[] doubleForwardMove = { gridX, (byte) (gridY - 2) };
-                    possibleMoves.add(doubleForwardMove);
+                    if(isNotUnderCheck(boardPositions, doubleForwardMove, false)){
+                        possibleMoves.add(doubleForwardMove);
+                    }      
                 }
             }
 
    
             if(gridX-1 > -1 && gridY - 1 > -1 && (byte) boardPositions[gridX-1][gridY-1] != Constants.pieceIDs.EMPTY_CELL && boardPositions[gridX-1][gridY-1]/16 == Constants.pieceIDs.BLACK){
                 byte[] attackLeft = {(byte) (gridX-1), (byte) (gridY-1)};
-                possibleMoves.add(attackLeft);
+                if(isNotUnderCheck(boardPositions, attackLeft, false)){
+                    possibleMoves.add(attackLeft);
+                }
             }
             if(gridX+1 <8 && gridY - 1 > -1 && (byte) boardPositions[gridX+1][gridY-1] != Constants.pieceIDs.EMPTY_CELL && boardPositions[gridX+1][gridY-1]/16 == Constants.pieceIDs.BLACK){
                 byte[] attackRight = {(byte) (gridX+1), (byte) (gridY-1)};
-                possibleMoves.add(attackRight);
+                if(isNotUnderCheck(boardPositions, attackRight, false)){
+                    possibleMoves.add(attackRight);
+                }
             }
 
         }
