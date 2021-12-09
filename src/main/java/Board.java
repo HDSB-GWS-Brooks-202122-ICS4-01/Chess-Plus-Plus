@@ -286,7 +286,21 @@ public class Board {
    private void displayPossibleMoves(Piece piece) {
       // Get array of possible moves.
       byte[][] moves = piece.getPossibleMoves(GRID);
+      boolean castleLeft = false;
+      boolean castleRight = false;
+      boolean passantLeft = false;
+      boolean passantRight = false;
+      King king = null;
+      Pawn pawn = null;
 
+      if(piece.getId() == Constants.pieceIDs.BLACK_KING || piece.getId() == Constants.pieceIDs.WHITE_KING){
+         king = (King) piece;
+         castleLeft = king.canCastleLeft(GRID);
+         castleRight = king.canCastleRight(GRID);
+      } else if ((piece.getId() > 7 && piece.getId()< 16) || (piece.getId() > 23 && piece.getId() < 32)){
+
+      }
+      
       System.out.println(Arrays.toString(moves));
       // Loop through the moves
       for (byte i = 0; i < moves.length; i++) {
@@ -307,6 +321,19 @@ public class Board {
 
          // Add altered stack pane to array.
          POSSIBLE_MOVES.add(sp_move);
+      }
+
+      if(castleLeft){
+         StackPane s_leftCastle = CELLS[king.getGridX()-2][king.getGridY()];
+         s_leftCastle.getStyleClass().add("cell-move");
+         setCastleMoveMouseClicked(s_leftCastle, piece, piece.getColor(), true);
+         POSSIBLE_MOVES.add(s_leftCastle);
+      }
+      if (castleRight){
+         StackPane s_leftCastle = CELLS[king.getGridX()+2][king.getGridY()];
+         s_leftCastle.getStyleClass().add("cell-move");
+         setCastleMoveMouseClicked(s_leftCastle, piece, piece.getColor(), false);
+         POSSIBLE_MOVES.add(s_leftCastle);
       }
    }
 
@@ -360,8 +387,6 @@ public class Board {
 
       GRID[fromX][fromY] = Constants.pieceIDs.EMPTY_CELL;
       GRID[toX][toY] = piece.id;
-
-      nextMove();
    }
 
    private void displayDeadPiece(Piece target) {
@@ -426,8 +451,48 @@ public class Board {
       sp.setOnMouseClicked(new EventHandler<MouseEvent>() {
          public void handle(MouseEvent me) {
             // When clicked move the piece.
+            piece.hasMoved = true;
             movePiece(piece, piece.getGridX(), piece.getGridY(), x, y);
+            nextMove();
          }
       });
+   }
+
+   private void setCastleMoveMouseClicked(StackPane sp, Piece piece, byte color, boolean left){
+      sp.setOnMouseClicked(new EventHandler<MouseEvent>() {
+         public void handle(MouseEvent me) {
+            // When clicked move the piece.
+            piece.hasMoved = true;
+            if(left){
+               movePiece(piece, piece.getGridX(), piece.getGridY(), (byte) (piece.getGridX()-2), piece.getGridY());
+               if(color == Constants.pieceIDs.BLACK){
+                  Piece rook = GAME_PIECES[Constants.pieceIDs.BLACK_QUEENS_ROOK];
+                  rook.hasMoved = true;
+                  movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX()+1), piece.getGridY());
+               } else {
+                  Piece rook = GAME_PIECES[Constants.pieceIDs.WHITE_QUEENS_ROOK];
+                  rook.hasMoved = true;
+                  movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX()+1), piece.getGridY());
+               }
+            } else {
+               movePiece(piece, piece.getGridX(), piece.getGridY(), (byte) (piece.getGridX()+2), piece.getGridY());
+               if(color == Constants.pieceIDs.BLACK){
+                  Piece rook = GAME_PIECES[Constants.pieceIDs.BLACK_KINGS_ROOK];
+                  rook.hasMoved = true;
+                  movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX()-1), piece.getGridY());
+               } else {
+                  Piece rook = GAME_PIECES[Constants.pieceIDs.WHITE_KINGS_ROOK];
+                  rook.hasMoved = true;
+                  movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX()-1), piece.getGridY());
+               }
+            }
+            nextMove();
+         }
+      });
+
+   }
+
+   private void setPassantMoveMouseClicked(StackPane sp, Piece piece){
+
    }
 }

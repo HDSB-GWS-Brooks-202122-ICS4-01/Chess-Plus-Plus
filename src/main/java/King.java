@@ -8,6 +8,7 @@ import javafx.scene.image.ImageView;
  */
 public class King extends Piece{
 
+
     public King(Byte id) {
         this.id = id;
         this.color = (byte) (id / 16);
@@ -63,6 +64,61 @@ public class King extends Piece{
         }
         return moves;
     }
+
+
+    public boolean canCastleLeft(byte[][] boardPositions){
+        if(color == Constants.pieceIDs.WHITE){
+            if(!hasMoved && !App.GAME_PIECES[Constants.pieceIDs.WHITE_QUEENS_ROOK].hasMoved){
+                if(boardPositions[gridX-1][gridY] == Constants.pieceIDs.EMPTY_CELL && boardPositions[gridX-2][gridY] == Constants.pieceIDs.EMPTY_CELL && boardPositions[gridX-3][gridY] == Constants.pieceIDs.EMPTY_CELL){
+                    byte[] posRightNow = {gridX, gridY};
+                    byte[] squareOne = {(byte) (gridX-1), gridY};
+                    byte[] squareTwo = {(byte) (gridX-2), gridY};
+                    if(isNotUnderCheck(boardPositions, squareOne, true) && isNotUnderCheck(boardPositions, squareTwo, true) && isNotUnderCheck(boardPositions, posRightNow, true)){
+                        return true;
+                    }
+                }
+            }
+        } else {
+            if(!hasMoved && !App.GAME_PIECES[Constants.pieceIDs.BLACK_QUEENS_ROOK].hasMoved){
+                if(boardPositions[gridX-1][gridY] == Constants.pieceIDs.EMPTY_CELL && boardPositions[gridX-2][gridY] == Constants.pieceIDs.EMPTY_CELL && boardPositions[gridX-3][gridY] == Constants.pieceIDs.EMPTY_CELL){
+                    byte[] posRightNow = {gridX, gridY};
+                    byte[] squareOne = {(byte) (gridX-1), gridY};
+                    byte[] squareTwo = {(byte) (gridX-2), gridY};
+                    if(isNotUnderCheck(boardPositions, squareOne, true) && isNotUnderCheck(boardPositions, squareTwo, true) && isNotUnderCheck(boardPositions, posRightNow, true)){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean canCastleRight(byte[][] boardPositions){
+        if(color == Constants.pieceIDs.WHITE){
+            if(!hasMoved && !App.GAME_PIECES[Constants.pieceIDs.WHITE_KINGS_ROOK].hasMoved){
+                if(boardPositions[gridX+1][gridY] == Constants.pieceIDs.EMPTY_CELL && boardPositions[gridX+2][gridY] == Constants.pieceIDs.EMPTY_CELL){
+                    byte[] posRightNow = {gridX, gridY};
+                    byte[] squareOne = {(byte) (gridX+1), gridY};
+                    byte[] squareTwo = {(byte) (gridX+2), gridY};
+                    if(isNotUnderCheck(boardPositions, squareOne, true) && isNotUnderCheck(boardPositions, squareTwo, true) && isNotUnderCheck(boardPositions, posRightNow, true)){
+                        return true;
+                    }
+                }
+            }
+        } else {
+            if(!hasMoved && !App.GAME_PIECES[Constants.pieceIDs.BLACK_KINGS_ROOK].hasMoved){
+                if(boardPositions[gridX+1][gridY] == Constants.pieceIDs.EMPTY_CELL && boardPositions[gridX+2][gridY] == Constants.pieceIDs.EMPTY_CELL){
+                    byte[] posRightNow = {gridX, gridY};
+                    byte[] squareOne = {(byte) (gridX+1), gridY};
+                    byte[] squareTwo = {(byte) (gridX+2), gridY};
+                    if(isNotUnderCheck(boardPositions, squareOne, true) && isNotUnderCheck(boardPositions, squareTwo, true) && isNotUnderCheck(boardPositions, posRightNow, true)){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    } 
 
     /**
      * Checks to see if this position is in the board.

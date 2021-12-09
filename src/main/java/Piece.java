@@ -11,6 +11,7 @@ public abstract class Piece {
     protected byte color;
     protected byte gridX;
     protected byte gridY;
+    protected boolean hasMoved;
 
     /**
      * Method for getting the possible moves of this piece based on the positions of
@@ -36,10 +37,12 @@ public abstract class Piece {
             }
         }
 
-        byte[] kingPos = getKingPos();
+        byte[] kingPos = new byte[2];
         if(isKing){
             kingPos[0] = possibleMove[0];
             kingPos[1] = possibleMove[1];
+        } else {
+            kingPos = getKingPos();
         }
         newBoardPositions[possibleMove[0]][possibleMove[1]] = id;
         newBoardPositions[gridX][gridY] = Constants.pieceIDs.EMPTY_CELL;
