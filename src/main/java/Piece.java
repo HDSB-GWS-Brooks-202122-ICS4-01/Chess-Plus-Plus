@@ -23,6 +23,13 @@ public abstract class Piece {
      */
     public abstract byte[][] getPossibleMoves(byte[][] boardPositions);
 
+    /**
+     * Method for getting if the king is not under check. 
+     * @param boardPositions The positions of pieces on the board.
+     * @param possibleMove The move to check.
+     * @param isKing if the move it is trying involves moving the king.
+     * @return
+     */
     public boolean isNotUnderCheck(byte[][] boardPositions, byte[] possibleMove, boolean isKing) {
         byte[][] newBoardPositions = new byte[8][8];
         for (int x = 0; x < 8; x++){
@@ -129,6 +136,12 @@ public abstract class Piece {
         return pos;
     }
 
+    /**
+     * Method for seeing if the king is under check, specifically checks if it is under check from the left.
+     * @param boardPositions positions of all pieces on the board
+     * @param pos position of the king
+     * @return true if king is under check from this direction, false if not. 
+     */
     private boolean checkLeft(byte[][] boardPositions, byte[] pos) {
         for (int i = pos[0]-1; i > -1; i--) {
             byte pieceAtSquare = boardPositions[i][pos[1]];
@@ -161,6 +174,12 @@ public abstract class Piece {
         return false;
     }
 
+    /**
+     * Method for seeing if the king is under check, specifically checks if it is under check from the right.
+     * @param boardPositions positions of all pieces on the board
+     * @param pos position of the king
+     * @return true if king is under check from this direction, false if not. 
+     */
     private boolean checkRight(byte[][] boardPositions, byte[] pos) {
         for (int i = pos[0]+1; i < 8; i++) {
             byte pieceAtSquare = boardPositions[i][pos[1]];
@@ -193,13 +212,15 @@ public abstract class Piece {
         return false;
     }
 
+    /**
+     * Method for seeing if the king is under check, specifically checks if it is under check from the top.
+     * @param boardPositions positions of all pieces on the board
+     * @param pos position of the king
+     * @return true if king is under check from this direction, false if not. 
+     */
     private boolean checkUp(byte[][] boardPositions, byte[] pos) {
         for (int i = pos[1]-1; i > -1; i--) {
-            byte pieceAtSquare = boardPositions[0][i];
-            System.out.println(pieceAtSquare);
-            System.out.println(color);
-
-            //
+            byte pieceAtSquare = boardPositions[pos[0]][i];
             if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / 16 != color) {
                 if (color == Constants.pieceIDs.BLACK) {
                     System.out.println(pieceAtSquare);
@@ -229,9 +250,15 @@ public abstract class Piece {
         return false;
     }
 
+    /**
+     * Method for seeing if the king is under check, specifically checks if it is under check from the bottom.
+     * @param boardPositions positions of all pieces on the board
+     * @param pos position of the king
+     * @return true if king is under check from this direction, false if not. 
+     */
     private boolean checkDown(byte[][] boardPositions, byte[] pos) {
         for (int i = pos[1]+1; i < 8; i++) {
-            byte pieceAtSquare = boardPositions[0][i];
+            byte pieceAtSquare = boardPositions[pos[0]][i];
             //
             if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / 16 != color) {
                 if (color == Constants.pieceIDs.BLACK) {
@@ -261,6 +288,14 @@ public abstract class Piece {
         return false;
     }
 
+
+
+    /**
+     * Method for seeing if the king is under check, specifically checks if it is under check from the top right diagonal.
+     * @param boardPositions positions of all pieces on the board
+     * @param pos position of the king
+     * @return true if king is under check from this direction, false if not. 
+     */
     private boolean checkUpRightDiagonal(byte[][] boardPositions, byte[] pos) {
         int j = pos[1]-1;
         for (int i = pos[0]+1; i < 8; i++) {
@@ -300,6 +335,12 @@ public abstract class Piece {
         return false;
     }
 
+    /**
+     * Method for seeing if the king is under check, specifically checks if it is under check from the top left diagonal.
+     * @param boardPositions positions of all pieces on the board
+     * @param pos position of the king
+     * @return true if king is under check from this direction, false if not. 
+     */
     private boolean checkUpLeftDiagonal(byte[][] boardPositions, byte[] pos) {
         int j = pos[1]-1;
         for (int i = pos[0]-1; i > -1; i--) {
@@ -340,6 +381,12 @@ public abstract class Piece {
         return false;
     }
 
+    /**
+     * Method for seeing if the king is under check, specifically checks if it is under check from the bottom left diagonal.
+     * @param boardPositions positions of all pieces on the board
+     * @param pos position of the king
+     * @return true if king is under check from this direction, false if not. 
+     */
     private boolean checkDownLeftDiagonal(byte[][] boardPositions, byte[] pos) {
         int j = pos[1]+1;
         for (int i = pos[0]-1; i > -1; i--) {
@@ -380,6 +427,12 @@ public abstract class Piece {
         return false;
     }
 
+    /**
+     * Method for seeing if the king is under check, specifically checks if it is under check from the bottom right diagonal.
+     * @param boardPositions positions of all pieces on the board
+     * @param pos position of the king
+     * @return true if king is under check from this direction, false if not. 
+     */
     private boolean checkDownRightDiagonal(byte[][] boardPositions, byte[] pos) {
         int j = pos[1]+1;
         for (int i = pos[0]+1; i < 8; i++) {
