@@ -22,7 +22,7 @@ public class Board {
 
    private final StackPane[][] CELLS = new StackPane[8][8];
 
-   private final ArrayList<Piece> GAME_PIECES = new ArrayList<Piece>();
+   private final Piece[] GAME_PIECES = new Piece[32];
    private final ArrayList<Piece> LIVE_PIECES = new ArrayList<Piece>();
    private final ArrayList<Piece> DEAD_PIECES = new ArrayList<Piece>();
 
@@ -99,11 +99,6 @@ public class Board {
 
             if (id == Constants.pieceIDs.BLACK_KING || id == Constants.pieceIDs.WHITE_KING) {
                piece = new King(id);
-               if(id == Constants.pieceIDs.BLACK_KING){
-                  App.blackKing = (King) piece;
-               } else {
-                  App.whiteKing = (King) piece;
-               }
             } else if (id == Constants.pieceIDs.BLACK_QUEEN || id == Constants.pieceIDs.WHITE_QUEEN) {
                piece = new Queen(id);
             } else if (id == Constants.pieceIDs.BLACK_KINGS_BISHOP || id == Constants.pieceIDs.BLACK_QUEENS_BISHOP
@@ -121,22 +116,12 @@ public class Board {
 
             piece.setGridPos(x, y);
             LIVE_PIECES.add(piece);
-            GAME_PIECES.add(piece);
+            GAME_PIECES[id] = piece;
             CELLS[x][y].getChildren().add(piece.getSprite());
          }
       }
 
-      // Loop through all game pieces and sort by ID as per Akil's wishes
-      for (int i = 0; i < GAME_PIECES.size() - 1; i++) {
-         for (int j = 0; j < GAME_PIECES.size(); j++) {
-            if (GAME_PIECES.get(j).getId() < GAME_PIECES.get(i).getId()) {
-               Piece temp = GAME_PIECES.get(j);
-
-               GAME_PIECES.set(j, GAME_PIECES.get(i));
-               GAME_PIECES.set(i, temp);
-            }
-         }
-      }
+      App.GAME_PIECES = GAME_PIECES;
 
       TIMER_BLACK = new PlayerTimer(GAME.getTimeReference(Constants.pieceIDs.BLACK), 600000, false);
       TIMER_WHITE = new PlayerTimer(GAME.getTimeReference(Constants.pieceIDs.WHITE), 600000, true);
@@ -241,15 +226,6 @@ public class Board {
       return DEAD_PIECES;
    }
 
-   /**
-    * This method will return an array list containing all the game pieces dead or
-    * alive.
-    * 
-    * @return ArrayList containing pieces
-    */
-   public ArrayList<Piece> getGamePieces() {
-      return GAME_PIECES;
-   }
 
    /**
     * This method will see if the attempted move is possible

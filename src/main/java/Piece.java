@@ -12,8 +12,6 @@ public abstract class Piece {
     protected byte gridX;
     protected byte gridY;
 
-    protected Piece[] GAME_PIECES;
-
     /**
      * Method for getting the possible moves of this piece based on the positions of
      * the piece on the board.
@@ -127,12 +125,13 @@ public abstract class Piece {
     protected byte[] getKingPos() {
         byte[] pos = new byte[2];
         if(color == Constants.pieceIDs.BLACK){
-            pos[0] = App.blackKing.getGridX();
-            pos[1] = App.blackKing.getGridY();
+            pos[0] = App.GAME_PIECES[Constants.pieceIDs.BLACK_KING].getGridX();
+            pos[1] = App.GAME_PIECES[Constants.pieceIDs.BLACK_KING].getGridY();
         } else {
-            pos[0] = App.whiteKing.getGridX();
-            pos[1] = App.whiteKing.getGridY();
+            pos[0] = App.GAME_PIECES[Constants.pieceIDs.WHITE_KING].getGridX();
+            pos[1] = App.GAME_PIECES[Constants.pieceIDs.WHITE_KING].getGridY();
         }
+        System.out.println(Arrays.toString(pos));
         return pos;
     }
 

@@ -9,6 +9,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * JavaFX Ap */
@@ -17,8 +18,7 @@ public class App extends Application {
 
     private static Scene scene;
     private static Image SPRITESHEET = new Image(App.class.getResource("assets\\chess_spritesheet.png").toString());
-    public static King blackKing;
-    public static King whiteKing;
+    public static Piece[] GAME_PIECES;
 
     @Override
     public void start(Stage stage) throws IOException {
