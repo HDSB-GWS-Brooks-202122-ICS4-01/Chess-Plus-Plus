@@ -1,5 +1,10 @@
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Scanner;
 
 import javafx.event.EventHandler;
 import javafx.scene.Node;
@@ -33,7 +38,8 @@ public class Board {
    private final PlayerTimer TIMER_BLACK;
    private final PlayerTimer TIMER_WHITE;
 
-   private final ArrayList<String> TRANSCRIPT = new ArrayList<String>(); 
+   private final ArrayList<String> BLACK_TRANSCRIPT = new ArrayList<String>();
+   private final ArrayList<String> WHITE_TRANSCRIPT = new ArrayList<String>();
 
    /**
     * Constructor for the Board class
@@ -48,6 +54,18 @@ public class Board {
       gp_DEAD_BLACK_CELLS = cells[1];
       gp_DEAD_WHITE_CELLS = cells[2];
 
+      TIMER_BLACK = new PlayerTimer(GAME.getTimeReference(Constants.pieceIDs.BLACK), 600000, false);
+      TIMER_WHITE = new PlayerTimer(GAME.getTimeReference(Constants.pieceIDs.WHITE), 600000, true);
+
+      setupBoard();
+      try {
+         parseTranscript();
+      } catch (IOException e) {
+         e.printStackTrace();
+      }
+   }
+
+   private void setupBoard() {
       // Loop through chess board nodes to find find stackpanes.
       for (Node node : gp_CHESS_BOARD.getChildren()) {
          StackPane sp = (StackPane) node;
@@ -123,8 +141,65 @@ public class Board {
 
       App.GAME_PIECES = GAME_PIECES;
 
-      TIMER_BLACK = new PlayerTimer(GAME.getTimeReference(Constants.pieceIDs.BLACK), 600000, false);
-      TIMER_WHITE = new PlayerTimer(GAME.getTimeReference(Constants.pieceIDs.WHITE), 600000, true);
+   }
+
+   private void parseTranscript() throws IOException {
+      final String REG = "((?=[A-Z])|(?<=[A-Z]))|((?=[a-z])|(?<=[a-z]))";
+      File tsFile = new File("src\\main\\resources\\data\\tstest.txt");
+
+      FileReader fileReader = new FileReader(tsFile);
+      Scanner r = new Scanner(fileReader);
+
+      String ts;
+
+      while (r.hasNextLine()) {
+         ts = r.nextLine();
+
+         if (ts.contains("TW")) {
+            TIMER_WHITE.setTime(Long.parseLong(ts.substring(2, ts.length())));
+         } else if (ts.contains("TB")) {
+            TIMER_BLACK.setTime(Long.parseLong(ts.substring(2, ts.length())));
+         } else {
+
+            String[] data = ts.split(REG);
+            System.out.println(Arrays.toString(data));
+
+            Piece piece = getPieceOnGrid(Byte.parseByte(data[0].trim()));
+
+            if (piece == null)
+               continue;
+
+            byte x = getBoardX(data[1]);
+            byte y = getBoardY(data[2]);
+
+            System.out.println("(" + x + ", " + y + ")");
+
+            if (x > 0 && x < 8 && y > 0 && y < 8) {
+               movePiece(piece, piece.getGridX(), piece.getGridY(), x, y);
+               System.out.println(203902903);
+            }
+         }
+      }
+   }
+
+   private byte getBoardX(String value) {
+      String[] xPos = Constants.boardData.X_ID;
+      for (byte i = 0; i < xPos.length; i++) {
+         if (xPos[i].equalsIgnoreCase(value))
+            return i;
+      }
+
+      return -1;
+   }
+
+   private byte getBoardY(String value) {
+      String[] yPos = Constants.boardData.Y_ID;
+      for (byte i = 0; i < yPos.length; i++) {
+         if (yPos[i].equalsIgnoreCase(value))
+            return i;
+      }
+
+      return -1;
    }
 
    /**
@@ -170,6 +245,21 @@ public class Board {
    private Piece getPieceOnGrid(int x, int y) {
       for (Piece piece : LIVE_PIECES) {
          if (piece.getGridX() == x && piece.getGridY() == y)
+            return piece;
+      }
+
+      return null;
+   }
+
+   /**
+    * This method will return the piece on the inputed board coordinates.
+    * 
+    * @param id The byte identification of a game piece
+    * @return Piece object or null.
+    */
+   private Piece getPieceOnGrid(byte id) {
+      for (Piece piece : LIVE_PIECES) {
+         if (piece.getId() == id)
             return piece;
       }
 
@@ -226,7 +316,6 @@ public class Board {
       return DEAD_PIECES;
    }
 
-
    /**
     * This method will see if the attempted move is possible
     * 
@@ -248,6 +337,7 @@ public class Board {
          sp_selected.getStyleClass().remove("cell-selected");
 
       sp_selected = null;
+      boolean inCheck = true;
 
       if (turn == Constants.pieceIDs.WHITE) {
          TIMER_WHITE.pauseTimer();
@@ -260,6 +350,20 @@ public class Board {
 
          turn = Constants.pieceIDs.WHITE;
       }
+
+      for (Piece p : LIVE_PIECES) {
+         if (p.getColor() != turn)
+            continue;
+         
+         if (p.getPossibleMoves(GRID).length > 0)
+            inCheck = false;
+      }
+
+      if (inCheck) {
+         System.out.println("Checkmate, game over!");
+      }
+
+      System.out.println("Next turn: " + turn);
    }
 
    /**
@@ -293,14 +397,14 @@ public class Board {
       King king = null;
       Pawn pawn = null;
 
-      if(piece.getId() == Constants.pieceIDs.BLACK_KING || piece.getId() == Constants.pieceIDs.WHITE_KING){
+      if (piece.getId() == Constants.pieceIDs.BLACK_KING || piece.getId() == Constants.pieceIDs.WHITE_KING) {
          king = (King) piece;
          castleLeft = king.canCastleLeft(GRID);
          castleRight = king.canCastleRight(GRID);
-      } else if ((piece.getId() > 7 && piece.getId()< 16) || (piece.getId() > 23 && piece.getId() < 32)){
+      } else if ((piece.getId() > 7 && piece.getId() < 16) || (piece.getId() > 23 && piece.getId() < 32)) {
 
       }
-      
+
       System.out.println(Arrays.toString(moves));
       // Loop through the moves
       for (byte i = 0; i < moves.length; i++) {
@@ -323,14 +427,14 @@ public class Board {
          POSSIBLE_MOVES.add(sp_move);
       }
 
-      if(castleLeft){
-         StackPane s_leftCastle = CELLS[king.getGridX()-2][king.getGridY()];
+      if (castleLeft) {
+         StackPane s_leftCastle = CELLS[king.getGridX() - 2][king.getGridY()];
          s_leftCastle.getStyleClass().add("cell-move");
          setCastleMoveMouseClicked(s_leftCastle, piece, piece.getColor(), true);
          POSSIBLE_MOVES.add(s_leftCastle);
       }
-      if (castleRight){
-         StackPane s_leftCastle = CELLS[king.getGridX()+2][king.getGridY()];
+      if (castleRight) {
+         StackPane s_leftCastle = CELLS[king.getGridX() + 2][king.getGridY()];
          s_leftCastle.getStyleClass().add("cell-move");
          setCastleMoveMouseClicked(s_leftCastle, piece, piece.getColor(), false);
          POSSIBLE_MOVES.add(s_leftCastle);
@@ -381,12 +485,23 @@ public class Board {
       to.getChildren().clear();
       to.getChildren().add(piece.getSprite());
 
-      System.out.println("(" + toX + ", " + toY + ")");
-
       piece.setGridPos(toX, toY);
 
       GRID[fromX][fromY] = Constants.pieceIDs.EMPTY_CELL;
-      GRID[toX][toY] = piece.id;
+      GRID[toX][toY] = piece.getId();
+
+      String moveTranscript = piece.getId() + Constants.boardData.X_ID[toX] + Constants.boardData.Y_ID[toY];
+
+      if (piece.getColor() == Constants.pieceIDs.BLACK)
+         BLACK_TRANSCRIPT.add(moveTranscript);
+      else
+         WHITE_TRANSCRIPT.add(moveTranscript);
+
+      System.out.println(BLACK_TRANSCRIPT.toString());
+      System.out.println("\n-------------------------------\n");
+      System.out.println(WHITE_TRANSCRIPT.toString());
+
+      // nextMove();
    }
 
    private void displayDeadPiece(Piece target) {
@@ -458,32 +573,32 @@ public class Board {
       });
    }
 
-   private void setCastleMoveMouseClicked(StackPane sp, Piece piece, byte color, boolean left){
+   private void setCastleMoveMouseClicked(StackPane sp, Piece piece, byte color, boolean left) {
       sp.setOnMouseClicked(new EventHandler<MouseEvent>() {
          public void handle(MouseEvent me) {
             // When clicked move the piece.
             piece.hasMoved = true;
-            if(left){
-               movePiece(piece, piece.getGridX(), piece.getGridY(), (byte) (piece.getGridX()-2), piece.getGridY());
-               if(color == Constants.pieceIDs.BLACK){
+            if (left) {
+               movePiece(piece, piece.getGridX(), piece.getGridY(), (byte) (piece.getGridX() - 2), piece.getGridY());
+               if (color == Constants.pieceIDs.BLACK) {
                   Piece rook = GAME_PIECES[Constants.pieceIDs.BLACK_QUEENS_ROOK];
                   rook.hasMoved = true;
-                  movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX()+1), piece.getGridY());
+                  movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX() + 1), piece.getGridY());
                } else {
                   Piece rook = GAME_PIECES[Constants.pieceIDs.WHITE_QUEENS_ROOK];
                   rook.hasMoved = true;
-                  movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX()+1), piece.getGridY());
+                  movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX() + 1), piece.getGridY());
                }
             } else {
-               movePiece(piece, piece.getGridX(), piece.getGridY(), (byte) (piece.getGridX()+2), piece.getGridY());
-               if(color == Constants.pieceIDs.BLACK){
+               movePiece(piece, piece.getGridX(), piece.getGridY(), (byte) (piece.getGridX() + 2), piece.getGridY());
+               if (color == Constants.pieceIDs.BLACK) {
                   Piece rook = GAME_PIECES[Constants.pieceIDs.BLACK_KINGS_ROOK];
                   rook.hasMoved = true;
-                  movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX()-1), piece.getGridY());
+                  movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX() - 1), piece.getGridY());
                } else {
                   Piece rook = GAME_PIECES[Constants.pieceIDs.WHITE_KINGS_ROOK];
                   rook.hasMoved = true;
-                  movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX()-1), piece.getGridY());
+                  movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX() - 1), piece.getGridY());
                }
             }
             nextMove();
@@ -492,7 +607,7 @@ public class Board {
 
    }
 
-   private void setPassantMoveMouseClicked(StackPane sp, Piece piece){
+   private void setPassantMoveMouseClicked(StackPane sp, Piece piece) {
 
    }
 }

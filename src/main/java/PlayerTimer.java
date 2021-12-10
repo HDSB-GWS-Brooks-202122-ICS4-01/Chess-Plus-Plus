@@ -39,6 +39,12 @@ public class PlayerTimer {
          tracker.pause();
    }
 
+   public void setTime(long millis) {
+      duration = millis;
+
+      lbl_timer.setText(getStringFormat());
+   }
+
    private void updateTime() {
       if (timeSince != -1) {
          this.duration -= (System.currentTimeMillis() - timeSince);
