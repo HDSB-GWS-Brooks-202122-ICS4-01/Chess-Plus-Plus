@@ -35,8 +35,8 @@ public abstract class Piece {
          } else if (id == Constants.pieceIDs.BLACK_KINGS_BISHOP || id == Constants.pieceIDs.BLACK_QUEENS_BISHOP
                || id == Constants.pieceIDs.WHITE_KINGS_BISHOP || id == Constants.pieceIDs.WHITE_QUEENS_BISHOP) {
             this.pieceType = Constants.pieceType.BISHOP;
-         } else if (id == Constants.pieceIDs.BLACK_KINGS_HORSE || id == Constants.pieceIDs.BLACK_QUEENS_HORSE
-               || id == Constants.pieceIDs.WHITE_KINGS_HORSE || id == Constants.pieceIDs.WHITE_QUEENS_HORSE) {
+         } else if (id == Constants.pieceIDs.BLACK_KINGS_KNIGHT || id == Constants.pieceIDs.BLACK_QUEENS_KNIGHT
+               || id == Constants.pieceIDs.WHITE_KINGS_KNIGHT || id == Constants.pieceIDs.WHITE_QUEENS_KNIGHT) {
             this.pieceType = Constants.pieceType.KNIGHT;
          } else if (id == Constants.pieceIDs.BLACK_KINGS_ROOK || id == Constants.pieceIDs.BLACK_QUEENS_ROOK
                || id == Constants.pieceIDs.WHITE_KINGS_ROOK || id == Constants.pieceIDs.WHITE_QUEENS_ROOK) {
@@ -114,7 +114,7 @@ public abstract class Piece {
             return false;
         }
 
-        // checks against horses
+        // checks against KNIGHTs
         byte[][] positionList = {
                 { (byte) (kingPos[0] + 2), (byte) (kingPos[1] - 1) },
                 { (byte) (kingPos[0] + 2), (byte) (kingPos[1] + 1) },
@@ -132,7 +132,7 @@ public abstract class Piece {
                 if (!inBoardRange(position)) {
                     continue;
                 }
-                byte id =newBoardPositions[move[0]][move[1]];
+                byte id =newBoardPositions[position[0]][position[1]];
                 if(id == Constants.pieceIDs.WHITE_KINGS_KNIGHT || id == Constants.pieceIDs.WHITE_QUEENS_KNIGHT){
                     return false;
                 }
@@ -142,7 +142,7 @@ public abstract class Piece {
                 if (!inBoardRange(position)) {
                     continue;
                 }
-                byte id =newBoardPositions[move[0]][move[1]];
+                byte id =newBoardPositions[position[0]][position[1]];
                 if(id == Constants.pieceIDs.BLACK_KINGS_KNIGHT || id == Constants.pieceIDs.BLACK_QUEENS_KNIGHT){
                     return false;
                 }
