@@ -10,6 +10,7 @@ public class Pawn extends Piece {
 
     public Pawn(Byte id) {
         this.id = id;
+        setType();
 
         // 0 if the color is black, 1 if the color isn't black
         this.color = (byte) (id / 16);

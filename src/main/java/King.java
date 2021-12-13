@@ -11,6 +11,7 @@ public class King extends Piece{
 
     public King(Byte id) {
         this.id = id;
+        setType();
         this.color = (byte) (id / 16);
         this.sprite = new ImageView(App.getSpritesheet());
         if (this.color == 0) {

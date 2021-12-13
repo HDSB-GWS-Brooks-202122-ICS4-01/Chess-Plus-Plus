@@ -9,6 +9,7 @@ import javafx.scene.image.ImageView;
 public abstract class Piece {
     protected ImageView sprite;
     protected byte id;
+    protected byte pieceType;
     protected byte color;
     protected byte gridX;
     protected byte gridY;
@@ -22,6 +23,29 @@ public abstract class Piece {
      * @return a 2d array containing all the possible moves based on this board.
      */
     public abstract byte[][] getPossibleMoves(byte[][] boardPositions);
+
+    /**
+     * Method for setting the type of a piece when it is instantiated.
+     */
+    protected void setType(){
+        if (id == Constants.pieceIDs.BLACK_KING || id == Constants.pieceIDs.WHITE_KING) {
+            this.pieceType = Constants.pieceType.KING;
+         } else if (id == Constants.pieceIDs.BLACK_QUEEN || id == Constants.pieceIDs.WHITE_QUEEN) {
+            this.pieceType = Constants.pieceType.QUEEN;
+         } else if (id == Constants.pieceIDs.BLACK_KINGS_BISHOP || id == Constants.pieceIDs.BLACK_QUEENS_BISHOP
+               || id == Constants.pieceIDs.WHITE_KINGS_BISHOP || id == Constants.pieceIDs.WHITE_QUEENS_BISHOP) {
+            this.pieceType = Constants.pieceType.BISHOP;
+         } else if (id == Constants.pieceIDs.BLACK_KINGS_HORSE || id == Constants.pieceIDs.BLACK_QUEENS_HORSE
+               || id == Constants.pieceIDs.WHITE_KINGS_HORSE || id == Constants.pieceIDs.WHITE_QUEENS_HORSE) {
+            this.pieceType = Constants.pieceType.KNIGHT;
+         } else if (id == Constants.pieceIDs.BLACK_KINGS_ROOK || id == Constants.pieceIDs.BLACK_QUEENS_ROOK
+               || id == Constants.pieceIDs.WHITE_KINGS_ROOK || id == Constants.pieceIDs.WHITE_QUEENS_ROOK) {
+            this.pieceType = Constants.pieceType.ROOK;
+         } else {
+            this.pieceType = Constants.pieceType.PAWN;
+         }
+
+    }
 
     /**
      * Method for getting if the king is not under check.

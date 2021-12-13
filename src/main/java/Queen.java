@@ -10,6 +10,7 @@ public class Queen extends Piece {
 
     public Queen(Byte id) {
         this.id = id;
+        setType();
         this.color = (byte) (id / 16);
         this.sprite = new ImageView(App.getSpritesheet());
         if (this.color == 0) {

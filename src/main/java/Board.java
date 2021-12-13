@@ -391,8 +391,6 @@ public class Board {
    private void displayPossibleMoves(Piece piece) {
       // Get array of possible moves.
       byte[][] moves = piece.getPossibleMoves(GRID);
-      boolean castleLeft = false;
-      boolean castleRight = false;
       boolean passantLeft = false;
       boolean passantRight = false;
       King king = null;
@@ -400,9 +398,42 @@ public class Board {
 
       if (piece.getId() == Constants.pieceIDs.BLACK_KING || piece.getId() == Constants.pieceIDs.WHITE_KING) {
          king = (King) piece;
-         castleLeft = king.canCastleLeft(GRID);
-         castleRight = king.canCastleRight(GRID);
-      } else if ((piece.getId() > 7 && piece.getId() < 16) || (piece.getId() > 23 && piece.getId() < 32)) {
+         if(king.canCastleLeft(GRID)){
+            StackPane s_leftCastle = CELLS[king.getGridX() - 2][king.getGridY()];
+            s_leftCastle.getStyleClass().add("cell-move");
+            setCastleMoveMouseClicked(s_leftCastle, piece, piece.getColor(), true);
+            POSSIBLE_MOVES.add(s_leftCastle);
+         }
+         if(king.canCastleRight(GRID)){
+            StackPane s_leftCastle = CELLS[king.getGridX() + 2][king.getGridY()];
+            s_leftCastle.getStyleClass().add("cell-move");
+            setCastleMoveMouseClicked(s_leftCastle, piece, piece.getColor(), false);
+            POSSIBLE_MOVES.add(s_leftCastle);
+         }
+      } else if ((piece.getId() > 7 && piece.getId() < 16) || (piece.getId() > 23 && piece.getId() < 32)){
+         pawn = (Pawn) piece;
+         byte pawnLeft = GRID[piece.gridX-1][piece.gridY];
+         byte pawnRight = GRID[piece.gridX+1][piece.gridY];
+
+         if((pawnLeft > 7 && pawnLeft < 16) || (pawnLeft > 23 && pawnLeft < 32)){
+            if(pawn.getColor() == Constants.pieceIDs.BLACK){
+               if(pawnLeft > 23 && pawnLeft < 32){
+                  
+               }
+            } else {
+
+            }
+            System.out.println("piece to the left is a pawn");
+         }
+         if((pawnRight > 7 && pawnRight < 16) || (pawnRight > 23 && pawnRight < 32)){
+            if(pawn.getColor() == Constants.pieceIDs.BLACK){
+
+            } else {
+
+            }
+            System.out.println("piece to the right is a pawn");
+         }
+
 
       }
 
@@ -426,19 +457,6 @@ public class Board {
 
          // Add altered stack pane to array.
          POSSIBLE_MOVES.add(sp_move);
-      }
-
-      if (castleLeft) {
-         StackPane s_leftCastle = CELLS[king.getGridX() - 2][king.getGridY()];
-         s_leftCastle.getStyleClass().add("cell-move");
-         setCastleMoveMouseClicked(s_leftCastle, piece, piece.getColor(), true);
-         POSSIBLE_MOVES.add(s_leftCastle);
-      }
-      if (castleRight) {
-         StackPane s_leftCastle = CELLS[king.getGridX() + 2][king.getGridY()];
-         s_leftCastle.getStyleClass().add("cell-move");
-         setCastleMoveMouseClicked(s_leftCastle, piece, piece.getColor(), false);
-         POSSIBLE_MOVES.add(s_leftCastle);
       }
    }
 
