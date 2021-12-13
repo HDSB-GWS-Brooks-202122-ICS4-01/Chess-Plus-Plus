@@ -1,3 +1,4 @@
+import java.text.ParsePosition;
 import java.util.Arrays;
 
 import javafx.scene.image.ImageView;
@@ -23,22 +24,25 @@ public abstract class Piece {
     public abstract byte[][] getPossibleMoves(byte[][] boardPositions);
 
     /**
-     * Method for getting if the king is not under check. 
+     * Method for getting if the king is not under check.
+     * 
      * @param boardPositions The positions of pieces on the board.
-     * @param possibleMove The move to check.
-     * @param isKing if the move it is trying involves moving the king.
+     * @param possibleMove   The move to check.
+     * @param isKing         if the move it is trying involves moving the king.
      * @return
      */
     public boolean isNotUnderCheck(byte[][] boardPositions, byte[] possibleMove, boolean isKing) {
         byte[][] newBoardPositions = new byte[8][8];
-        for (int x = 0; x < 8; x++){
-            for (int y = 0; y < 8; y++){
+        for (int x = 0; x < 8; x++) {
+            for (int y = 0; y < 8; y++) {
                 newBoardPositions[x][y] = boardPositions[x][y];
             }
         }
 
+        System.out.println("Checking this move: " + Arrays.toString(possibleMove));
+
         byte[] kingPos = new byte[2];
-        if(isKing){
+        if (isKing) {
             kingPos[0] = possibleMove[0];
             kingPos[1] = possibleMove[1];
         } else {
@@ -47,6 +51,12 @@ public abstract class Piece {
         newBoardPositions[possibleMove[0]][possibleMove[1]] = id;
         newBoardPositions[gridX][gridY] = Constants.pieceIDs.EMPTY_CELL;
 
+        
+        if(checkPawnAttack(newBoardPositions, kingPos)){
+          System.out.println("Check from a pawn");
+          return false;
+        }
+         
         if (checkLeft(newBoardPositions, kingPos)) {
             System.out.println("Check from left side");
             return false;
@@ -80,21 +90,22 @@ public abstract class Piece {
             return false;
         }
 
-        byte[][] moveList = {
-            {(byte) (kingPos[0]+2), (byte) (kingPos[1]-1)},
-            {(byte) (kingPos[0]+2), (byte) (kingPos[1]+1)},
-            {(byte) (kingPos[0]-2), (byte) (kingPos[1]-1)},
-            {(byte) (kingPos[0]-2), (byte) (kingPos[1]+1)},
+        // checks against horses
+        byte[][] positionList = {
+                { (byte) (kingPos[0] + 2), (byte) (kingPos[1] - 1) },
+                { (byte) (kingPos[0] + 2), (byte) (kingPos[1] + 1) },
+                { (byte) (kingPos[0] - 2), (byte) (kingPos[1] - 1) },
+                { (byte) (kingPos[0] - 2), (byte) (kingPos[1] + 1) },
 
-            {(byte) (kingPos[0]+1), (byte) (kingPos[1]-2)},
-            {(byte) (kingPos[0]-1), (byte) (kingPos[1]-2)},
-            {(byte) (kingPos[0]+1), (byte) (kingPos[1]+2)},
-            {(byte) (kingPos[0]-1), (byte) (kingPos[1]+2)}
+                { (byte) (kingPos[0] + 1), (byte) (kingPos[1] - 2) },
+                { (byte) (kingPos[0] - 1), (byte) (kingPos[1] - 2) },
+                { (byte) (kingPos[0] + 1), (byte) (kingPos[1] + 2) },
+                { (byte) (kingPos[0] - 1), (byte) (kingPos[1] + 2) }
         };
 
-        if(color == Constants.pieceIDs.BLACK){
-            for (byte[] move : moveList){
-                if(!inBoardRange(move)){
+        if (color == Constants.pieceIDs.BLACK) {
+            for (byte[] position : positionList) {
+                if (!inBoardRange(position)) {
                     continue;
                 }
                 byte id =newBoardPositions[move[0]][move[1]];
@@ -103,8 +114,8 @@ public abstract class Piece {
                 }
             }
         } else {
-            for (byte[] move : moveList){
-                if(!inBoardRange(move)){
+            for (byte[] position : positionList) {
+                if (!inBoardRange(position)) {
                     continue;
                 }
                 byte id =newBoardPositions[move[0]][move[1]];
@@ -112,10 +123,40 @@ public abstract class Piece {
                     return false;
                 }
             }
-        
 
-        
         }
+
+        // position list for checking checks by other king
+        byte[][] kPosList = {
+                { (byte) (kingPos[0] + 1), kingPos[1] },
+                { (byte) (kingPos[0] - 1), kingPos[1] },
+                { (byte) (kingPos[0] + 1), (byte) (kingPos[1] + 1) },
+                { (byte) (kingPos[0] + 1), (byte) (kingPos[1] - 1) },
+                { (byte) (kingPos[0] - 1), (byte) (kingPos[1] + 1) },
+                { (byte) (kingPos[0] - 1), (byte) (kingPos[1] - 1) },
+                { kingPos[0], (byte) (kingPos[1] - 1) },
+                { kingPos[0], (byte) (kingPos[1] + 1) }
+
+        };
+
+        if (color == Constants.pieceIDs.WHITE) {
+            for (byte[] kPos : kPosList) {
+                if (inBoardRange(kPos) && newBoardPositions[kPos[0]][kPos[1]] == Constants.pieceIDs.BLACK_KING) {
+                    System.out.println("Check by black king");
+                    return false;
+                }
+
+            }
+        } else {
+            for (byte[] kPos : kPosList) {
+                if (inBoardRange(kPos) && newBoardPositions[kPos[0]][kPos[1]] == Constants.pieceIDs.WHITE_KING) {
+                    System.out.println("Check by white king");
+                    return false;
+                }
+            }
+        }
+
+        System.out.println("Done checks");
         return true;
 
     }
@@ -127,25 +168,57 @@ public abstract class Piece {
      */
     protected byte[] getKingPos() {
         byte[] pos = new byte[2];
-        if(color == Constants.pieceIDs.BLACK){
+        if (color == Constants.pieceIDs.BLACK) {
             pos[0] = App.GAME_PIECES[Constants.pieceIDs.BLACK_KING].getGridX();
             pos[1] = App.GAME_PIECES[Constants.pieceIDs.BLACK_KING].getGridY();
         } else {
             pos[0] = App.GAME_PIECES[Constants.pieceIDs.WHITE_KING].getGridX();
             pos[1] = App.GAME_PIECES[Constants.pieceIDs.WHITE_KING].getGridY();
         }
-        System.out.println(Arrays.toString(pos));
         return pos;
     }
 
     /**
-     * Method for seeing if the king is under check, specifically checks if it is under check from the left.
+     * Method for checking if a pawn is attacking the king. NOTE: This method
+     * shouldn't exist as it can and should be implemented into the
+     * diagonal check methods. The only reason I am doing this is because there is a
+     * bug so this is a temporary fix.
+     * 
+     * @param boardPositions
+     * @param pos
+     * @return
+     */
+    private boolean checkPawnAttack(byte[][] boardPositions, byte[] pos) {
+        if (color == Constants.pieceIDs.BLACK) {
+            byte pieceToTheRight = (inBoardRange((byte) (pos[0]+1), (byte) (pos[1]+1))) ? boardPositions[pos[0] + 1][pos[1] + 1] : -1;
+            byte pieceToTheLeft = (inBoardRange((byte) (pos[0]-1), (byte) (pos[1]+1))) ? boardPositions[pos[0] - 1][pos[1] + 1] : -1;
+            if ((pieceToTheRight > 23 && pieceToTheRight < 32) || (pieceToTheLeft > 23 && pieceToTheLeft < 32)) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            byte pieceToTheRight = (inBoardRange((byte) (pos[0]+1), (byte) (pos[1]-1))) ? boardPositions[pos[0] + 1][pos[1] - 1] : -1;
+            byte pieceToTheLeft = (inBoardRange((byte) (pos[0]-1), (byte) (pos[1]-1))) ? boardPositions[pos[0] - 1][pos[1] - 1] : -1;
+            if ((pieceToTheRight > 7 && pieceToTheRight < 16) || (pieceToTheLeft > 7 && pieceToTheLeft < 16)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+    }
+
+    /**
+     * Method for seeing if the king is under check, specifically checks if it is
+     * under check from the left.
+     * 
      * @param boardPositions positions of all pieces on the board
-     * @param pos position of the king
-     * @return true if king is under check from this direction, false if not. 
+     * @param pos            position of the king
+     * @return true if king is under check from this direction, false if not.
      */
     private boolean checkLeft(byte[][] boardPositions, byte[] pos) {
-        for (int i = pos[0]-1; i > -1; i--) {
+        for (int i = pos[0] - 1; i > -1; i--) {
             byte pieceAtSquare = boardPositions[i][pos[1]];
             //
             if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / 16 != color) {
@@ -155,7 +228,7 @@ public abstract class Piece {
                             || pieceAtSquare == Constants.pieceIDs.WHITE_QUEEN) {
                         return true;
                     } else {
-                        continue;
+                        return false;
                     }
                 } else {
                     if (pieceAtSquare == Constants.pieceIDs.BLACK_KINGS_ROOK
@@ -163,7 +236,7 @@ public abstract class Piece {
                             || pieceAtSquare == Constants.pieceIDs.BLACK_QUEEN) {
                         return true;
                     } else {
-                        continue;
+                        return false;
                     }
 
                 }
@@ -177,13 +250,15 @@ public abstract class Piece {
     }
 
     /**
-     * Method for seeing if the king is under check, specifically checks if it is under check from the right.
+     * Method for seeing if the king is under check, specifically checks if it is
+     * under check from the right.
+     * 
      * @param boardPositions positions of all pieces on the board
-     * @param pos position of the king
-     * @return true if king is under check from this direction, false if not. 
+     * @param pos            position of the king
+     * @return true if king is under check from this direction, false if not.
      */
     private boolean checkRight(byte[][] boardPositions, byte[] pos) {
-        for (int i = pos[0]+1; i < 8; i++) {
+        for (int i = pos[0] + 1; i < 8; i++) {
             byte pieceAtSquare = boardPositions[i][pos[1]];
             //
             if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / 16 != color) {
@@ -193,7 +268,7 @@ public abstract class Piece {
                             || pieceAtSquare == Constants.pieceIDs.WHITE_QUEEN) {
                         return true;
                     } else {
-                        continue;
+                        return false;
                     }
                 } else {
                     if (pieceAtSquare == Constants.pieceIDs.BLACK_KINGS_ROOK
@@ -201,7 +276,7 @@ public abstract class Piece {
                             || pieceAtSquare == Constants.pieceIDs.BLACK_QUEEN) {
                         return true;
                     } else {
-                        continue;
+                        return false;
                     }
 
                 }
@@ -215,23 +290,24 @@ public abstract class Piece {
     }
 
     /**
-     * Method for seeing if the king is under check, specifically checks if it is under check from the top.
+     * Method for seeing if the king is under check, specifically checks if it is
+     * under check from the top.
+     * 
      * @param boardPositions positions of all pieces on the board
-     * @param pos position of the king
-     * @return true if king is under check from this direction, false if not. 
+     * @param pos            position of the king
+     * @return true if king is under check from this direction, false if not.
      */
     private boolean checkUp(byte[][] boardPositions, byte[] pos) {
-        for (int i = pos[1]-1; i > -1; i--) {
+        for (int i = pos[1] - 1; i > -1; i--) {
             byte pieceAtSquare = boardPositions[pos[0]][i];
             if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / 16 != color) {
                 if (color == Constants.pieceIDs.BLACK) {
-                    System.out.println(pieceAtSquare);
                     if (pieceAtSquare == Constants.pieceIDs.WHITE_KINGS_ROOK
                             || pieceAtSquare == Constants.pieceIDs.WHITE_QUEENS_ROOK
                             || pieceAtSquare == Constants.pieceIDs.WHITE_QUEEN) {
                         return true;
                     } else {
-                        continue;
+                        return false;
                     }
                 } else {
                     if (pieceAtSquare == Constants.pieceIDs.BLACK_KINGS_ROOK
@@ -239,7 +315,7 @@ public abstract class Piece {
                             || pieceAtSquare == Constants.pieceIDs.BLACK_QUEEN) {
                         return true;
                     } else {
-                        continue;
+                        return false;
                     }
 
                 }
@@ -253,13 +329,15 @@ public abstract class Piece {
     }
 
     /**
-     * Method for seeing if the king is under check, specifically checks if it is under check from the bottom.
+     * Method for seeing if the king is under check, specifically checks if it is
+     * under check from the bottom.
+     * 
      * @param boardPositions positions of all pieces on the board
-     * @param pos position of the king
-     * @return true if king is under check from this direction, false if not. 
+     * @param pos            position of the king
+     * @return true if king is under check from this direction, false if not.
      */
     private boolean checkDown(byte[][] boardPositions, byte[] pos) {
-        for (int i = pos[1]+1; i < 8; i++) {
+        for (int i = pos[1] + 1; i < 8; i++) {
             byte pieceAtSquare = boardPositions[pos[0]][i];
             //
             if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / 16 != color) {
@@ -269,7 +347,7 @@ public abstract class Piece {
                             || pieceAtSquare == Constants.pieceIDs.WHITE_QUEEN) {
                         return true;
                     } else {
-                        continue;
+                        return false;
                     }
                 } else {
                     if (pieceAtSquare == Constants.pieceIDs.BLACK_KINGS_ROOK
@@ -277,7 +355,7 @@ public abstract class Piece {
                             || pieceAtSquare == Constants.pieceIDs.BLACK_QUEEN) {
                         return true;
                     } else {
-                        continue;
+                        return false;
                     }
 
                 }
@@ -290,31 +368,31 @@ public abstract class Piece {
         return false;
     }
 
-
-
     /**
-     * Method for seeing if the king is under check, specifically checks if it is under check from the top right diagonal.
+     * Method for seeing if the king is under check, specifically checks if it is
+     * under check from the top right diagonal.
+     * 
      * @param boardPositions positions of all pieces on the board
-     * @param pos position of the king
-     * @return true if king is under check from this direction, false if not. 
+     * @param pos            position of the king
+     * @return true if king is under check from this direction, false if not.
      */
     private boolean checkUpRightDiagonal(byte[][] boardPositions, byte[] pos) {
-        int j = pos[1]-1;
-        for (int i = pos[0]+1; i < 8; i++) {
-            if(j < 0){
+
+        int j = pos[1] - 1;
+        for (int i = pos[0] + 1; i < 8; i++) {
+            if (j < 0) {
                 break;
             }
             byte pieceAtSquare = boardPositions[i][j];
             //
             if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / 16 != color) {
-                if (color== Constants.pieceIDs.BLACK) {
+                if (color == Constants.pieceIDs.BLACK) {
                     if (pieceAtSquare == Constants.pieceIDs.WHITE_KINGS_BISHOP
                             || pieceAtSquare == Constants.pieceIDs.WHITE_QUEENS_BISHOP
                             || pieceAtSquare == Constants.pieceIDs.WHITE_QUEEN) {
                         return true;
                     } else {
-                        j--;
-                        continue;
+                        break;
                     }
                 } else {
                     if (pieceAtSquare == Constants.pieceIDs.BLACK_KINGS_BISHOP
@@ -322,8 +400,7 @@ public abstract class Piece {
                             || pieceAtSquare == Constants.pieceIDs.BLACK_QUEEN) {
                         return true;
                     } else {
-                        j--;
-                        continue;
+                        break;
                     }
 
                 }
@@ -338,20 +415,20 @@ public abstract class Piece {
     }
 
     /**
-     * Method for seeing if the king is under check, specifically checks if it is under check from the top left diagonal.
+     * Method for seeing if the king is under check, specifically checks if it is
+     * under check from the top left diagonal.
+     * 
      * @param boardPositions positions of all pieces on the board
-     * @param pos position of the king
-     * @return true if king is under check from this direction, false if not. 
+     * @param pos            position of the king
+     * @return true if king is under check from this direction, false if not.
      */
     private boolean checkUpLeftDiagonal(byte[][] boardPositions, byte[] pos) {
-        int j = pos[1]-1;
-        for (int i = pos[0]-1; i > -1; i--) {
-            if(j < 0){
+        int j = pos[1] - 1;
+        for (int i = pos[0] - 1; i > -1; i--) {
+            if (j < 0) {
                 break;
             }
             byte pieceAtSquare = boardPositions[i][j];
-            System.out.println(pieceAtSquare);
-            //
             if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / 16 != color) {
                 if (color == Constants.pieceIDs.BLACK) {
                     if (pieceAtSquare == Constants.pieceIDs.WHITE_KINGS_BISHOP
@@ -359,8 +436,7 @@ public abstract class Piece {
                             || pieceAtSquare == Constants.pieceIDs.WHITE_QUEEN) {
                         return true;
                     } else {
-                        j--;
-                        continue;
+                        break;
                     }
                 } else {
                     if (pieceAtSquare == Constants.pieceIDs.BLACK_KINGS_BISHOP
@@ -368,8 +444,7 @@ public abstract class Piece {
                             || pieceAtSquare == Constants.pieceIDs.BLACK_QUEEN) {
                         return true;
                     } else {
-                        j--;
-                        continue;
+                        break;
                     }
 
                 }
@@ -384,20 +459,21 @@ public abstract class Piece {
     }
 
     /**
-     * Method for seeing if the king is under check, specifically checks if it is under check from the bottom left diagonal.
+     * Method for seeing if the king is under check, specifically checks if it is
+     * under check from the bottom left diagonal.
+     * 
      * @param boardPositions positions of all pieces on the board
-     * @param pos position of the king
-     * @return true if king is under check from this direction, false if not. 
+     * @param pos            position of the king
+     * @return true if king is under check from this direction, false if not.
      */
     private boolean checkDownLeftDiagonal(byte[][] boardPositions, byte[] pos) {
-        int j = pos[1]+1;
-        for (int i = pos[0]-1; i > -1; i--) {
-            if(j > 7){
+
+        int j = pos[1] + 1;
+        for (int i = pos[0] - 1; i > -1; i--) {
+            if (j > 7) {
                 break;
             }
             byte pieceAtSquare = boardPositions[i][j];
-            System.out.println(pieceAtSquare);
-            //
             if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / 16 != color) {
                 if (color == Constants.pieceIDs.BLACK) {
                     if (pieceAtSquare == Constants.pieceIDs.WHITE_KINGS_BISHOP
@@ -405,8 +481,7 @@ public abstract class Piece {
                             || pieceAtSquare == Constants.pieceIDs.WHITE_QUEEN) {
                         return true;
                     } else {
-                        j++;
-                        continue;
+                        break;
                     }
                 } else {
                     if (pieceAtSquare == Constants.pieceIDs.BLACK_KINGS_BISHOP
@@ -414,8 +489,7 @@ public abstract class Piece {
                             || pieceAtSquare == Constants.pieceIDs.BLACK_QUEEN) {
                         return true;
                     } else {
-                        j++;
-                        continue;
+                        break;
                     }
 
                 }
@@ -430,20 +504,20 @@ public abstract class Piece {
     }
 
     /**
-     * Method for seeing if the king is under check, specifically checks if it is under check from the bottom right diagonal.
+     * Method for seeing if the king is under check, specifically checks if it is
+     * under check from the bottom right diagonal.
+     * 
      * @param boardPositions positions of all pieces on the board
-     * @param pos position of the king
-     * @return true if king is under check from this direction, false if not. 
+     * @param pos            position of the king
+     * @return true if king is under check from this direction, false if not.
      */
     private boolean checkDownRightDiagonal(byte[][] boardPositions, byte[] pos) {
-        int j = pos[1]+1;
-        for (int i = pos[0]+1; i < 8; i++) {
-            if(j > 7){
+        int j = pos[1] + 1;
+        for (int i = pos[0] + 1; i < 8; i++) {
+            if (j > 7) {
                 break;
             }
             byte pieceAtSquare = boardPositions[i][j];
-            System.out.println(pieceAtSquare);
-            //
             if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / 16 != color) {
                 if (color == Constants.pieceIDs.BLACK) {
                     if (pieceAtSquare == Constants.pieceIDs.WHITE_KINGS_BISHOP
@@ -451,8 +525,7 @@ public abstract class Piece {
                             || pieceAtSquare == Constants.pieceIDs.WHITE_QUEEN) {
                         return true;
                     } else {
-                        j++;
-                        continue;
+                        break;
                     }
                 } else {
                     if (pieceAtSquare == Constants.pieceIDs.BLACK_KINGS_BISHOP
@@ -460,8 +533,7 @@ public abstract class Piece {
                             || pieceAtSquare == Constants.pieceIDs.BLACK_QUEEN) {
                         return true;
                     } else {
-                        j++;
-                        continue;
+                        break;
                     }
 
                 }
@@ -474,15 +546,25 @@ public abstract class Piece {
         }
         return false;
     }
-
 
     /**
      * Checks to see if this position is in the board.
+     * 
      * @param pos
      * @return true if the position is in the board, false if not.
      */
-    protected boolean inBoardRange(byte[] pos){
+    protected boolean inBoardRange(byte[] pos) {
         return (pos[0] > -1 && pos[0] < 8) && (pos[1] > -1 && pos[1] < 8);
+    }
+
+    /**
+     * Checks to see if this position is in the board.
+     * @param x The x position.
+     * @param y The y position.
+     * @return true if the position is in the board, false if not. 
+     */
+    protected boolean inBoardRange(byte x, byte y){
+        return (x > -1 && x < 8) && (y > -1 && y < 8);
     }
 
     /**

@@ -58,11 +58,11 @@ public class Board {
       TIMER_WHITE = new PlayerTimer(GAME.getTimeReference(Constants.pieceIDs.WHITE), 600000, true);
 
       setupBoard();
-      try {
+      /*try {
          parseTranscript();
       } catch (IOException e) {
          e.printStackTrace();
-      }
+      }*/
    }
 
    private void setupBoard() {
@@ -332,6 +332,7 @@ public class Board {
     * This method will cycle to the next player's turn
     */
    public void nextMove() {
+      App.MOVE_COUNT++;
       resetPossibleMoves();
       if (sp_selected != null)
          sp_selected.getStyleClass().remove("cell-selected");

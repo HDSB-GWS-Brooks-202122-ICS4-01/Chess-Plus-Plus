@@ -6,6 +6,8 @@ import javafx.scene.image.ImageView;
  * Pawn class which extends the abstract Piece class.
  */
 public class Pawn extends Piece {
+    int passant;
+
     public Pawn(Byte id) {
         this.id = id;
 
@@ -47,6 +49,7 @@ public class Pawn extends Piece {
                     byte[] doubleForwardMove = { gridX, (byte) (gridY + 2) };
                     if(isNotUnderCheck(boardPositions, doubleForwardMove, false)){
                         possibleMoves.add(doubleForwardMove);
+                        passant = App.MOVE_COUNT;
                     }      
                 }
 
@@ -77,6 +80,7 @@ public class Pawn extends Piece {
                     byte[] doubleForwardMove = { gridX, (byte) (gridY - 2) };
                     if(isNotUnderCheck(boardPositions, doubleForwardMove, false)){
                         possibleMoves.add(doubleForwardMove);
+                        passant = App.MOVE_COUNT;
                     }      
                 }
             }

@@ -17,6 +17,8 @@ public class App extends Application {
 
     private static Scene scene;
     private static Image SPRITESHEET = new Image(App.class.getResource("assets\\chess_spritesheet.png").toString());
+
+    public static int MOVE_COUNT = 1;
     public static Piece[] GAME_PIECES;
 
     @Override
