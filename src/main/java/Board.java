@@ -521,7 +521,10 @@ public class Board {
       System.out.println(WHITE_TRANSCRIPT.toString());
 
       if  (piece.getType() == Constants.pieceType.PAWN) {
-         GAME.displayWhitePawnPromotion();
+         try {
+            GAME.displayWhitePawnPromotion(); 
+         } catch (IOException e) {}
+         
       }
    }
 

@@ -619,6 +619,14 @@ public abstract class Piece {
     }
 
     /**
+     * Method for getting the type of a piece.
+     * @return a byte representing the piece type.
+     */
+    public byte getType(){
+        return this.pieceType;
+    }
+
+    /**
      * Method for getting the grid x value.
      * 
      * @return
