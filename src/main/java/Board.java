@@ -140,7 +140,6 @@ public class Board {
       }
 
       App.GAME_PIECES = GAME_PIECES;
-
    }
 
    private void parseTranscript() throws IOException {
@@ -523,8 +522,7 @@ public class Board {
       if  (piece.getType() == Constants.pieceType.PAWN) {
          try {
             GAME.displayWhitePawnPromotion(); 
-         } catch (IOException e) {}
-         
+         } catch (IOException e) {}  
       }
    }
 
