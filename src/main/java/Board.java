@@ -122,8 +122,8 @@ public class Board {
             } else if (id == Constants.pieceIDs.BLACK_KINGS_BISHOP || id == Constants.pieceIDs.BLACK_QUEENS_BISHOP
                   || id == Constants.pieceIDs.WHITE_KINGS_BISHOP || id == Constants.pieceIDs.WHITE_QUEENS_BISHOP) {
                piece = new Bishop(id);
-            } else if (id == Constants.pieceIDs.BLACK_KINGS_HORSE || id == Constants.pieceIDs.BLACK_QUEENS_HORSE
-                  || id == Constants.pieceIDs.WHITE_KINGS_HORSE || id == Constants.pieceIDs.WHITE_QUEENS_HORSE) {
+            } else if (id == Constants.pieceIDs.BLACK_KINGS_KNIGHT || id == Constants.pieceIDs.BLACK_QUEENS_KNIGHT
+                  || id == Constants.pieceIDs.WHITE_KINGS_KNIGHT || id == Constants.pieceIDs.WHITE_QUEENS_KNIGHT) {
                piece = new Knight(id);
             } else if (id == Constants.pieceIDs.BLACK_KINGS_ROOK || id == Constants.pieceIDs.BLACK_QUEENS_ROOK
                   || id == Constants.pieceIDs.WHITE_KINGS_ROOK || id == Constants.pieceIDs.WHITE_QUEENS_ROOK) {
@@ -501,7 +501,9 @@ public class Board {
       System.out.println("\n-------------------------------\n");
       System.out.println(WHITE_TRANSCRIPT.toString());
 
-      // nextMove();
+      if  (piece.getType() == Constants.pieceType.PAWN) {
+         GAME.displayWhitePawnPromotion();
+      }
    }
 
    private void displayDeadPiece(Piece target) {

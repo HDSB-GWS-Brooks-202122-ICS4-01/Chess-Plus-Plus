@@ -98,7 +98,7 @@ public abstract class Piece {
                     continue;
                 }
                 byte id =newBoardPositions[move[0]][move[1]];
-                if(id == Constants.pieceIDs.WHITE_KINGS_HORSE || id == Constants.pieceIDs.WHITE_QUEENS_HORSE){
+                if(id == Constants.pieceIDs.WHITE_KINGS_KNIGHT || id == Constants.pieceIDs.WHITE_QUEENS_KNIGHT){
                     return false;
                 }
             }
@@ -108,7 +108,7 @@ public abstract class Piece {
                     continue;
                 }
                 byte id =newBoardPositions[move[0]][move[1]];
-                if(id == Constants.pieceIDs.BLACK_KINGS_HORSE || id == Constants.pieceIDs.BLACK_QUEENS_HORSE){
+                if(id == Constants.pieceIDs.BLACK_KINGS_KNIGHT || id == Constants.pieceIDs.BLACK_QUEENS_KNIGHT){
                     return false;
                 }
             }
