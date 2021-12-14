@@ -50,7 +50,6 @@ public class Pawn extends Piece {
                     byte[] doubleForwardMove = { gridX, (byte) (gridY + 2) };
                     if(isNotUnderCheck(boardPositions, doubleForwardMove, false)){
                         possibleMoves.add(doubleForwardMove);
-                        passant = App.MOVE_COUNT;
                     }      
                 }
 
@@ -81,7 +80,6 @@ public class Pawn extends Piece {
                     byte[] doubleForwardMove = { gridX, (byte) (gridY - 2) };
                     if(isNotUnderCheck(boardPositions, doubleForwardMove, false)){
                         possibleMoves.add(doubleForwardMove);
-                        passant = App.MOVE_COUNT;
                     }      
                 }
             }
@@ -117,6 +115,23 @@ public class Pawn extends Piece {
 
         // Object[] moves = ;
         return moves;
+    }
+
+    /**
+     * Method for setting the passant value of a pawn. 
+     * 
+     * @param num New number to set the passant value to.
+     */
+    public void setPassant(int num){
+        this.passant = num;
+    }
+
+    /**
+     * Method for getting the passant value of a pawn.
+     * @return an integer, representing the passant value. 
+     */
+    public int getPassant(){
+        return this.passant;
     }
 
 }

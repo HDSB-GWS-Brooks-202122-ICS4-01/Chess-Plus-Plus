@@ -63,7 +63,7 @@ public abstract class Piece {
             }
         }
 
-        System.out.println("Checking this move: " + Arrays.toString(possibleMove));
+        //System.out.println("Checking this move: " + Arrays.toString(possibleMove));
 
         byte[] kingPos = new byte[2];
         if (isKing) {
@@ -180,7 +180,7 @@ public abstract class Piece {
             }
         }
 
-        System.out.println("Done checks");
+        //System.out.println("Done checks");
         return true;
 
     }
