@@ -411,6 +411,7 @@ public class Board {
             POSSIBLE_MOVES.add(s_leftCastle);
          }
          if (king.canCastleRight(GRID)) {
+<<<<<<< Updated upstream
             StackPane s_rightCastle = CELLS[king.getGridX() + 2][king.getGridY()];
             s_rightCastle.getStyleClass().add("cell-move");
             setCastleMoveMouseClicked(s_rightCastle, piece, piece.getColor(), false);
@@ -433,6 +434,22 @@ public class Board {
                   s_leftPawn.getStyleClass().add("cell-enemy");
                   setPassantMoveMouseClicked(s_leftPawn, pawn, (Pawn) GAME_PIECES[pawnLeft]);
                   POSSIBLE_MOVES.add(s_leftPawn);
+=======
+            StackPane s_leftCastle = CELLS[king.getGridX() + 2][king.getGridY()];
+            s_leftCastle.getStyleClass().add("cell-move");
+            setCastleMoveMouseClicked(s_leftCastle, piece, piece.getColor(), false);
+            POSSIBLE_MOVES.add(s_leftCastle);
+         }
+      } else if ((piece.getId() > 7 && piece.getId() < 16) || (piece.getId() > 23 && piece.getId() < 32)) {
+         pawn = (Pawn) piece;
+         byte pawnLeft = GRID[piece.gridX - 1][piece.gridY];
+         byte pawnRight = GRID[piece.gridX + 1][piece.gridY];
+
+         if ((pawnLeft > 7 && pawnLeft < 16) || (pawnLeft > 23 && pawnLeft < 32)) {
+            if (pawn.getColor() == Constants.pieceIDs.BLACK) {
+               if (pawnLeft > 23 && pawnLeft < 32) {
+
+>>>>>>> Stashed changes
                }
             } else {
                if (pawnLeft > 7 && pawnLeft < 16
@@ -446,6 +463,11 @@ public class Board {
             }
             System.out.println("piece to the left is a pawn");
          }
+<<<<<<< Updated upstream
+=======
+         if ((pawnRight > 7 && pawnRight < 16) || (pawnRight > 23 && pawnRight < 32)) {
+            if (pawn.getColor() == Constants.pieceIDs.BLACK) {
+>>>>>>> Stashed changes
 
          if ((pawnRight > 7 && pawnRight < 16) || (pawnRight > 23 && pawnRight < 32)) {
             if (pawn.getColor() == Constants.pieceIDs.BLACK) {
@@ -559,6 +581,7 @@ public class Board {
       System.out.println("\n-------------------------------\n");
       System.out.println(WHITE_TRANSCRIPT.toString());
 
+<<<<<<< Updated upstream
       /*
       if (piece.getType() == Constants.pieceType.PAWN) {
          try {
@@ -566,6 +589,16 @@ public class Board {
          } catch (IOException e) {
          }
       }*/
+=======
+      // if (piece.getType() == Constants.pieceType.PAWN && (piece.getGridY() == 0 ||
+      // piece.getGridY() == 7)) {
+      if (piece.getType() == Constants.pieceType.PAWN) {
+         try {
+            GAME.displayWhitePawnPromotion(piece);
+         } catch (IOException e) {
+         }
+      }
+>>>>>>> Stashed changes
    }
 
    private void displayDeadPiece(Piece target) {
@@ -708,5 +741,74 @@ public class Board {
          
       });
 
+   }
+
+   public void promotePawn(Piece piece, String type) {
+      byte x = piece.getGridX();
+      byte y = piece.getGridY();
+
+      byte id;
+
+      Piece newPiece;
+
+      if (type.equalsIgnoreCase("QUEEN")) {
+         if (piece.getColor() == Constants.pieceIDs.BLACK)
+            id = Constants.pieceIDs.BLACK_QUEEN;
+         else
+            id = Constants.pieceIDs.WHITE_QUEEN;
+
+         newPiece = new Queen(id);
+      } else if (type.equalsIgnoreCase("BISHOP")) {
+         if (piece.getColor() == Constants.pieceIDs.BLACK) {
+            if (x % 2 == 0)
+               id = Constants.pieceIDs.BLACK_QUEENS_BISHOP;
+            else
+               id = Constants.pieceIDs.BLACK_KINGS_BISHOP;
+         }
+
+         else {
+            if (x % 2 == 0)
+               id = Constants.pieceIDs.WHITE_QUEENS_BISHOP;
+            else
+               id = Constants.pieceIDs.WHITE_KINGS_BISHOP;
+         }
+
+         newPiece = new Bishop(id);
+      } else if (type.equalsIgnoreCase("KNIGHT")) {
+         if (piece.getColor() == Constants.pieceIDs.BLACK) {
+            if (x % 2 == 0)
+               id = Constants.pieceIDs.BLACK_QUEENS_BISHOP;
+            else
+               id = Constants.pieceIDs.BLACK_KINGS_BISHOP;
+         }
+
+         else {
+            if (x % 2 == 0)
+               id = Constants.pieceIDs.WHITE_QUEENS_KNIGHT;
+            else
+               id = Constants.pieceIDs.WHITE_KINGS_KNIGHT;
+         }
+
+         newPiece = new Knight(id);
+      } else {
+         if (piece.getColor() == Constants.pieceIDs.BLACK) {
+            if (x % 2 == 0)
+               id = Constants.pieceIDs.BLACK_QUEENS_ROOK;
+            else
+               id = Constants.pieceIDs.BLACK_KINGS_ROOK;
+         }
+
+         else {
+            if (x % 2 == 0)
+               id = Constants.pieceIDs.WHITE_QUEENS_ROOK;
+            else
+               id = Constants.pieceIDs.WHITE_KINGS_ROOK;
+         }
+
+         newPiece = new Rook(id);
+      }
+
+      movePiece(newPiece, x, y, x, y);
+      LIVE_PIECES.set(LIVE_PIECES.indexOf(piece), newPiece);
    }
 }
