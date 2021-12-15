@@ -446,10 +446,24 @@ public class Board {
             }
             System.out.println("piece to the left is a pawn");
          }
+
          if ((pawnRight > 7 && pawnRight < 16) || (pawnRight > 23 && pawnRight < 32)) {
             if (pawn.getColor() == Constants.pieceIDs.BLACK) {
-
+               if (pawnRight > 23 && pawnRight < 32
+                     && ((Pawn) GAME_PIECES[pawnRight]).getPassant() == App.MOVE_COUNT - 1 && pawn.gridY + 1 < 8) {
+                  StackPane s_rightPawn = CELLS[pawn.gridX+1][pawn.gridY+1];
+                  s_rightPawn.getStyleClass().add("cell-enemy");
+                  setPassantMoveMouseClicked(s_rightPawn, pawn, (Pawn) GAME_PIECES[pawnRight]);
+                  POSSIBLE_MOVES.add(s_rightPawn);
+               }
             } else {
+               if (pawnRight > 7 && pawnRight < 16
+                     && ((Pawn) GAME_PIECES[pawnRight]).getPassant() == App.MOVE_COUNT - 1 && pawn.gridY - 1 < 8) {
+                  StackPane s_rightPawn = CELLS[pawn.gridX+1][pawn.gridY-1];
+                  s_rightPawn.getStyleClass().add("cell-enemy");
+                  setPassantMoveMouseClicked(s_rightPawn, pawn, (Pawn) GAME_PIECES[pawnRight]);
+                  POSSIBLE_MOVES.add(s_rightPawn);
+               }
 
             }
             System.out.println("piece to the right is a pawn");
@@ -663,41 +677,31 @@ public class Board {
          public void handle(MouseEvent event) {
             if(primaryPawn.getColor() == Constants.pieceIDs.BLACK){
                if(enemyPawn.getGridX()< primaryPawn.getGridX()){
+                  //pawn is to the left
                   movePiece(primaryPawn, primaryPawn.gridX, primaryPawn.gridY, (byte) (primaryPawn.gridX-1), (byte) (primaryPawn.gridY+1));
 
-
-                  StackPane enemyPane = CELLS[enemyPawn.gridX][enemyPawn.gridY];
-                  enemyPane.getChildren().clear();
-                  LIVE_PIECES.remove(enemyPawn);
-                  DEAD_PIECES.add(enemyPawn);
-
-                  displayDeadPiece(enemyPawn);
-                  //pawn is to the left
-
+               } else {
+                  //pawn is to the right
+                  movePiece(primaryPawn, primaryPawn.gridX, primaryPawn.gridY, (byte) (primaryPawn.gridX+1), (byte) (primaryPawn.gridY+1));
                }
             } else {
                if(enemyPawn.getGridX()< primaryPawn.getGridX()){
+                  //pawn to the left
                   movePiece(primaryPawn, primaryPawn.gridX, primaryPawn.gridY, (byte) (primaryPawn.gridX-1), (byte) (primaryPawn.gridY-1));
-
-
-                  StackPane enemyPane = CELLS[enemyPawn.gridX][enemyPawn.gridY];
-                  enemyPane.getChildren().clear();
-                  LIVE_PIECES.remove(enemyPawn);
-                  DEAD_PIECES.add(enemyPawn);
-
-                  displayDeadPiece(enemyPawn);
-                  //pawn is to the left
-
+               } else {
+                  //pawn is to the right
+                  movePiece(primaryPawn, primaryPawn.gridX, primaryPawn.gridY, (byte) (primaryPawn.gridX+1), (byte) (primaryPawn.gridY-1));
                }
 
             }
 
+            GRID[enemyPawn.gridX][enemyPawn.gridY] = Constants.pieceIDs.EMPTY_CELL;
+            StackPane enemyPane = CELLS[enemyPawn.gridX][enemyPawn.gridY];
+            enemyPane.getChildren().clear();
+            LIVE_PIECES.remove(enemyPawn);
+            DEAD_PIECES.add(enemyPawn);
 
-
-
-
-
-
+            displayDeadPiece(enemyPawn);
             nextMove();
          }
 
