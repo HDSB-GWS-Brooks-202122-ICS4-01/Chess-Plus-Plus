@@ -26,7 +26,6 @@ public class App extends Application {
         scene = new Scene(loadFXML("startScreen"));
         stage.setScene(scene);
         stage.show();
-
         stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             public void handle(WindowEvent we) {
                 System.exit(0);
@@ -42,7 +41,7 @@ public class App extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(fxml + ".fxml"));
         return fxmlLoader.load();
     }
-
+ 
     public static void main(String[] args) {
         launch();
     }
