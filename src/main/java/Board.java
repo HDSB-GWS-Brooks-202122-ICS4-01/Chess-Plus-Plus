@@ -419,17 +419,16 @@ public class Board {
       } else if ((piece.getId() > 7 && piece.getId() < 16) || (piece.getId() > 23 && piece.getId() < 32)) {
          pawn = (Pawn) piece;
 
-         //gets the id of the piece to the right and left
-         //makes sure it can check to the left
+         // gets the id of the piece to the right and left
+         // makes sure it can check to the left
          byte pawnLeft = (pawn.gridX - 1 > -1) ? GRID[piece.gridX - 1][piece.gridY] : -1;
          byte pawnRight = (pawn.gridX + 1 < 8) ? GRID[piece.gridX + 1][piece.gridY] : -1;
-
 
          if ((pawnLeft > 7 && pawnLeft < 16) || (pawnLeft > 23 && pawnLeft < 32)) {
             if (pawn.getColor() == Constants.pieceIDs.BLACK) {
                if (pawnLeft > 23 && pawnLeft < 32
                      && ((Pawn) GAME_PIECES[pawnLeft]).getPassant() == App.MOVE_COUNT - 1 && pawn.gridY + 1 < 8) {
-                  StackPane s_leftPawn = CELLS[pawn.gridX-1][pawn.gridY+1];
+                  StackPane s_leftPawn = CELLS[pawn.gridX - 1][pawn.gridY + 1];
                   s_leftPawn.getStyleClass().add("cell-enemy");
                   setPassantMoveMouseClicked(s_leftPawn, pawn, (Pawn) GAME_PIECES[pawnLeft]);
                   POSSIBLE_MOVES.add(s_leftPawn);
@@ -437,7 +436,7 @@ public class Board {
             } else {
                if (pawnLeft > 7 && pawnLeft < 16
                      && ((Pawn) GAME_PIECES[pawnLeft]).getPassant() == App.MOVE_COUNT - 1 && pawn.gridY - 1 > -1) {
-                  StackPane s_leftPawn = CELLS[pawn.gridX-1][pawn.gridY-1];
+                  StackPane s_leftPawn = CELLS[pawn.gridX - 1][pawn.gridY - 1];
                   s_leftPawn.getStyleClass().add("cell-enemy");
                   setPassantMoveMouseClicked(s_leftPawn, pawn, (Pawn) GAME_PIECES[pawnLeft]);
                   POSSIBLE_MOVES.add(s_leftPawn);
@@ -451,7 +450,7 @@ public class Board {
             if (pawn.getColor() == Constants.pieceIDs.BLACK) {
                if (pawnRight > 23 && pawnRight < 32
                      && ((Pawn) GAME_PIECES[pawnRight]).getPassant() == App.MOVE_COUNT - 1 && pawn.gridY + 1 < 8) {
-                  StackPane s_rightPawn = CELLS[pawn.gridX+1][pawn.gridY+1];
+                  StackPane s_rightPawn = CELLS[pawn.gridX + 1][pawn.gridY + 1];
                   s_rightPawn.getStyleClass().add("cell-enemy");
                   setPassantMoveMouseClicked(s_rightPawn, pawn, (Pawn) GAME_PIECES[pawnRight]);
                   POSSIBLE_MOVES.add(s_rightPawn);
@@ -459,7 +458,7 @@ public class Board {
             } else {
                if (pawnRight > 7 && pawnRight < 16
                      && ((Pawn) GAME_PIECES[pawnRight]).getPassant() == App.MOVE_COUNT - 1 && pawn.gridY - 1 < 8) {
-                  StackPane s_rightPawn = CELLS[pawn.gridX+1][pawn.gridY-1];
+                  StackPane s_rightPawn = CELLS[pawn.gridX + 1][pawn.gridY - 1];
                   s_rightPawn.getStyleClass().add("cell-enemy");
                   setPassantMoveMouseClicked(s_rightPawn, pawn, (Pawn) GAME_PIECES[pawnRight]);
                   POSSIBLE_MOVES.add(s_rightPawn);
@@ -523,7 +522,7 @@ public class Board {
       StackPane from = CELLS[fromX][fromY];
       from.getChildren().clear();
 
-      if(piece.getType() == Constants.pieceType.PAWN && Math.abs(toY - fromY) == 2){
+      if (piece.getType() == Constants.pieceType.PAWN && Math.abs(toY - fromY) == 2) {
          ((Pawn) piece).setPassant(App.MOVE_COUNT);
          System.out.println("Passant: " + ((Pawn) piece).getPassant());
       }
@@ -559,9 +558,7 @@ public class Board {
       System.out.println("\n-------------------------------\n");
       System.out.println(WHITE_TRANSCRIPT.toString());
 
-      // if (piece.getType() == Constants.pieceType.PAWN && (piece.getGridY() == 0 ||
-      // piece.getGridY() == 7)) {
-      if (piece.getType() == Constants.pieceType.PAWN) {
+      if (piece.getType() == Constants.pieceType.PAWN && (piece.getGridY() == 0 || piece.getGridY() == 7)) {
          try {
             GAME.displayWhitePawnPromotion(piece);
          } catch (IOException e) {
@@ -673,25 +670,29 @@ public class Board {
    }
 
    private void setPassantMoveMouseClicked(StackPane sp, Pawn primaryPawn, Pawn enemyPawn) {
-      sp.setOnMouseClicked(new EventHandler<MouseEvent>(){
+      sp.setOnMouseClicked(new EventHandler<MouseEvent>() {
          @Override
          public void handle(MouseEvent event) {
-            if(primaryPawn.getColor() == Constants.pieceIDs.BLACK){
-               if(enemyPawn.getGridX()< primaryPawn.getGridX()){
-                  //pawn is to the left
-                  movePiece(primaryPawn, primaryPawn.gridX, primaryPawn.gridY, (byte) (primaryPawn.gridX-1), (byte) (primaryPawn.gridY+1));
+            if (primaryPawn.getColor() == Constants.pieceIDs.BLACK) {
+               if (enemyPawn.getGridX() < primaryPawn.getGridX()) {
+                  // pawn is to the left
+                  movePiece(primaryPawn, primaryPawn.gridX, primaryPawn.gridY, (byte) (primaryPawn.gridX - 1),
+                        (byte) (primaryPawn.gridY + 1));
 
                } else {
-                  //pawn is to the right
-                  movePiece(primaryPawn, primaryPawn.gridX, primaryPawn.gridY, (byte) (primaryPawn.gridX+1), (byte) (primaryPawn.gridY+1));
+                  // pawn is to the right
+                  movePiece(primaryPawn, primaryPawn.gridX, primaryPawn.gridY, (byte) (primaryPawn.gridX + 1),
+                        (byte) (primaryPawn.gridY + 1));
                }
             } else {
-               if(enemyPawn.getGridX()< primaryPawn.getGridX()){
-                  //pawn to the left
-                  movePiece(primaryPawn, primaryPawn.gridX, primaryPawn.gridY, (byte) (primaryPawn.gridX-1), (byte) (primaryPawn.gridY-1));
+               if (enemyPawn.getGridX() < primaryPawn.getGridX()) {
+                  // pawn to the left
+                  movePiece(primaryPawn, primaryPawn.gridX, primaryPawn.gridY, (byte) (primaryPawn.gridX - 1),
+                        (byte) (primaryPawn.gridY - 1));
                } else {
-                  //pawn is to the right
-                  movePiece(primaryPawn, primaryPawn.gridX, primaryPawn.gridY, (byte) (primaryPawn.gridX+1), (byte) (primaryPawn.gridY-1));
+                  // pawn is to the right
+                  movePiece(primaryPawn, primaryPawn.gridX, primaryPawn.gridY, (byte) (primaryPawn.gridX + 1),
+                        (byte) (primaryPawn.gridY - 1));
                }
 
             }
@@ -706,7 +707,6 @@ public class Board {
             nextMove();
          }
 
-         
       });
 
    }

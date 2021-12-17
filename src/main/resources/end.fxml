@@ -33,30 +33,30 @@
 -->
 
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.RowConstraints?>
-
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
 
 <HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="850.0" prefWidth="1250.0" style="-fx-background-color: #007593;" stylesheets="@end.css" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="EndController">
    <children>
-      <GridPane maxHeight="300.0" minWidth="300.0">
-        <columnConstraints>
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-        </columnConstraints>
-        <rowConstraints>
-          <RowConstraints fillHeight="false" minHeight="0.0" prefHeight="0.0" vgrow="SOMETIMES" />
-          <RowConstraints fillHeight="false" minHeight="0.0" prefHeight="0.0" vgrow="SOMETIMES" />
-          <RowConstraints fillHeight="false" minHeight="0.0" prefHeight="0.0" vgrow="SOMETIMES" />
-            <RowConstraints fillHeight="false" minHeight="0.0" prefHeight="0.0" vgrow="SOMETIMES" />
-        </rowConstraints>
+      <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
          <children>
-            <Button fx:id="btn_replay" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="50.0" prefWidth="300.0" styleClass="btn-submit" text="Replay" />
-            <Button fx:id="btn_matchmake" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="50.0" prefWidth="300.0" styleClass="btn-submit" text="Matchmake" GridPane.rowIndex="1" />
-            <Button fx:id="btn_downloadTranscript" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="50.0" prefWidth="300.0" styleClass="btn-submit" text="Home" GridPane.rowIndex="2" />
-            <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="50.0" prefWidth="300.0" styleClass="btn-submit" text="Download Transcript" GridPane.rowIndex="3" />
+            <Pane VBox.vgrow="ALWAYS" />
+            <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefHeight="850.0" prefWidth="1251.0">
+               <children>
+                  <Pane HBox.hgrow="ALWAYS" />
+                  <VBox>
+                     <children>
+                        <Button fx:id="btn_replay" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="50.0" prefWidth="300.0" styleClass="btn-submit" text="Replay" />
+                        <Button fx:id="btn_matchmake" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="50.0" prefWidth="300.0" styleClass="btn-submit" text="Matchmake" />
+                        <Button fx:id="btn_downloadTranscript" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="50.0" prefWidth="300.0" styleClass="btn-submit" text="Home" />
+                        <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="50.0" prefWidth="300.0" styleClass="btn-submit" text="Download Transcript" />
+                     </children>
+                  </VBox>
+                  <Pane HBox.hgrow="ALWAYS" />
+               </children>
+            </HBox>
          </children>
-      </GridPane>
+      </VBox>
    </children>
 </HBox>
