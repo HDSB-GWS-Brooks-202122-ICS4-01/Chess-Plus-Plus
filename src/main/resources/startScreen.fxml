@@ -7,7 +7,7 @@
 
 <Pane fx:id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="850.0" prefWidth="1250.0" style="-fx-background-color: #621B00;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="StartScreenController">
    <children>
-      <Button fx:id="playButton" layoutX="562.0" layoutY="464.0" mnemonicParsing="false" onAction="#switchToGame" style="-fx-background-color: TRANSPARENT;" text="Play" textFill="WHITE">
+      <Button fx:id="playButton" layoutX="562.0" layoutY="464.0" mnemonicParsing="false" onAction="#switchToGame" text="Play" textFill="WHITE">
          <font>
             <Font name="System Bold" size="38.0" />
          </font>
@@ -17,7 +17,7 @@
             <Font name="System Bold" size="96.0" />
          </font>
       </Label>
-      <Button fx:id="settingsButton" layoutX="583.0" layoutY="583.0" mnemonicParsing="false" style="-fx-background-color: transparent;" text="Settings" textFill="WHITE">
+      <Button fx:id="settingsButton" layoutX="583.0" layoutY="583.0" mnemonicParsing="false" text="Settings" textFill="WHITE">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>

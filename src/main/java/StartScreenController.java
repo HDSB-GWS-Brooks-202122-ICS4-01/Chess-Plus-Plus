@@ -18,62 +18,54 @@ import javafx.util.Duration;
 
 public class StartScreenController {
 
-    @FXML Pane mainPane;
-    @FXML Button playButton;
-    @FXML Button settingsButton;
-    @FXML Label title;
+    @FXML
+    Pane mainPane;
+    @FXML
+    Button playButton;
+    @FXML
+    Button settingsButton;
+    @FXML
+    Label title;
 
     @FXML
-    public void initialize(){
+    public void initialize() {
+        System.out.println(playButton.getStyle());
         playButton.setVisible(false);
         settingsButton.setVisible(false);
+        playButton.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, null, null)));
+        settingsButton.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, null, null)));
+
         title.setVisible(false);
         title.setLayoutY(-100);
 
+        ButtonFadeTransition playHoverEffect = new ButtonFadeTransition(playButton, Color.web("#621B00"),
+                Color.web("#C75000"), Duration.millis(200));
+        ButtonFadeTransition playExitEffect = new ButtonFadeTransition(playButton, Color.web("#C75000"),
+                Color.web("#621B00"), Duration.millis(200));
+        ButtonFadeTransition settingsHoverEffect = new ButtonFadeTransition(settingsButton, Color.web("#621B00"),
+                Color.web("#C75000"), Duration.millis(200));
+        ButtonFadeTransition settingsExitEffect = new ButtonFadeTransition(settingsButton, Color.web("#C75000"),
+                Color.web("#621B00"), Duration.millis(200));
 
-
-
-        Transition buttonHoverEffect = new Transition() {
-            {
-                setCycleDuration(Duration.millis(200));
-            }
-
-            @Override
-            public void interpolate(double frac){
-                BackgroundFill fill = new BackgroundFill((Color.web("#621B00").interpolate(Color.web("#C75000"), frac)), null, null);
-
-                playButton.setBackground(new Background(fill));
-
-            }
-            
-        };
-
-
-        Transition buttonExitEffect = new Transition(){
-            {setCycleDuration(Duration.millis(200));}
-
-            @Override
-            protected void interpolate(double frac) {
-                BackgroundFill fill = new BackgroundFill((Color.web("#C75000").interpolate(Color.web("#621B00"), frac)), null, null);
-
-                playButton.setBackground(new Background(fill));
-            }
-
-        };
         playButton.setOnMouseEntered(e -> {
-            buttonHoverEffect.play();
+            playHoverEffect.play();
+        });
+        playButton.setOnMouseExited(e -> {
+            playExitEffect.play();
         });
 
-        playButton.setOnMouseExited(e -> {
-            buttonExitEffect.play();
+        settingsButton.setOnMouseEntered(e -> {
+            settingsHoverEffect.play();
+        });
+        settingsButton.setOnMouseExited(e -> {
+            settingsExitEffect.play();
         });
 
         mainPane.setOnMouseEntered(this::animateStartUp);
     }
-    
 
-    public void animateStartUp(MouseEvent event){
-        
+    public void animateStartUp(MouseEvent event) {
+
         title.setVisible(true);
         TranslateTransition tt = new TranslateTransition(Duration.millis(1000), title);
         tt.setFromY(title.getLayoutY());
@@ -90,14 +82,14 @@ public class StartScreenController {
             ft.play();
             ftt.play();
 
-        } );
+        });
         tt.play();
         mainPane.setOnMouseEntered(null);
 
     }
 
     @FXML
-    public void switchToGame() throws IOException{
+    public void switchToGame() throws IOException {
         App.setRoot("game");
     }
 
