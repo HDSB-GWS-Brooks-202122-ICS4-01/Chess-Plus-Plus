@@ -1,5 +1,3 @@
-import java.text.ParsePosition;
-import java.util.Arrays;
 
 import javafx.scene.image.ImageView;
 

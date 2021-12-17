@@ -1,8 +1,6 @@
 import java.io.IOException;
 
 import javafx.animation.FadeTransition;
-import javafx.animation.FillTransition;
-import javafx.animation.Transition;
 import javafx.animation.TranslateTransition;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -11,9 +9,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 
 public class StartScreenController {
@@ -90,7 +86,22 @@ public class StartScreenController {
 
     @FXML
     public void switchToGame() throws IOException {
-        App.setRoot("game");
+        FadeTransition ft = new FadeTransition(Duration.millis(600), playButton);
+        FadeTransition ftt = new FadeTransition(Duration.millis(600), settingsButton);
+        FadeTransition fttt = new FadeTransition(Duration.millis(600), title);
+        ft.setToValue(0);
+        ftt.setToValue(0);
+        fttt.setToValue(0);
+        fttt.play();
+        ft.setOnFinished(e -> {
+            try {
+                App.setRoot("game");
+            } catch (Exception exception) {}
+        });
+        ft.play();
+        ftt.play();
+
+        //App.setRoot("game");
     }
 
 }

@@ -1,8 +1,6 @@
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.invoke.ConstantBootstraps;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
@@ -151,39 +149,42 @@ public class Board {
       File tsFile = new File("src\\main\\resources\\data\\tstest.txt");
 
       FileReader fileReader = new FileReader(tsFile);
-      Scanner r = new Scanner(fileReader);
+      try (Scanner r = new Scanner(fileReader)) {
+         String ts;
+         App.MOVE_COUNT = 1;
 
-      String ts;
-      App.MOVE_COUNT = 1;
+         while (r.hasNextLine()) {
+            ts = r.nextLine();
 
-      while (r.hasNextLine()) {
-         ts = r.nextLine();
+            if (ts.contains("TW")) {
+               TIMER_WHITE.setTime(Long.parseLong(ts.substring(2, ts.length())));
+            } else if (ts.contains("TB")) {
+               TIMER_BLACK.setTime(Long.parseLong(ts.substring(2, ts.length())));
+            } else {
 
-         if (ts.contains("TW")) {
-            TIMER_WHITE.setTime(Long.parseLong(ts.substring(2, ts.length())));
-         } else if (ts.contains("TB")) {
-            TIMER_BLACK.setTime(Long.parseLong(ts.substring(2, ts.length())));
-         } else {
+               String[] data = ts.split(REG);
+               System.out.println(Arrays.toString(data));
 
-            String[] data = ts.split(REG);
-            System.out.println(Arrays.toString(data));
+               Piece piece = getPieceOnGrid(Byte.parseByte(data[0].trim()));
 
-            Piece piece = getPieceOnGrid(Byte.parseByte(data[0].trim()));
+               if (piece == null)
+                  continue;
 
-            if (piece == null)
-               continue;
+               byte x = getBoardX(data[1]);
+               byte y = getBoardY(data[2]);
 
-            byte x = getBoardX(data[1]);
-            byte y = getBoardY(data[2]);
+               System.out.println("(" + x + ", " + y + ")");
 
-            System.out.println("(" + x + ", " + y + ")");
-
-            if (x > 0 && x < 8 && y > 0 && y < 8) {
-               App.MOVE_COUNT++;
-               movePiece(piece, piece.getGridX(), piece.getGridY(), x, y);
-               System.out.println(203902903);
+               if (x > 0 && x < 8 && y > 0 && y < 8) {
+                  App.MOVE_COUNT++;
+                  movePiece(piece, piece.getGridX(), piece.getGridY(), x, y);
+                  System.out.println(203902903);
+               }
             }
          }
+      } catch (NumberFormatException e) {
+         // TODO Auto-generated catch block
+         e.printStackTrace();
       }
    }
 
