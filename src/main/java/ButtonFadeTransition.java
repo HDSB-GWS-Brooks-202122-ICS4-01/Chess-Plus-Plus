@@ -10,6 +10,9 @@ import javafx.scene.paint.Color;
  * Class for making fade transitions with button background.
  * Note: In order to prevent flickering with the background, there must be no
  * CSS applied to this element.
+ * 
+ * @author Akil Pathiranage
+ * @version 1.0
  */
 public class ButtonFadeTransition extends Transition {
 

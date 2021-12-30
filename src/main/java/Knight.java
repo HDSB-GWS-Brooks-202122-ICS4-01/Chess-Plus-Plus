@@ -4,7 +4,9 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.image.ImageView;
 
 /**
- * Knight class which extends the abstract Piece class. 
+ * Knight class which extends the abstract Piece class.
+ * @author Akil Pathiranage
+ * @version 1.0 
  */
 public class Knight extends Piece{
 

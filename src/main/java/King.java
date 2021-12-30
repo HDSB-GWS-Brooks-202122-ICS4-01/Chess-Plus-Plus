@@ -1,10 +1,14 @@
+
 import java.util.ArrayList;
 
 import javafx.geometry.Rectangle2D;
 import javafx.scene.image.ImageView;
 
 /**
- * King class which extends the abstract Piece class. 
+ * King class which extends the abstract Piece class.
+ * 
+ * @author Akil Pathiranage
+ * @version 1.0 
  */
 public class King extends Piece{
 

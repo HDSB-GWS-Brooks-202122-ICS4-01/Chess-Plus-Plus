@@ -3,6 +3,8 @@ import javafx.scene.image.ImageView;
 
 /**
  * Abstract class for pieces.
+ * @author Akil Pathiranage
+ * @version 1.0 
  */
 public abstract class Piece {
     protected ImageView sprite;

@@ -5,6 +5,8 @@ import javafx.scene.image.ImageView;
 
 /**
  * Rook class which extends the abstract Piece class.
+ * @author Akil Pathiranage
+ * @version 1.0 
  */
 public class Rook extends Piece {
 

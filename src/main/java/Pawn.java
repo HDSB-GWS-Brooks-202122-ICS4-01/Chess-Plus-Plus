@@ -4,6 +4,8 @@ import javafx.scene.image.ImageView;
 
 /**
  * Pawn class which extends the abstract Piece class.
+ * 
+ * @author Akil Pathiranage
  */
 public class Pawn extends Piece {
     int passant;

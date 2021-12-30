@@ -1,10 +1,12 @@
-import java.util.ArrayList;
 
+import java.util.ArrayList;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.image.ImageView;
 
 /**
- * Bishop class which extends the abstract Piece class. 
+ * Bishop class which extends the abstract Piece class.
+ * @author Akil Pathiranage
+ * @version 1.0 
  */
 public class Bishop extends Piece{
 

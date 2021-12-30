@@ -5,6 +5,9 @@ import javafx.scene.image.ImageView;
 
 /**
  * Queen class which extends the abstract Piece class. 
+ * 
+ * @author Akil Pathiranage
+ * @version 1.0
  */
 public class Queen extends Piece {
 

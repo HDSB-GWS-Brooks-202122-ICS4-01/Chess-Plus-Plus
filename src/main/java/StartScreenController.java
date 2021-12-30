@@ -12,6 +12,12 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
+/**
+ * Class for the controller for the start screen. 
+ * 
+ * @author Akil Pathiranage
+ * @version 1.0
+ */
 public class StartScreenController {
     @FXML
     Pane mainPane;
@@ -25,6 +31,8 @@ public class StartScreenController {
     Button aiButton;
     @FXML
     Button resumeButton;
+
+    
 
     @FXML
     public void initialize() {
