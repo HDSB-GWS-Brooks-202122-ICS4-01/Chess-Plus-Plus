@@ -50,46 +50,54 @@ public class StartScreenController {
         title.setVisible(false);
         title.setLayoutY(-100);
 
-        ButtonFadeTransition playHoverEffect = new ButtonFadeTransition(playButton, Color.web("#621B00"),
+        RegionFillTransition playHoverEffect = new RegionFillTransition(playButton, Color.web("#621B00"),
                 Color.web("#C75000"), Duration.millis(200));
-        ButtonFadeTransition playExitEffect = new ButtonFadeTransition(playButton, Color.web("#C75000"),
+        RegionFillTransition playExitEffect = new RegionFillTransition(playButton, Color.web("#C75000"),
                 Color.web("#621B00"), Duration.millis(200));
-        ButtonFadeTransition settingsHoverEffect = new ButtonFadeTransition(settingsButton, Color.web("#621B00"),
+        RegionFillTransition settingsHoverEffect = new RegionFillTransition(settingsButton, Color.web("#621B00"),
                 Color.web("#C75000"), Duration.millis(200));
-        ButtonFadeTransition settingsExitEffect = new ButtonFadeTransition(settingsButton, Color.web("#C75000"),
+        RegionFillTransition settingsExitEffect = new RegionFillTransition(settingsButton, Color.web("#C75000"),
                 Color.web("#621B00"), Duration.millis(200));
-        ButtonFadeTransition aiHoverEffect = new ButtonFadeTransition(aiButton, Color.web("#621B00"),
+        RegionFillTransition aiHoverEffect = new RegionFillTransition(aiButton, Color.web("#621B00"),
                 Color.web("#C75000"), Duration.millis(200));
-        ButtonFadeTransition aiExitEffect = new ButtonFadeTransition(aiButton, Color.web("#C75000"),
+        RegionFillTransition aiExitEffect = new RegionFillTransition(aiButton, Color.web("#C75000"),
                 Color.web("#621B00"), Duration.millis(200));
-        ButtonFadeTransition resumeHoverEffect = new ButtonFadeTransition(resumeButton, Color.web("#621B00"),
+        RegionFillTransition resumeHoverEffect = new RegionFillTransition(resumeButton, Color.web("#621B00"),
                 Color.web("#C75000"), Duration.millis(200));
-        ButtonFadeTransition resumeExitEffect = new ButtonFadeTransition(resumeButton, Color.web("#C75000"),
+        RegionFillTransition resumeExitEffect = new RegionFillTransition(resumeButton, Color.web("#C75000"),
                 Color.web("#621B00"), Duration.millis(200));
 
         playButton.setOnMouseEntered(e -> {
+            playExitEffect.stop();
             playHoverEffect.play();
         });
         playButton.setOnMouseExited(e -> {
+            playHoverEffect.stop();
             playExitEffect.play();
         });
 
         settingsButton.setOnMouseEntered(e -> {
+            settingsExitEffect.stop();
             settingsHoverEffect.play();
         });
         settingsButton.setOnMouseExited(e -> {
+            settingsHoverEffect.stop();
             settingsExitEffect.play();
         });
         aiButton.setOnMouseEntered(e -> {
+            aiExitEffect.stop();
             aiHoverEffect.play();
         });
         aiButton.setOnMouseExited(e -> {
+            aiHoverEffect.stop();
             aiExitEffect.play();
         });
         resumeButton.setOnMouseEntered(e -> {
+            resumeExitEffect.stop();
             resumeHoverEffect.play();
         });
         resumeButton.setOnMouseExited(e -> {
+            resumeHoverEffect.stop();
             resumeExitEffect.play();
         });
 

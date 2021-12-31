@@ -1,27 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="850.0" prefWidth="1250.0" style="-fx-background-color: #2F1000;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SettingsController">
+<Pane fx:id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="850.0" prefWidth="1250.0" style="-fx-background-color: #621B00;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SettingsController">
    <children>
-      <MenuButton fx:id="diffButton" layoutX="198.0" layoutY="169.0" mnemonicParsing="false" text="AI Difficulty">
+      <MenuButton fx:id="diffButton" contentDisplay="CENTER" layoutX="198.0" layoutY="169.0" mnemonicParsing="false" text="AI Difficulty" textFill="WHITE">
         <items>
           <MenuItem fx:id="onEasy" mnemonicParsing="false" onAction="#onEasy" text="Easy" />
           <MenuItem fx:id="onMedium" mnemonicParsing="false" onAction="#onMedium" text="Medium" />
             <MenuItem fx:id="onHard" mnemonicParsing="false" onAction="#onHard" text="Hard" />
         </items>
+         <font>
+            <Font name="System Bold" size="38.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
       </MenuButton>
-      <MenuButton fx:id="gameTimeButton" layoutX="195.0" layoutY="239.0" mnemonicParsing="false" text="Game Clock">
+      <MenuButton fx:id="gameTimeButton" contentDisplay="CENTER" layoutX="198.0" layoutY="475.0" mnemonicParsing="false" text="Game Clock" textFill="WHITE">
         <items>
             <MenuItem fx:id="thirty" mnemonicParsing="false" onAction="#onThirty" text="30:00" />
             <MenuItem fx:id="ten" mnemonicParsing="false" onAction="#onTen" text="10:00" />
             <MenuItem fx:id="three" mnemonicParsing="false" onAction="#onThree" text="3:00" />
             <MenuItem fx:id="infinite" mnemonicParsing="false" onAction="#onInfinite" text="Unlimited" />
         </items>
+         <font>
+            <Font name="System Bold" size="38.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
       </MenuButton>
-      <Button fx:id="mainMenuButton" layoutX="1058.0" layoutY="762.0" mnemonicParsing="false" onAction="#switchToIntro" text="Main Menu" />
+      <Button fx:id="mainMenuButton" layoutX="1058.0" layoutY="762.0" mnemonicParsing="false" onAction="#switchToIntro" text="Main Menu" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor></Button>
    </children>
 </Pane>

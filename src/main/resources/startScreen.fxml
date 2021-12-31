@@ -33,11 +33,17 @@
          <font>
             <Font name="System Bold" size="38.0" />
          </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
       </Button>
       <Button fx:id="resumeButton" layoutX="820.0" layoutY="465.0" mnemonicParsing="false" onAction="#switchToResume" text="Resume Game" textFill="WHITE">
          <font>
             <Font name="System Bold" size="38.0" />
          </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
       </Button>
    </children>
 </Pane>

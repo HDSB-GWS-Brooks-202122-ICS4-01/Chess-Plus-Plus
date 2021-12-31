@@ -4,6 +4,7 @@ import javafx.animation.Transition;
 import javafx.scene.control.Button;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 
 /**
@@ -14,16 +15,16 @@ import javafx.scene.paint.Color;
  * @author Akil Pathiranage
  * @version 1.0
  */
-public class ButtonFadeTransition extends Transition {
+public class RegionFillTransition extends Transition {
 
     Color start;
     Color end;
-    Button button;
+    Region region;
 
-    public ButtonFadeTransition(Button button, Color start, Color end, Duration duration) {
+    public RegionFillTransition(Region region, Color start, Color end, Duration duration) {
         this.start = start;
         this.end = end;
-        this.button = button;
+        this.region = region;
         setCycleDuration(duration);
 
     }
@@ -32,7 +33,7 @@ public class ButtonFadeTransition extends Transition {
     public void interpolate(double frac) {
         BackgroundFill fill = new BackgroundFill((start.interpolate(end, frac)), null, null);
 
-        button.setBackground(new Background(fill));
+        region.setBackground(new Background(fill));
 
     }
 
