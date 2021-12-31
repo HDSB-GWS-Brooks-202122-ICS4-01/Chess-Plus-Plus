@@ -19,6 +19,7 @@ public class SettingsController {
             
             try {
                 config.load(reader);
+                reader.close();
                 System.out.println("GameTime: " + config.getProperty("gametime"));
                 System.out.println("aidiff: " + config.getProperty("aidiff"));
 
@@ -39,11 +40,15 @@ public class SettingsController {
                 FileWriter writer = new FileWriter("src\\main\\resources\\data\\config.properties");
     
                 config.store(writer, "Config created");
+                writer.close();
                 
             } catch (IOException ioException) {
                 ioException.printStackTrace();
             }
         }
+
+
+
         
     }
 
@@ -52,6 +57,7 @@ public class SettingsController {
         try {
             FileWriter writer = new FileWriter("src\\main\\resources\\data\\config.properties");
             config.store(writer, "Config saved");
+            writer.close();
         } catch (IOException ioException) {
             ioException.printStackTrace();
         }
@@ -59,6 +65,43 @@ public class SettingsController {
         try {
             App.setRoot("startScreen");
         } catch (Exception e) {}
+
+    }
+
+    @FXML
+    public void onEasy(){
+
+    }
+
+    @FXML
+    public void onMedium(){
+
+    }
+
+    @FXML
+    public void onHard(){
+
+    }
+
+    @FXML
+    public void onTen(){
+        config.setProperty("gametime", "10");
+    }
+
+    @FXML
+    public void onThirty(){
+        System.out.println("chnag");
+        config.setProperty("gametime", "30");
+    }
+
+    @FXML
+    public void onThree(){
+        config.setProperty("gametime", "3");
+
+    }
+
+    @FXML
+    public void onInfinite(){
 
     }
     

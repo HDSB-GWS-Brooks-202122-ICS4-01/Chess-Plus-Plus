@@ -5,22 +5,21 @@
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.layout.Pane?>
 
-
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="850.0" prefWidth="1250.0" style="-fx-background-color: #2F1000;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SettingsController">
    <children>
       <MenuButton fx:id="diffButton" layoutX="198.0" layoutY="169.0" mnemonicParsing="false" text="AI Difficulty">
         <items>
-          <MenuItem mnemonicParsing="false" text="Easy" />
-          <MenuItem mnemonicParsing="false" text="Medium" />
-            <MenuItem mnemonicParsing="false" text="Hard" />
+          <MenuItem fx:id="onEasy" mnemonicParsing="false" onAction="#onEasy" text="Easy" />
+          <MenuItem fx:id="onMedium" mnemonicParsing="false" onAction="#onMedium" text="Medium" />
+            <MenuItem fx:id="onHard" mnemonicParsing="false" onAction="#onHard" text="Hard" />
         </items>
       </MenuButton>
       <MenuButton fx:id="gameTimeButton" layoutX="195.0" layoutY="239.0" mnemonicParsing="false" text="Game Clock">
         <items>
-            <MenuItem mnemonicParsing="false" text="30:00" />
-          <MenuItem mnemonicParsing="false" text="10:00" />
-          <MenuItem mnemonicParsing="false" text="5:00" />
-            <MenuItem mnemonicParsing="false" text="Unlimited" />
+            <MenuItem fx:id="thirty" mnemonicParsing="false" onAction="#onThirty" text="30:00" />
+            <MenuItem fx:id="ten" mnemonicParsing="false" onAction="#onTen" text="10:00" />
+            <MenuItem fx:id="three" mnemonicParsing="false" onAction="#onThree" text="3:00" />
+            <MenuItem fx:id="infinite" mnemonicParsing="false" onAction="#onInfinite" text="Unlimited" />
         </items>
       </MenuButton>
       <Button fx:id="mainMenuButton" layoutX="1058.0" layoutY="762.0" mnemonicParsing="false" onAction="#switchToIntro" text="Main Menu" />

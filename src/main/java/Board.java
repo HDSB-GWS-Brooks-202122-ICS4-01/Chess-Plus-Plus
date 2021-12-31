@@ -1,12 +1,15 @@
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Properties;
 import java.util.Scanner;
 
 import javafx.event.EventHandler;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
@@ -53,8 +56,37 @@ public class Board {
       gp_DEAD_BLACK_CELLS = cells[1];
       gp_DEAD_WHITE_CELLS = cells[2];
 
-      TIMER_BLACK = new PlayerTimer(GAME.getTimeReference(Constants.pieceIDs.BLACK), 600000, false);
-      TIMER_WHITE = new PlayerTimer(GAME.getTimeReference(Constants.pieceIDs.WHITE), 600000, true);
+      Properties config = new Properties();
+      int gameTime = 600000;
+      Label blackLabel = GAME.getTimeReference(Constants.pieceIDs.BLACK);
+      Label whiteLabel = GAME.getTimeReference(Constants.pieceIDs.WHITE);
+
+      try {
+         FileReader r = new FileReader("src\\main\\resources\\data\\config.properties");
+         config.load(r);
+         r.close();
+         if (config.getProperty("gametime").equals("10")) {
+            gameTime = 600000;
+            blackLabel.setText("10:00");
+            whiteLabel.setText("10:00");
+         } else if (config.getProperty("gametime").equals("3")) {
+            gameTime = 180000;
+            blackLabel.setText("3:00");
+            whiteLabel.setText("3:00");
+         } else if (config.getProperty("gametime").equals("30")){
+            gameTime = 1800000;
+            blackLabel.setText("30:00");
+            whiteLabel.setText("30:00");
+         }
+
+         
+      } catch (Exception e) {
+         e.printStackTrace();
+      }
+      System.out.println(gameTime);
+
+      TIMER_BLACK = new PlayerTimer(blackLabel, gameTime, false);
+      TIMER_WHITE = new PlayerTimer(whiteLabel, gameTime, true);
 
       setupBoard();
       /*

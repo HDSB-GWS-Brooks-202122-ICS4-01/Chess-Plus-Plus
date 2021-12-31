@@ -1,5 +1,4 @@
 import java.io.IOException;
-import java.time.Duration;
 
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
@@ -12,7 +11,6 @@ import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 
 public class GameController {
