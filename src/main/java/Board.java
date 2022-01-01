@@ -5,6 +5,8 @@ import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 import javafx.event.EventHandler;
@@ -15,7 +17,11 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 
+/**
+ * Board class
+ */
 public class Board {
+   private static final ArrayList<String> MATCH_TRANSCRIPT = new ArrayList<String>();
    private final GameController GAME;
    private final GridPane gp_CHESS_BOARD;
    private final GridPane gp_DEAD_WHITE_CELLS;
@@ -25,7 +31,7 @@ public class Board {
    private byte cbdc = 0;
    private byte cwdc = 0;
 
-   private final byte[][] GRID = Constants.boardData.DEFAULT_GAME_SETUP;
+   private final byte[][] GRID = Constants.boardData.DEFAULT_GAME_SETUP.clone();
 
    private final StackPane[][] CELLS = new StackPane[8][8];
 
@@ -37,11 +43,12 @@ public class Board {
    private final ArrayList<StackPane> POSSIBLE_MOVES = new ArrayList<StackPane>();
 
    private byte turn = Constants.pieceIDs.WHITE;
-   private final PlayerTimer TIMER_BLACK;
-   private final PlayerTimer TIMER_WHITE;
 
-   private final ArrayList<String> BLACK_TRANSCRIPT = new ArrayList<String>();
-   private final ArrayList<String> WHITE_TRANSCRIPT = new ArrayList<String>();
+   private final PlayerTimer TIMER_WHITE;
+   private final PlayerTimer TIMER_BLACK;
+
+   private final Map[] STATS = new Map[]{new HashMap<String, Integer>(), new HashMap<String, Integer>(), new HashMap<String, String>()};
+   private byte winner;
 
    /**
     * Constructor for the Board class
@@ -98,6 +105,11 @@ public class Board {
        */
    }
 
+   /**
+    * This method is called once in the constructor of the Board class.
+    * The method will setup the boeard by placing all the game pieces in the
+    * correct starting locations, it will also initialize all the array lists.
+    */
    private void setupBoard() {
       // Loop through chess board nodes to find find stackpanes.
       App.MOVE_COUNT = 1;
@@ -174,8 +186,23 @@ public class Board {
       }
 
       App.GAME_PIECES = GAME_PIECES;
+
+      STATS[Constants.pieceIDs.WHITE].put("remaining_time", (int)TIMER_WHITE.getTimeMillis());
+      STATS[Constants.pieceIDs.WHITE].put("total_moves", 0);
+      STATS[Constants.pieceIDs.WHITE].put("pieces_killed", 0);
+
+      STATS[Constants.pieceIDs.BLACK].put("remaining_time", (int)TIMER_BLACK.getTimeMillis());
+      STATS[Constants.pieceIDs.BLACK].put("total_moves", 0);
+      STATS[Constants.pieceIDs.BLACK].put("pieces_killed", 0);
    }
 
+   /**
+    * This method will read a text file containing data as to the moves that have
+    * been played.
+    * It will then renact each move until the entire file is parsed.
+    * 
+    * @throws IOException May throw an exception if the file location is not found.
+    */
    private void parseTranscript() throws IOException {
       final String REG = "((?=[A-Z])|(?<=[A-Z]))|((?=[a-z])|(?<=[a-z]))";
       File tsFile = new File("src\\main\\resources\\data\\tstest.txt");
@@ -218,6 +245,33 @@ public class Board {
          // TODO Auto-generated catch block
          e.printStackTrace();
       }
+   }
+
+   /**
+    * This method is called when the match concludes.
+    */
+   private void gameover() throws IOException {
+      TIMER_BLACK.pauseTimer();
+      TIMER_WHITE.pauseTimer();
+
+      MATCH_TRANSCRIPT.add("TW" + TIMER_WHITE.getTimeMillis());
+      MATCH_TRANSCRIPT.add("TB" + TIMER_BLACK.getTimeMillis());
+
+      String ms = MATCH_TRANSCRIPT.toString();
+
+      ms = ms.replace("[", "");
+      ms = ms.replace("]", "");
+      ms = ms.replaceAll(",", "\n");
+      ms = ms.replaceAll(" ", "");
+
+      App.setTranscript(ms);
+
+      STATS[Constants.pieceIDs.WHITE].replace("remaining_time", (int)TIMER_WHITE.getTimeMillis());
+      STATS[Constants.pieceIDs.BLACK].replace("remaining_time", (int)TIMER_BLACK.getTimeMillis());
+
+      App.setMatchStats(STATS);
+
+      GAME.gameOver(winner);
    }
 
    private byte getBoardX(String value) {
@@ -369,7 +423,7 @@ public class Board {
    /**
     * This method will cycle to the next player's turn
     */
-   public void nextMove() {
+   public void nextTurn() {
       App.MOVE_COUNT++;
       resetPossibleMoves();
       if (sp_selected != null)
@@ -377,15 +431,19 @@ public class Board {
 
       sp_selected = null;
       boolean inCheck = true;
+      winner = turn;
+
+      STATS[turn].replace("total_moves", (int)STATS[turn].get("total_moves") + 1);
 
       if (turn == Constants.pieceIDs.WHITE) {
          TIMER_WHITE.pauseTimer();
          TIMER_BLACK.playTimer();
 
+
          turn = Constants.pieceIDs.BLACK;
       } else {
          TIMER_BLACK.pauseTimer();
-         TIMER_WHITE.playTimer();
+         TIMER_WHITE.playTimer(); 
 
          turn = Constants.pieceIDs.WHITE;
       }
@@ -399,7 +457,11 @@ public class Board {
       }
 
       if (inCheck) {
-         System.out.println("Checkmate, game over!");
+         try {
+            gameover();
+         } catch (IOException e) {
+            e.printStackTrace();
+         }
       }
 
       System.out.println("Next turn: " + turn);
@@ -568,6 +630,8 @@ public class Board {
             LIVE_PIECES.remove(p);
             DEAD_PIECES.add(p);
 
+            STATS[turn].replace("pieces_killed", (int)STATS[turn].get("pieces_killed") + 1);
+
             displayDeadPiece(p);
             break;
          }
@@ -582,14 +646,16 @@ public class Board {
 
       String moveTranscript = piece.getId() + Constants.boardData.X_ID[toX] + Constants.boardData.Y_ID[toY];
 
-      if (piece.getColor() == Constants.pieceIDs.BLACK)
-         BLACK_TRANSCRIPT.add(moveTranscript);
-      else
-         WHITE_TRANSCRIPT.add(moveTranscript);
+      // if (piece.getColor() == Constants.pieceIDs.BLACK)
+      //    BLACK_TRANSCRIPT.add(moveTranscript);
+      // else
+      //    WHITE_TRANSCRIPT.add(moveTranscript);
 
-      System.out.println(BLACK_TRANSCRIPT.toString());
-      System.out.println("\n-------------------------------\n");
-      System.out.println(WHITE_TRANSCRIPT.toString());
+      MATCH_TRANSCRIPT.add(moveTranscript);
+
+      // System.out.println(BLACK_TRANSCRIPT.toString());
+      // System.out.println("\n-------------------------------\n");
+      // System.out.println(WHITE_TRANSCRIPT.toString());
 
       if (piece.getType() == Constants.pieceType.PAWN && (piece.getGridY() == 0 || piece.getGridY() == 7)) {
          try {
@@ -599,6 +665,11 @@ public class Board {
       }
    }
 
+   /**
+    * This method will display all the possible moves of a selected game piece.
+    * 
+    * @param target The target game piece.
+    */
    private void displayDeadPiece(Piece target) {
       ImageView img = target.getSprite();
       img.setFitWidth(30);
@@ -663,11 +734,20 @@ public class Board {
             // When clicked move the piece.
             piece.hasMoved = true;
             movePiece(piece, piece.getGridX(), piece.getGridY(), x, y);
-            nextMove();
+            nextTurn();
          }
       });
    }
 
+   /**
+    * 
+    * TODO: Akil doc this method.
+    * 
+    * @param sp
+    * @param piece
+    * @param color
+    * @param left
+    */
    private void setCastleMoveMouseClicked(StackPane sp, Piece piece, byte color, boolean left) {
       sp.setOnMouseClicked(new EventHandler<MouseEvent>() {
          public void handle(MouseEvent me) {
@@ -696,12 +776,18 @@ public class Board {
                   movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX() - 1), piece.getGridY());
                }
             }
-            nextMove();
+            nextTurn();
          }
       });
 
    }
 
+   /**
+    * TODO: Akil doc this method
+    * @param sp
+    * @param primaryPawn
+    * @param enemyPawn
+    */
    private void setPassantMoveMouseClicked(StackPane sp, Pawn primaryPawn, Pawn enemyPawn) {
       sp.setOnMouseClicked(new EventHandler<MouseEvent>() {
          @Override
@@ -737,13 +823,20 @@ public class Board {
             DEAD_PIECES.add(enemyPawn);
 
             displayDeadPiece(enemyPawn);
-            nextMove();
+            nextTurn();
          }
 
       });
 
    }
 
+   /**
+    * This method will promote a pawn piece. It will display a new prompt box allowing the player who reaches the end
+    * to choose a piece to replace the pawn. 
+    * This method is called from the GameController class
+    * @param piece   The pawn piece to be promoted
+    * @param type    The type of piece to replace it.
+    */
    public void promotePawn(Piece piece, String type) {
       byte x = piece.getGridX();
       byte y = piece.getGridY();

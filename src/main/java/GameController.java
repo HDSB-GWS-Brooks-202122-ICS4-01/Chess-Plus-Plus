@@ -3,6 +3,8 @@ import java.io.IOException;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
+import javafx.animation.ParallelTransition;
+import javafx.animation.SequentialTransition;
 import javafx.animation.Timeline;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -12,10 +14,11 @@ import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 
 public class GameController {
    @FXML
-   StackPane sp_root;
+   StackPane sp_root, sp_container;
 
    @FXML
    GridPane gp_board, gp_blackDeadCells, gp_whiteDeadCells;
@@ -23,11 +26,15 @@ public class GameController {
    @FXML
    Label lbl_bTimer, lbl_wTimer;
 
+   @FXML
+   VBox vb_gameover;
+
    private Board board;
 
    @FXML
    public void initialize() {
       board = new Board(this, new GridPane[] { gp_board, gp_blackDeadCells, gp_whiteDeadCells });
+      System.out.println(true);
    }
 
    public Label getTimeReference(byte color) {
@@ -83,7 +90,8 @@ public class GameController {
 
                   Timeline timeline = new Timeline(
                         new KeyFrame(javafx.util.Duration.seconds(1),
-                              new KeyValue(nextScene.translateYProperty(), sp_root.getHeight(), Interpolator.EASE_BOTH)),
+                              new KeyValue(nextScene.translateYProperty(), sp_root.getHeight(),
+                                    Interpolator.EASE_BOTH)),
                         new KeyFrame(javafx.util.Duration.seconds(1),
                               new KeyValue(nextScene.translateYProperty(), sp_root.getHeight(),
                                     Interpolator.EASE_BOTH)));
@@ -98,5 +106,48 @@ public class GameController {
       });
 
       timeline.play();
+   }
+
+   /**
+    * This method will transition to the end screen.
+    * 
+    * @param piece Piece that needs to be promoted
+    * @throws IOException May throw an exception if the fxml is not found.
+    */
+   public void gameOver(byte winner) throws IOException {
+      App.setWinner(winner);
+
+      vb_gameover.translateYProperty().set(sp_root.getScene().getHeight());
+      vb_gameover.setVisible(true);
+
+      Parent endScene = App.loadFXML("end");
+
+      sp_root.getChildren().add(endScene);
+      endScene.translateYProperty().set(sp_root.getScene().getHeight());
+
+      Timeline[] timelines = new Timeline[] {
+            new Timeline(
+                  new KeyFrame(javafx.util.Duration.seconds(1),
+                        new KeyValue(vb_gameover.translateYProperty(), 0, Interpolator.EASE_BOTH))
+            ),
+            new Timeline(
+                  new KeyFrame(javafx.util.Duration.seconds(1),
+                        new KeyValue(endScene.translateYProperty(), 0)),
+                  new KeyFrame(javafx.util.Duration.seconds(1),
+                        new KeyValue(sp_container.translateYProperty(), -sp_root.getScene().getHeight()))),
+      };
+
+      // Play ani
+      timelines[0].play();
+      timelines[0].setOnFinished(f0 -> {
+         timelines[1].setDelay(javafx.util.Duration.seconds(3));
+         timelines[1].play();
+
+      });
+
+      timelines[1].setOnFinished(f1 -> {
+         sp_root.getChildren().remove(endScene);
+         App.setRoot(endScene);
+      });
    }
 }

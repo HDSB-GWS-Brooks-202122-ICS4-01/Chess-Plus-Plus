@@ -39,7 +39,7 @@ public class PlayerTimer {
    public void setTime(long millis) {
       duration = millis;
 
-      lbl_timer.setText(getStringFormat());
+      lbl_timer.setText(getStringFormat(duration));
    }
 
    private void updateTime() {
@@ -51,13 +51,13 @@ public class PlayerTimer {
             this.duration = 0;
          }
 
-         lbl_timer.setText(getStringFormat());
+         lbl_timer.setText(getStringFormat(duration));
       }
 
       timeSince = System.currentTimeMillis();
    }
 
-   private String getStringFormat() {
+   public static String getStringFormat(long duration) {
       long minutes = (duration / 1000) / 60;
       int seconds = (int)((duration / 1000) % 60);
 
@@ -93,5 +93,9 @@ public class PlayerTimer {
 
       timeSince = -1;
       tracker.pause();
+   }
+
+   public long getTimeMillis() {
+      return duration;
    }
 }
