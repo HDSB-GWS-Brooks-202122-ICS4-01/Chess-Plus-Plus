@@ -1,11 +1,11 @@
 import javafx.animation.FadeTransition;
-import javafx.animation.FillTransition;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuButton;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
@@ -15,6 +15,12 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
+/**
+ * Class for the setting controller for the settings scene. 
+ * 
+ * @author Akil Pathiranage
+ * @version 1.0
+ */
 public class SettingsController {
 
     Properties config;
@@ -31,8 +37,14 @@ public class SettingsController {
     @FXML
     Button mainMenuButton;
 
+    /**
+     * Method for intializing the Settings scene. 
+     * 
+     */
     @FXML
     public void initialize() {
+
+        //This code begins by trying to load the config file. 
         try {
             FileReader reader = new FileReader("src\\main\\resources\\data\\config.properties");
             config = new Properties();
@@ -66,63 +78,38 @@ public class SettingsController {
             }
         }
 
-        gameTimeButton.setOpacity(0);
-        mainMenuButton.setOpacity(0);
-        diffButton.setOpacity(0);
-        gameTimeButton.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, null, null)));
-        diffButton.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, null, null)));
-        mainMenuButton.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, null, null)));
+        Region[] elements = {gameTimeButton, mainMenuButton, diffButton};
 
-        RegionFillTransition gameTimeButtonHover = new RegionFillTransition(gameTimeButton, Color.web("#2F1000"),
+        //This for loop sets up each element on the screen
+        //It makes them completely transparent to prepare for the intro transition.
+        //It also makes sure the backgrounds of each element are transparent. 
+
+        //Then it adds the hover effect for each button and creates the intro transition
+        //for each button and plays it.
+        for(Region element: elements){
+            element.setOpacity(0);
+            element.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, null, null)));
+
+            RegionFillTransition hoverEffect = new RegionFillTransition(element, Color.TRANSPARENT,
                 Color.web("#C75000"), Duration.millis(200));
-        RegionFillTransition gameTimeButtonExit = new RegionFillTransition(gameTimeButton, Color.web("#C75000"),
-                Color.web("#2F1000"), Duration.millis(200));
-        gameTimeButton.setOnMouseEntered(e -> {
-            gameTimeButtonExit.stop();
-            gameTimeButtonHover.play();
-        });
+            RegionFillTransition exitEffect = new RegionFillTransition(element, Color.web("#C75000"),
+                Color.TRANSPARENT, Duration.millis(200));
 
-        gameTimeButton.setOnMouseExited(e -> {
-            gameTimeButtonHover.stop();
-            gameTimeButtonExit.play();
-        });
+            element.setOnMouseEntered(e -> {
+                exitEffect.stop();
+                hoverEffect.play();
+            });
+        
+            element.setOnMouseExited(e -> {
+                hoverEffect.stop();
+                exitEffect.play();
+            });
 
-        RegionFillTransition diffButtonHover = new RegionFillTransition(diffButton, Color.web("#2F1000"),
-                Color.web("#C75000"), Duration.millis(200));
-        RegionFillTransition diffButtonExit = new RegionFillTransition(diffButton, Color.web("#C75000"),
-                Color.web("#2F1000"), Duration.millis(200));
-        diffButton.setOnMouseEntered(e -> {
-            diffButtonExit.stop();
-            diffButtonHover.play();
-        });
+            FadeTransition introTransition = new FadeTransition(Duration.millis(1000), element);
+            introTransition.setFromValue(0);
+            introTransition.setToValue(1);
+            introTransition.play();
 
-        diffButton.setOnMouseExited(e -> {
-            diffButtonHover.stop();
-            diffButtonExit.play();
-        });
-
-        RegionFillTransition mainButtonHover = new RegionFillTransition(mainMenuButton, Color.web("#2F1000"),
-                Color.web("#C75000"), Duration.millis(200));
-        RegionFillTransition mainButtonExit = new RegionFillTransition(mainMenuButton, Color.web("#C75000"),
-                Color.web("#2F1000"), Duration.millis(200));
-        mainMenuButton.setOnMouseEntered(e -> {
-            mainButtonExit.stop();
-            mainButtonHover.play();
-        });
-
-        mainMenuButton.setOnMouseExited(e -> {
-            mainButtonHover.stop();
-            mainButtonExit.play();
-        });
-
-        FadeTransition[] introTransitions = {
-                new FadeTransition(Duration.millis(1000), mainMenuButton),
-                new FadeTransition(Duration.millis(1000), diffButton),
-                new FadeTransition(Duration.millis(1000), gameTimeButton) };
-        for (FadeTransition transition : introTransitions){
-            transition.setFromValue(0);
-            transition.setToValue(1);
-            transition.play();
         }
 
         RegionFillTransition paneTransition = new RegionFillTransition(mainPane, Color.web("#621B00"), Color.web("#2F1000"), Duration.millis(1500));
@@ -130,6 +117,10 @@ public class SettingsController {
 
     }
 
+
+    /**
+     * Method for switching to the intro screen. 
+     */
     @FXML
     public void switchToIntro() {
         try {
@@ -139,10 +130,6 @@ public class SettingsController {
         } catch (IOException ioException) {
             ioException.printStackTrace();
         }
-
-        gameTimeButton.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, null, null)));
-        diffButton.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, null, null)));
-        mainMenuButton.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, null, null)));
 
 
         FadeTransition[] outroTransitions = {
@@ -167,39 +154,67 @@ public class SettingsController {
 
     }
 
+    /**
+     * Method for setting the difficulty to easy, called from the action event handler for
+     * the easy menuItem.
+     */
     @FXML
     public void onEasy() {
         config.setProperty("aidiff", "easy");
     }
 
+    /**
+     * Method for setting the difficulty to medium, called from the action event handler for
+     * the medium menuItem.
+     */
     @FXML
     public void onMedium() {
         config.setProperty("aidiff", "medium");
 
     }
 
+    /**
+     * Method for setting the difficulty to hard, called from the action event handler for
+     * the hard menuItem.
+     */
     @FXML
     public void onHard() {
         config.setProperty("aidiff", "hard");
     }
 
+    /**
+     * Method for setting the time limit to ten minutes per player, called from the action event handler for
+     * the 10:00 menuItem.
+     */
     @FXML
     public void onTen() {
         config.setProperty("gametime", "10");
     }
 
+    /**
+     * Method for setting the time limit to ten minutes per player, called from the action event handler for
+     * the 30:00 menuItem.
+     */
     @FXML
     public void onThirty() {
         System.out.println("chnag");
         config.setProperty("gametime", "30");
     }
 
+    /**
+     * Method for setting the time limit to ten minutes per player, called from the action event handler for
+     * the 3:00 menuItem.
+     */
     @FXML
     public void onThree() {
         config.setProperty("gametime", "3");
 
     }
 
+    /**
+     * Method for setting the time limit to ten minutes per player, called from the action event handler for
+     * the infinite menuItem.
+     */
     @FXML
     public void onInfinite() {
 

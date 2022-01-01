@@ -9,6 +9,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
@@ -31,157 +32,120 @@ public class StartScreenController {
     Button aiButton;
     @FXML
     Button resumeButton;
+    
 
     
 
+    /**
+     * Method for intializing the start screen scene. 
+     */
     @FXML
     public void initialize() {
 
-        playButton.setVisible(false);
-        settingsButton.setVisible(false);
-        resumeButton.setVisible(false);
-        aiButton.setVisible(false);
+        Region[] elements = {playButton, resumeButton, settingsButton, aiButton};
 
-        playButton.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, null, null)));
-        settingsButton.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, null, null)));
-        aiButton.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, null, null)));
-        resumeButton.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, null, null)));
+        for(Region element : elements){
+            element.setOpacity(0);
+            element.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, null, null)));
+
+            RegionFillTransition hoverEffect = new RegionFillTransition(element, Color.TRANSPARENT,
+                Color.web("#C75000"), Duration.millis(200));
+            RegionFillTransition exitEffect = new RegionFillTransition(element, Color.web("#C75000"),
+                Color.TRANSPARENT, Duration.millis(200));
+            
+            element.setOnMouseEntered(e -> {
+                exitEffect.stop();
+                hoverEffect.play();
+            });
+            element.setOnMouseExited(e -> {
+                hoverEffect.stop();
+                exitEffect.play();
+            });
+
+        }
 
         title.setVisible(false);
         title.setLayoutY(-100);
 
-        RegionFillTransition playHoverEffect = new RegionFillTransition(playButton, Color.web("#621B00"),
-                Color.web("#C75000"), Duration.millis(200));
-        RegionFillTransition playExitEffect = new RegionFillTransition(playButton, Color.web("#C75000"),
-                Color.web("#621B00"), Duration.millis(200));
-        RegionFillTransition settingsHoverEffect = new RegionFillTransition(settingsButton, Color.web("#621B00"),
-                Color.web("#C75000"), Duration.millis(200));
-        RegionFillTransition settingsExitEffect = new RegionFillTransition(settingsButton, Color.web("#C75000"),
-                Color.web("#621B00"), Duration.millis(200));
-        RegionFillTransition aiHoverEffect = new RegionFillTransition(aiButton, Color.web("#621B00"),
-                Color.web("#C75000"), Duration.millis(200));
-        RegionFillTransition aiExitEffect = new RegionFillTransition(aiButton, Color.web("#C75000"),
-                Color.web("#621B00"), Duration.millis(200));
-        RegionFillTransition resumeHoverEffect = new RegionFillTransition(resumeButton, Color.web("#621B00"),
-                Color.web("#C75000"), Duration.millis(200));
-        RegionFillTransition resumeExitEffect = new RegionFillTransition(resumeButton, Color.web("#C75000"),
-                Color.web("#621B00"), Duration.millis(200));
-
-        playButton.setOnMouseEntered(e -> {
-            playExitEffect.stop();
-            playHoverEffect.play();
-        });
-        playButton.setOnMouseExited(e -> {
-            playHoverEffect.stop();
-            playExitEffect.play();
-        });
-
-        settingsButton.setOnMouseEntered(e -> {
-            settingsExitEffect.stop();
-            settingsHoverEffect.play();
-        });
-        settingsButton.setOnMouseExited(e -> {
-            settingsHoverEffect.stop();
-            settingsExitEffect.play();
-        });
-        aiButton.setOnMouseEntered(e -> {
-            aiExitEffect.stop();
-            aiHoverEffect.play();
-        });
-        aiButton.setOnMouseExited(e -> {
-            aiHoverEffect.stop();
-            aiExitEffect.play();
-        });
-        resumeButton.setOnMouseEntered(e -> {
-            resumeExitEffect.stop();
-            resumeHoverEffect.play();
-        });
-        resumeButton.setOnMouseExited(e -> {
-            resumeHoverEffect.stop();
-            resumeExitEffect.play();
-        });
-
         mainPane.setOnMouseEntered(this::animateStartUp);
     }
 
+    /**
+     * Method for animating the startup of the application. This is called once per scene change to the start screen.
+     * 
+     * @param event MouseEvent object that resulted in the event. 
+     */
     public void animateStartUp(MouseEvent event) {
-
         title.setVisible(true);
         TranslateTransition tt = new TranslateTransition(Duration.millis(1000), title);
         tt.setFromY(title.getLayoutY());
         tt.setToY(300);
+
         tt.setOnFinished(e -> {
-            playButton.setVisible(true);
-            playButton.setOpacity(0);
-            FadeTransition playFade = new FadeTransition(Duration.millis(600), playButton);
-            playFade.setToValue(1);
-            playFade.play();
+            Region[] elements = {playButton, settingsButton, resumeButton, aiButton};
 
-            settingsButton.setVisible(true);
-            settingsButton.setOpacity(0);
-            FadeTransition settingsFade = new FadeTransition(Duration.millis(600), settingsButton);
-            settingsFade.setToValue(1);
-            settingsFade.play();
-
-
-            aiButton.setVisible(true);
-            aiButton.setOpacity(0);
-            FadeTransition aiFade = new FadeTransition(Duration.millis(600), aiButton);
-            aiFade.setToValue(1);
-            aiFade.play();
-
-            resumeButton.setVisible(true);
-            resumeButton.setOpacity(0);
-            FadeTransition resumeFade = new FadeTransition(Duration.millis(600), resumeButton);
-            resumeFade.setToValue(1);
-            resumeFade.play();
+            for(Region element : elements){
+                FadeTransition fade = new FadeTransition(Duration.millis(600), element);
+                fade.setToValue(1);
+                fade.play();
+            }
         });
         tt.play();
         mainPane.setOnMouseEntered(null);
 
     }
 
+    /**
+     * Method for switching the scene to the game, pass and play. 
+     */
     @FXML
     public void switchToGame() {
         transition("game");
     }
 
+    /**
+     * Method for switching the scene to the settings.
+     */
     @FXML
     public void switchToSettings(){
         transition("settings");
     }
 
+    /**
+     * Method for switching the scene to the game against a computer. 
+     */
     @FXML
     public void switchToAi() {
 
     }
 
+    /**
+     * Method for switching the scene to resume the last played game.
+     */
     @FXML
     public void switchToResume() {
 
     }
 
+    /**
+     * Method for transitioning between scenes. Contains all the code for teh fade transitions, once the transitions are done it
+     * tries to switch the scene. 
+     * @param inp The name of the fxml file without the extension. 
+     */
     private void transition(String inp){
-        FadeTransition playFade = new FadeTransition(Duration.millis(600), playButton);
-        playFade.setToValue(0);
-        playFade.play();
-
-        FadeTransition settingsFade = new FadeTransition(Duration.millis(600), settingsButton);
-        settingsFade.setToValue(0);
-        settingsFade.play();
-
-        FadeTransition aiFade = new FadeTransition(Duration.millis(600), aiButton);
-        aiFade.setToValue(0);
-        aiFade.play();
-
-        FadeTransition resumeFade = new FadeTransition(Duration.millis(600), resumeButton);
-        resumeFade.setToValue(0);
-        resumeFade.play();
-
-        FadeTransition fttt = new FadeTransition(Duration.millis(600), title);
-        fttt.setToValue(0);
-        fttt.play();
-        fttt.setOnFinished(e -> {
+        FadeTransition[] transitions = {
+            new FadeTransition(Duration.millis(600), playButton), 
+            new FadeTransition(Duration.millis(600), settingsButton),
+            new FadeTransition(Duration.millis(600), aiButton),
+            new FadeTransition(Duration.millis(600), resumeButton),
+            new FadeTransition(Duration.millis(600), title)};
+        
+        for(FadeTransition transition : transitions){
+            transition.setToValue(0);
+            transition.play();
+        }
+  
+        transitions[4].setOnFinished(e -> {
             try {
                 App.setRoot(inp);
             } catch (IOException exception) {

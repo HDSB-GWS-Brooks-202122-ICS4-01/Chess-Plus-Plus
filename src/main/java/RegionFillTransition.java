@@ -1,7 +1,5 @@
 import javafx.util.Duration;
-
 import javafx.animation.Transition;
-import javafx.scene.control.Button;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Region;
@@ -21,6 +19,13 @@ public class RegionFillTransition extends Transition {
     Color end;
     Region region;
 
+    /**
+     * Constructor for RegionFillTransition object. 
+     * @param region Region object to apply the fill transition to.
+     * @param start The color to begin from. 
+     * @param end The color to end from. 
+     * @param duration The duration of the animation. 
+     */
     public RegionFillTransition(Region region, Color start, Color end, Duration duration) {
         this.start = start;
         this.end = end;
@@ -29,6 +34,9 @@ public class RegionFillTransition extends Transition {
 
     }
 
+    /**
+     *{@inheritDoc}
+     */
     @Override
     public void interpolate(double frac) {
         BackgroundFill fill = new BackgroundFill((start.interpolate(end, frac)), null, null);

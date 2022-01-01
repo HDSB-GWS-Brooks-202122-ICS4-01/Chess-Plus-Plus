@@ -741,12 +741,13 @@ public class Board {
 
    /**
     * 
-    * TODO: Akil doc this method.
+    * This method serves the same purpose as the setPossibleMoveMouseClicked() method does, except it is 
+    * attached to castling moves. Castling moves require multiple pieces to be removed so this method needed to be created. 
     * 
-    * @param sp
-    * @param piece
-    * @param color
-    * @param left
+    * @param sp StackPane of the king. 
+    * @param piece King object. 
+    * @param color Color/team value. 
+    * @param left If true, castling to the left of the screen, false if not. 
     */
    private void setCastleMoveMouseClicked(StackPane sp, Piece piece, byte color, boolean left) {
       sp.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -783,15 +784,18 @@ public class Board {
    }
 
    /**
-    * TODO: Akil doc this method
-    * @param sp
-    * @param primaryPawn
-    * @param enemyPawn
+    * This method serves the same purpose as setPossibleMoveMouseClicked, except it is only made for 
+    * en passant moves from pawns. This is because in en passant, a pawn moves to the square behind the other pawn and the other pawn still gets deleted. 
+    * @param sp StackPane of the primary pawn. 
+    * @param primaryPawn Pawn object of the primary pawn. 
+    * @param enemyPawn Pawn object of the enemy pawn. 
     */
    private void setPassantMoveMouseClicked(StackPane sp, Pawn primaryPawn, Pawn enemyPawn) {
       sp.setOnMouseClicked(new EventHandler<MouseEvent>() {
          @Override
          public void handle(MouseEvent event) {
+
+            //Moves the primary pawn to its new spot. 
             if (primaryPawn.getColor() == Constants.pieceIDs.BLACK) {
                if (enemyPawn.getGridX() < primaryPawn.getGridX()) {
                   // pawn is to the left
@@ -816,6 +820,7 @@ public class Board {
 
             }
 
+            //Removes enemyPawn from the game. 
             GRID[enemyPawn.gridX][enemyPawn.gridY] = Constants.pieceIDs.EMPTY_CELL;
             StackPane enemyPane = CELLS[enemyPawn.gridX][enemyPawn.gridY];
             enemyPane.getChildren().clear();
