@@ -7,6 +7,11 @@ import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
+/**
+ * This class handles the player's timer.
+ * @author Selim Abdelwahab
+ * @version 1.0 
+ */
 public class PlayerTimer {
    Timeline tracker;
    Timer timer = new Timer();

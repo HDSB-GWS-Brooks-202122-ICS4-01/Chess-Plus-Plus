@@ -18,7 +18,9 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 
 /**
- * Board class
+ * Board class, handles the interaction of pieces and displaying them.
+ * @author Selim Abdelwahab
+ * @version 1.0 
  */
 public class Board {
    private static final ArrayList<String> MATCH_TRANSCRIPT = new ArrayList<String>();

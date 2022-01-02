@@ -158,4 +158,9 @@ public class Constants {
                 public static final double ROOK_X = 800;
                 public static final double PAWN_X = 1000;
         }
+
+        public static final class Online {
+                public static final String PATH_TO_JSON_PK = "src\\main\\resources\\priv\\chess-app-bb905-firebase-adminsdk-o32he-f6d06326b1.json";
+                public static final String PATH_TO_DEFAULT_AVATAR = "https://firebasestorage.googleapis.com/v0/b/chess-app-bb905.appspot.com/o/default%2Fdefault_avatar.jpg?alt=media&token=ca0d2869-02db-48ea-b9b8-4ed1a134607f";
+        }
 }

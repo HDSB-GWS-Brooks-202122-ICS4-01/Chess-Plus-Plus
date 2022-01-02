@@ -78,6 +78,12 @@ public class SettingsController {
             }
         }
 
+        /**
+         * If you want to this
+         * Properties config = App.getConfig();
+         * Because the config file is needed in other areas too.
+         */
+
         Region[] elements = {gameTimeButton, mainMenuButton, diffButton};
 
         //This for loop sets up each element on the screen

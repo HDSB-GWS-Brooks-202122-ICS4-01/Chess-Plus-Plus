@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.text.Font?>
+
+<StackPane fx:id="sp_root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="850.0" prefWidth="1250.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Register">
+   <children>
+      <Pane fx:id="pn_main" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="850.0" prefWidth="1250.0" style="-fx-background-color: black;">
+         <children>
+            <Label fx:id="title" layoutX="439.0" layoutY="-30.0" text="Register" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="96.0" />
+               </font>
+            </Label>
+            <GridPane layoutX="125.0" layoutY="100.0">
+               <columnConstraints>
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="500.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="500.0" />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints fillHeight="false" minHeight="10.0" prefHeight="100.0" vgrow="SOMETIMES" />
+                  <RowConstraints fillHeight="false" minHeight="10.0" prefHeight="100.0" vgrow="SOMETIMES" />
+                  <RowConstraints fillHeight="false" minHeight="10.0" prefHeight="100.0" vgrow="SOMETIMES" />
+                  <RowConstraints fillHeight="false" minHeight="10.0" prefHeight="100.0" vgrow="SOMETIMES" />
+               </rowConstraints>
+               <children>
+                  <Label text="Email" textFill="WHITE">
+                     <font>
+                        <Font name="Algerian" size="60.0" />
+                     </font>
+                  </Label>
+                  <Label text="Password" textFill="WHITE" GridPane.rowIndex="1">
+                     <font>
+                        <Font name="Algerian" size="60.0" />
+                     </font>
+                  </Label>
+                  <Label text=":" textFill="WHITE" GridPane.halignment="RIGHT">
+                     <font>
+                        <Font name="Algerian" size="60.0" />
+                     </font>
+                     <GridPane.margin>
+                        <Insets right="20.0" />
+                     </GridPane.margin>
+                  </Label>
+                  <Label text=":" textFill="WHITE" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
+                     <font>
+                        <Font name="Algerian" size="60.0" />
+                     </font>
+                     <GridPane.margin>
+                        <Insets right="20.0" />
+                     </GridPane.margin>
+                  </Label>
+                  <TextField fx:id="tf_email" alignment="CENTER" maxHeight="50.0" style="-fx-background-color: rgba(255, 255, 255, 0.8);" GridPane.columnIndex="1">
+                     <font>
+                        <Font name="Algerian" size="40.0" />
+                     </font>
+                  </TextField>
+                  <PasswordField fx:id="pf_password" alignment="CENTER" maxHeight="50.0" style="-fx-background-color: rgba(255, 255, 255, 0.8);" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                     <font>
+                        <Font size="33.0" />
+                     </font>
+                  </PasswordField>
+                  <Label text="Confirm Password" textFill="WHITE" GridPane.rowIndex="2">
+                     <font>
+                        <Font name="Algerian" size="45.0" />
+                     </font>
+                  </Label>
+                  <Label text=":" textFill="WHITE" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
+                     <font>
+                        <Font name="Algerian" size="60.0" />
+                     </font>
+                     <GridPane.margin>
+                        <Insets right="20.0" />
+                     </GridPane.margin>
+                  </Label>
+                  <PasswordField fx:id="pf_passwordConfirm" alignment="CENTER" maxHeight="50.0" style="-fx-background-color: rgba(255, 255, 255, 0.8);" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                     <font>
+                        <Font size="33.0" />
+                     </font>
+                  </PasswordField>
+                  <Label text="Display Name" textFill="WHITE" GridPane.rowIndex="3">
+                     <font>
+                        <Font name="Algerian" size="60.0" />
+                     </font>
+                  </Label>
+                  <Label text=":" textFill="WHITE" GridPane.halignment="RIGHT" GridPane.rowIndex="3">
+                     <font>
+                        <Font name="Algerian" size="60.0" />
+                     </font>
+                     <GridPane.margin>
+                        <Insets right="20.0" />
+                     </GridPane.margin>
+                  </Label>
+                  <TextField fx:id="tf_displayName" alignment="CENTER" maxHeight="50.0" style="-fx-background-color: rgba(255, 255, 255, 0.8);" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                     <font>
+                        <Font name="Algerian" size="40.0" />
+                     </font>
+                  </TextField>
+                  <Label fx:id="lbl_dnCounter" text="0/15" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.valignment="BOTTOM">
+                     <GridPane.margin>
+                        <Insets bottom="17.0" right="5.0" />
+                     </GridPane.margin>
+                     <font>
+                        <Font name="Times New Roman Bold Italic" size="16.0" />
+                     </font>
+                  </Label>
+               </children>
+            </GridPane>
+            <GridPane layoutX="125.0" layoutY="520.0">
+               <columnConstraints>
+                  <ColumnConstraints />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints />
+                  <RowConstraints minHeight="50.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="50.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="50.0" prefHeight="30.0" vgrow="SOMETIMES" />
+               </rowConstraints>
+               <children>
+                  <Button fx:id="btn_signIn" mnemonicParsing="false" onAction="#switchToSignIn" prefHeight="80.0" prefWidth="1000.0" text="Sign in" textFill="WHITE" GridPane.rowIndex="2">
+                     <font>
+                        <Font name="Caladea Bold" size="38.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                     <GridPane.margin>
+                        <Insets top="15.0" />
+                     </GridPane.margin>
+                  </Button>
+                  <Button fx:id="btn_register" mnemonicParsing="false" onAction="#createAccount" prefHeight="80.0" prefWidth="1000.0" text="Register" textFill="WHITE" GridPane.rowIndex="1">
+                     <font>
+                        <Font name="Caladea Bold" size="38.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                     <GridPane.margin>
+                        <Insets bottom="15.0" />
+                     </GridPane.margin>
+                  </Button>
+                  <Label fx:id="lbl_output" textFill="WHITE" GridPane.rowIndex="3">
+                     <font>
+                        <Font name="Times New Roman Bold" size="24.0" />
+                     </font>
+                  </Label>
+               </children>
+            </GridPane>
+         </children>
+      </Pane>
+   </children>
+</StackPane>

@@ -14,6 +14,11 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
+/**
+ * Controller of the game scene, also initializes the Board class.
+ * @author Selim Abdelwahab
+ * @version 1.0 
+ */
 public class GameController {
    @FXML
    StackPane sp_root, sp_container;

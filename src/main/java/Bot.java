@@ -1,5 +1,5 @@
 public class Bot {
-    int depth;
+    final int depth;
 
     public Bot(String diff){
         switch(diff){

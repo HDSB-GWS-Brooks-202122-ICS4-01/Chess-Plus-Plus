@@ -30,6 +30,11 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.util.Duration;
 
+/**
+ * Controller of the end scene.
+ * @author Selim Abdelwahab
+ * @version 1.0 
+ */
 public class EndController {
    @FXML
    StackPane sp_root;

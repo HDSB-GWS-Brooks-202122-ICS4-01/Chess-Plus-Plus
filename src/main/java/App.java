@@ -9,9 +9,22 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Properties;
+
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.storage.Acl.User;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.UserRecord;
 
 /**
  * JavaFX Ap
@@ -31,8 +44,17 @@ public class App extends Application {
     private static Map[] matchStats = null;
 
     @Override
-    public void start(Stage stage) throws IOException {
-        scene = new Scene(loadFXML("game"));
+    public void start(Stage stage) throws IOException, FirebaseAuthException {
+        FileInputStream serviceAccount = new FileInputStream(Constants.Online.PATH_TO_JSON_PK);
+
+        FirebaseOptions options = new FirebaseOptions.Builder()
+                .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                .setDatabaseUrl("https://chess-app-bb905-default-rtdb.firebaseio.com")
+                .build();
+
+        FirebaseApp.initializeApp(options);
+
+        scene = new Scene(loadFXML("startScreen"));
         stage.setScene(scene);
         stage.show();
         stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
@@ -40,6 +62,54 @@ public class App extends Application {
                 System.exit(0);
             }
         });
+    }
+
+    static Properties getConfig() {
+        Properties config = null;
+
+        try {
+            FileReader reader = new FileReader("src\\main\\resources\\data\\config.properties");
+            config = new Properties();
+
+            try {
+                config.load(reader);
+                reader.close();
+            } catch (Exception e) {
+                System.out.println("Couldn't read from config file");
+                e.printStackTrace();
+            }
+
+        } catch (FileNotFoundException fileNotFoundException) {
+
+            System.out.println("Config file not found! Recreating new file");
+
+            config = new Properties();
+            config.setProperty("gametime", "10");
+            config.setProperty("aidiff", "easy");
+            config.setProperty("signedIn", "f");
+            config.setProperty("UID", "null");
+            try {
+                FileWriter writer = new FileWriter("src\\main\\resources\\data\\config.properties");
+
+                config.store(writer, "Config created");
+                writer.close();
+
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
+        }
+
+        return config;
+    }
+
+    static void saveConfig(Properties config) {
+        try {
+            FileWriter writer = new FileWriter("src\\main\\resources\\data\\config.properties");
+            config.store(writer, "Config saved");
+            writer.close();
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
     }
 
     static void setRoot(Parent parent) {
