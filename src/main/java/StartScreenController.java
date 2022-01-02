@@ -1,18 +1,28 @@
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Properties;
 import java.util.UUID;
 
+import javax.swing.SwingUtilities;
+
+import com.google.api.services.storage.Storage;
+import com.google.api.services.storage.model.Bucket;
+import com.google.cloud.storage.Blob.BlobSourceOption;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
+import com.google.firebase.cloud.StorageClient;
 
 import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.animation.TranslateTransition;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -63,7 +73,8 @@ public class StartScreenController {
     @FXML
     public void initialize() throws IOException, FirebaseAuthException {
 
-        Region[] elements = { playButton, resumeButton, settingsButton, aiButton, btn_signIn, btn_register, btn_signOut };
+        Region[] elements = { playButton, resumeButton, settingsButton, aiButton, btn_signIn, btn_register,
+                btn_signOut };
 
         for (Region element : elements) {
             element.setOpacity(0);
@@ -91,25 +102,38 @@ public class StartScreenController {
         mainPane.setOnMouseEntered(this::animateStartUp);
 
         // Check if the user is signed in
-        if (config.getProperty("signedIn").equals("t")) { // Signed in
-            pn_signedIn.setVisible(true);
-            pn_notSignedIn.setVisible(false);
+        if (config.getProperty(Constants.Online.CONFIG_SIGNED_IN).equals("t")) { // Signed in
+            try {
+                pn_signedIn.setVisible(true);
+                pn_notSignedIn.setVisible(false);
 
-            String UID = config.getProperty("UID");
+                String UID = config.getProperty("UID");
 
-            UserRecord userRecord = FirebaseAuth.getInstance().getUser(UID);
+                UserRecord userRecord = FirebaseAuth.getInstance().getUser(UID);
 
-            lbl_welcome.setText("Welcome, " + userRecord.getDisplayName().toUpperCase());
+                lbl_welcome.setText("Welcome, " + userRecord.getDisplayName().toUpperCase() + "!");
 
-            Image avatar = new Image(userRecord.getPhotoUrl());
+                com.google.cloud.storage.Bucket bucket = StorageClient.getInstance().bucket();
 
-            imgv_avatar.setImage(avatar);
-            Rectangle clip = new Rectangle(imgv_avatar.getFitWidth(), imgv_avatar.getFitHeight());
-            clip.setArcHeight(200);
-            clip.setArcWidth(200);
-            clip.setStroke(Color.BLACK);
+                Image avatar = new Image(new ByteArrayInputStream(bucket.get("profiles/" + userRecord.getUid() + "/avatar.jpg").getContent()));
 
-            imgv_avatar.setClip(clip);
+                imgv_avatar.setImage(avatar);
+                imgv_avatar.setFitWidth(150);
+                imgv_avatar.setFitHeight(150);
+                Rectangle clip = new Rectangle(imgv_avatar.getFitWidth(), imgv_avatar.getFitHeight());
+                clip.setArcWidth(avatar.getWidth());
+                clip.setArcHeight(avatar.getHeight());
+
+                imgv_avatar.setClip(clip);
+            } catch (Exception e) { // Most likely the user was deleted
+                pn_signedIn.setVisible(false);
+                pn_notSignedIn.setVisible(true);
+
+                config.setProperty(Constants.Online.CONFIG_SIGNED_IN, "f");
+                config.setProperty(Constants.Online.CONFIG_UID, "null");
+
+                App.saveConfig(config);
+            }
 
         } else {
             pn_notSignedIn.setVisible(true);
@@ -130,7 +154,8 @@ public class StartScreenController {
         tt.setToY(300);
 
         tt.setOnFinished(e -> {
-            Region[] elements = { playButton, settingsButton, resumeButton, aiButton, btn_signIn, btn_register, btn_signOut };
+            Region[] elements = { playButton, settingsButton, resumeButton, aiButton, btn_signIn, btn_register,
+                    btn_signOut };
 
             for (Region element : elements) {
                 FadeTransition fade = new FadeTransition(Duration.millis(600), element);
@@ -262,9 +287,34 @@ public class StartScreenController {
     @FXML
     private void signOut() throws IOException {
         config.setProperty("UID", "null");
-        config.setProperty("signedIn", "f");
+        config.setProperty(Constants.Online.CONFIG_SIGNED_IN, "f");
 
         App.saveConfig(config);
         App.setRoot("startScreen");
+    }
+
+    @FXML
+    private void switchToProfile() throws IOException {
+        Parent profileScene = App.loadFXML("profile");
+
+        sp_root.getChildren().add(profileScene);
+        profileScene.translateXProperty().set(-sp_root.getScene().getWidth());
+
+        Timeline timeline = new Timeline(new KeyFrame(javafx.util.Duration.seconds(1),
+                new KeyValue(profileScene.translateXProperty(), 0)),
+                new KeyFrame(javafx.util.Duration.seconds(1),
+                        new KeyValue(mainPane.translateXProperty(), sp_root.getScene().getWidth())));
+
+        // Play ani
+        timeline.play();
+
+        timeline.setOnFinished(f1 -> {
+            sp_root.getChildren().remove(profileScene);
+
+            try {
+                App.setRoot("profile");
+            } catch (IOException e) {
+            }
+        });
     }
 }

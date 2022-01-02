@@ -60,12 +60,12 @@
                         <Insets right="20.0" />
                      </GridPane.margin>
                   </Label>
-                  <TextField fx:id="tf_email" alignment="CENTER" maxHeight="50.0" style="-fx-background-color: rgba(255, 255, 255, 0.8);" GridPane.columnIndex="1">
+                  <TextField fx:id="tf_email" alignment="CENTER" maxHeight="50.0" style="-fx-background-color: rgba(255, 255, 255, 0.8);" text="Mimo280604@gmail.com" GridPane.columnIndex="1">
                      <font>
                         <Font name="Algerian" size="40.0" />
                      </font>
                   </TextField>
-                  <PasswordField fx:id="pf_password" alignment="CENTER" maxHeight="50.0" style="-fx-background-color: rgba(255, 255, 255, 0.8);" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                  <PasswordField fx:id="pf_password" alignment="CENTER" maxHeight="50.0" style="-fx-background-color: rgba(255, 255, 255, 0.8);" text="Mimo.Abdelwahab2806" GridPane.columnIndex="1" GridPane.rowIndex="1">
                      <font>
                         <Font size="33.0" />
                      </font>
@@ -83,7 +83,7 @@
                         <Insets right="20.0" />
                      </GridPane.margin>
                   </Label>
-                  <PasswordField fx:id="pf_passwordConfirm" alignment="CENTER" maxHeight="50.0" style="-fx-background-color: rgba(255, 255, 255, 0.8);" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                  <PasswordField fx:id="pf_passwordConfirm" alignment="CENTER" maxHeight="50.0" style="-fx-background-color: rgba(255, 255, 255, 0.8);" text="Mimo.Abdelwahab2806" GridPane.columnIndex="1" GridPane.rowIndex="2">
                      <font>
                         <Font size="33.0" />
                      </font>
@@ -101,7 +101,7 @@
                         <Insets right="20.0" />
                      </GridPane.margin>
                   </Label>
-                  <TextField fx:id="tf_displayName" alignment="CENTER" maxHeight="50.0" style="-fx-background-color: rgba(255, 255, 255, 0.8);" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                  <TextField fx:id="tf_displayName" alignment="CENTER" maxHeight="50.0" style="-fx-background-color: rgba(255, 255, 255, 0.8);" text="Mimo" GridPane.columnIndex="1" GridPane.rowIndex="3">
                      <font>
                         <Font name="Algerian" size="40.0" />
                      </font>

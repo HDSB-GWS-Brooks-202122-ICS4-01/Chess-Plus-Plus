@@ -87,8 +87,8 @@ public class Constants {
 
                 };
 
-                public static final String[] X_ID = {"A", "B", "C", "D", "E", "F", "G", "H"};
-                public static final String[] Y_ID = {"1", "2", "3", "4", "5", "6", "7", "8"};
+                public static final String[] X_ID = { "A", "B", "C", "D", "E", "F", "G", "H" };
+                public static final String[] Y_ID = { "1", "2", "3", "4", "5", "6", "7", "8" };
 
                 // first index represents the id, second index has the position
                 public static final byte[][] INITIAL_POSITIONS = {
@@ -161,6 +161,10 @@ public class Constants {
 
         public static final class Online {
                 public static final String PATH_TO_JSON_PK = "src\\main\\resources\\priv\\chess-app-bb905-firebase-adminsdk-o32he-f6d06326b1.json";
-                public static final String PATH_TO_DEFAULT_AVATAR = "https://firebasestorage.googleapis.com/v0/b/chess-app-bb905.appspot.com/o/default%2Fdefault_avatar.jpg?alt=media&token=ca0d2869-02db-48ea-b9b8-4ed1a134607f";
+                public static final String PATH_TO_DEFAULT_AVATAR = "src\\main\\resources\\assets\\default_avatar.jpg";
+                public static final String PATH_TO_DEFAULT_STATS = "src\\main\\resources\\data\\default_stats.txt";
+                public static final String PATH_TO_STATS = "src\\main\\resources\\data\\stats.txt";
+                public static final String CONFIG_SIGNED_IN = "signedIn";
+                public static final String CONFIG_UID = "UID";
         }
 }

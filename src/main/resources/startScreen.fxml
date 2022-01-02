@@ -10,6 +10,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Font?>
 
 
@@ -72,7 +73,7 @@
                   </Button>
                </children>
             </GridPane>
-            <Pane fx:id="pn_notSignedIn" layoutY="650.0" prefHeight="200.0" prefWidth="1250.0" style="-fx-background-color: rgba(0, 0, 0, 0.5);">
+            <Pane fx:id="pn_notSignedIn" layoutY="650.0" prefHeight="200.0" prefWidth="1250.0" style="-fx-background-color: rgba(255, 255, 255, 0.5);">
                <children>
                   <Button fx:id="btn_signIn" layoutX="750.0" layoutY="60.0" mnemonicParsing="false" onAction="#switchToSignIn" prefHeight="80.0" prefWidth="200.0" text="Sign in" textFill="WHITE">
                      <font>
@@ -82,7 +83,7 @@
                         <Cursor fx:constant="HAND" />
                      </cursor>
                   </Button>
-                  <Label layoutX="10.0" layoutY="44.0" maxWidth="600.0" text="You are not signed in. To save your progress, sign in or register." textFill="#c6c6c6" wrapText="true">
+                  <Label layoutX="10.0" layoutY="44.0" maxWidth="600.0" text="You are not signed in. To save your progress, sign in or register." wrapText="true">
                      <font>
                         <Font name="System Bold" size="35.0" />
                      </font>
@@ -97,18 +98,30 @@
                   </Button>
                </children>
             </Pane>
-            <Pane fx:id="pn_signedIn" layoutY="650.0" prefHeight="200.0" prefWidth="1250.0" style="-fx-background-color: rgba(0, 0, 0, 0.5);">
+            <Pane fx:id="pn_signedIn" layoutY="650.0" prefHeight="200.0" prefWidth="1250.0" style="-fx-background-color: rgba(255, 255, 255, 0.5);">
                <children>
-                  <Label fx:id="lbl_welcome" layoutX="256.0" layoutY="8.0" text="Welcome, " textFill="WHITE">
+                  <Label fx:id="lbl_welcome" layoutX="200.0" layoutY="8.0" text="Welcome, ">
                      <font>
                         <Font name="System Bold" size="36.0" />
                      </font>
                   </Label>
-                  <ImageView fx:id="imgv_avatar" fitHeight="200.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
                   <Button fx:id="btn_signOut" layoutX="850.0" layoutY="60.0" mnemonicParsing="false" onAction="#signOut" prefHeight="81.0" prefWidth="250.0" text="Sign Out" textFill="WHITE">
                      <font>
                         <Font name="System Bold" size="38.0" />
                      </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Circle fill="#ffffff00" layoutX="100.0" layoutY="100.0" radius="75.0" stroke="BLACK" strokeType="OUTSIDE" strokeWidth="10.0" />
+                  <Button contentDisplay="CENTER" layoutX="25.0" layoutY="25.0" maxHeight="150.0" maxWidth="150.0" minHeight="150.0" minWidth="150.0" mnemonicParsing="false" onAction="#switchToProfile" prefHeight="150.0" prefWidth="150.0" style="-fx-background-color: transparent; -fx-border-radius: 75; -fx-border-width: 15;">
+                     <graphic>
+                        <ImageView fx:id="imgv_avatar" fitHeight="150.0" fitWidth="150.0" onDragDetected="#switchToProfile" pickOnBounds="true" preserveRatio="true">
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </ImageView>
+                     </graphic>
                      <cursor>
                         <Cursor fx:constant="HAND" />
                      </cursor>

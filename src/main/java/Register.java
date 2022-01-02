@@ -1,9 +1,34 @@
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
+import java.rmi.server.UID;
+import java.util.Arrays;
 import java.util.Properties;
+import java.util.Scanner;
 
+import com.google.auth.oauth2.ServiceAccountCredentials;
+import com.google.cloud.WriteChannel;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.BlobInfo;
+import com.google.cloud.storage.Bucket;
+import com.google.cloud.storage.BucketInfo;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageClass;
+import com.google.cloud.storage.StorageOptions;
+import com.google.cloud.storage.Bucket.BlobTargetOption;
+import com.google.common.io.Files;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
+import com.google.firebase.auth.OidcProviderConfig.UpdateRequest;
+import com.google.firebase.cloud.StorageClient;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -16,6 +41,10 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.PixelBuffer;
+import javafx.scene.image.PixelFormat;
+import javafx.scene.image.PixelReader;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
@@ -106,13 +135,18 @@ public class Register {
     * This method will run a few checks when the register button is pressed, and
     * then attempt to create an account.
     * 
-    * @throws NullPointerException  Will throw an error if there is an invalid
-    *                               entry.
-    * @throws FirebaseAuthException Will throw an error if an email is taken, or
-    *                               the domain name is incorrect, etc.
+    * @throws NullPointerException         Will throw an error if there is an
+    *                                      invalid
+    *                                      entry.
+    * @throws FirebaseAuthException        Will throw an error if an email is
+    *                                      taken, or
+    *                                      the domain name is incorrect, etc.
+    * @throws FileNotFoundException
+    * @throws UnsupportedEncodingException
     */
    @FXML
-   private void createAccount() throws NullPointerException, FirebaseAuthException {
+   private void createAccount()
+         throws NullPointerException, FirebaseAuthException, FileNotFoundException, UnsupportedEncodingException {
       boolean error = false;
 
       if (tf_displayName.getText().isBlank()) {
@@ -141,25 +175,33 @@ public class Register {
 
       UserRecord userRecord = null;
       try {
-
          com.google.firebase.auth.UserRecord.CreateRequest request = new com.google.firebase.auth.UserRecord.CreateRequest()
                .setEmail(tf_email.getText())
                .setEmailVerified(false)
                .setPassword(pf_password.getText())
                .setDisplayName(tf_displayName.getText())
-               .setPhotoUrl(Constants.Online.PATH_TO_DEFAULT_AVATAR)
+               // .setPhotoUrl(Constants.Online.PATH_TO_DEFAULT_AVATAR)
                .setDisabled(false);
 
          userRecord = FirebaseAuth.getInstance().createUser(request);
 
+         Bucket bucket = StorageClient.getInstance().bucket();
+         bucket.create("profiles/" + userRecord.getUid() + "/transcripts/holder.txt",
+               "This is your transcripts file path".getBytes(StandardCharsets.UTF_8));
+
+         bucket.create("profiles/" + userRecord.getUid() + "/stats.txt",
+               java.nio.file.Files.readAllBytes(Paths.get(Constants.Online.PATH_TO_DEFAULT_STATS)));
+
+         bucket.create("profiles/" + userRecord.getUid() + "/avatar.jpg",
+               java.nio.file.Files.readAllBytes(Paths.get(Constants.Online.PATH_TO_DEFAULT_AVATAR)));
+
          System.out.println("Successfully created new user: " + userRecord.getUid());
 
-      } catch (NullPointerException np) {
+      } catch (Exception e) {
+         e.printStackTrace();
          error = true;
-         lbl_output.setText(np.getMessage());
-      } catch (FirebaseAuthException fae) {
-         error = true;
-         lbl_output.setText(fae.getMessage());
+         lbl_output.setText(e.getMessage());
+         System.out.println(e.getMessage());
       }
 
       if (error) {
@@ -173,7 +215,7 @@ public class Register {
 
          App.saveConfig(config);
 
-         Timeline toHome = new Timeline(new KeyFrame(Duration.seconds(4), f -> {
+         Timeline toHome = new Timeline(new KeyFrame(Duration.seconds(2), f -> {
             try {
                switchToHome();
             } catch (IOException e) {
@@ -191,16 +233,16 @@ public class Register {
       Parent homeScene = App.loadFXML("startScreen");
 
       sp_root.getChildren().addAll(homeScene, signInScene);
-      signInScene.translateXProperty().set(-sp_root.getScene().getWidth());
-      homeScene.translateXProperty().set(-2 * sp_root.getScene().getWidth());
+      signInScene.translateXProperty().set(-sp_root.getScene().getWindow().getWidth());
+      homeScene.translateXProperty().set(-2 * sp_root.getScene().getWindow().getWidth());
 
       Timeline timeline = new Timeline(
             new KeyFrame(javafx.util.Duration.seconds(1),
                   new KeyValue(homeScene.translateXProperty(), 0)),
             new KeyFrame(javafx.util.Duration.seconds(1),
-                  new KeyValue(signInScene.translateXProperty(), sp_root.getScene().getWidth())),
+                  new KeyValue(signInScene.translateXProperty(), sp_root.getScene().getWindow().getWidth())),
             new KeyFrame(javafx.util.Duration.seconds(1),
-                  new KeyValue(pn_main.translateXProperty(), 2 * sp_root.getScene().getWidth())));
+                  new KeyValue(pn_main.translateXProperty(), 2 * sp_root.getScene().getWindow().getWidth())));
 
       // Play ani
       timeline.play();

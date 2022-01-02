@@ -44,16 +44,7 @@ public class App extends Application {
     private static Map[] matchStats = null;
 
     @Override
-    public void start(Stage stage) throws IOException, FirebaseAuthException {
-        FileInputStream serviceAccount = new FileInputStream(Constants.Online.PATH_TO_JSON_PK);
-
-        FirebaseOptions options = new FirebaseOptions.Builder()
-                .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                .setDatabaseUrl("https://chess-app-bb905-default-rtdb.firebaseio.com")
-                .build();
-
-        FirebaseApp.initializeApp(options);
-
+    public void start(Stage stage) throws IOException {
         scene = new Scene(loadFXML("startScreen"));
         stage.setScene(scene);
         stage.show();
@@ -140,7 +131,17 @@ public class App extends Application {
             return "White";
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+        FileInputStream serviceAccount = new FileInputStream(Constants.Online.PATH_TO_JSON_PK);
+
+        FirebaseOptions options = new FirebaseOptions.Builder()
+                .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                .setDatabaseUrl("https://chess-app-bb905-default-rtdb.firebaseio.com")
+                .setStorageBucket("chess-app-bb905.appspot.com")
+                .build();
+
+        FirebaseApp.initializeApp(options);
+
         launch();
     }
 
