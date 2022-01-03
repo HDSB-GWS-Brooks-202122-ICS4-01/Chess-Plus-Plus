@@ -1,7 +1,6 @@
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Properties;
@@ -33,7 +32,7 @@ public class Board {
    private byte cbdc = 0;
    private byte cwdc = 0;
 
-   private final byte[][] GRID = Constants.boardData.DEFAULT_GAME_SETUP.clone();
+   private final byte[][] GRID = new byte[8][8];
 
    private final StackPane[][] CELLS = new StackPane[8][8];
 
@@ -60,6 +59,11 @@ public class Board {
     *                   StackPane.
     */
    public Board(GameController game, GridPane[] cells) {
+      for (byte x = 0; x < 8; x++) {
+         for (byte y = 0; y < 8; y++) {
+            GRID[x][y] = Constants.boardData.DEFAULT_GAME_SETUP[x][y];
+         }
+      }
       GAME = game;
       gp_CHESS_BOARD = cells[0];
       gp_DEAD_BLACK_CELLS = cells[1];
@@ -87,8 +91,6 @@ public class Board {
             blackLabel.setText("30:00");
             whiteLabel.setText("30:00");
          }
-
-         
       } catch (Exception e) {
          e.printStackTrace();
       }
@@ -187,7 +189,7 @@ public class Board {
          }
       }
 
-      App.GAME_PIECES = GAME_PIECES;
+      App.GAME_PIECES = GAME_PIECES.clone();
 
       STATS[Constants.pieceIDs.WHITE].put("remaining_time", (int)TIMER_WHITE.getTimeMillis());
       STATS[Constants.pieceIDs.WHITE].put("total_moves", 0);

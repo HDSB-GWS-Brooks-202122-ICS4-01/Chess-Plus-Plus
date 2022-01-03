@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.print.DocFlavor.STRING;
 
 import javafx.animation.FillTransition;
+import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.ParallelTransition;
@@ -132,9 +133,9 @@ public class EndController {
       gameScene.translateYProperty().set(-sp_root.getScene().getHeight());
 
       Timeline timeline = new Timeline(new KeyFrame(javafx.util.Duration.seconds(1),
-            new KeyValue(gameScene.translateYProperty(), 0)),
+            new KeyValue(gameScene.translateYProperty(), 0, Interpolator.EASE_BOTH)),
             new KeyFrame(javafx.util.Duration.seconds(1),
-                  new KeyValue(hb_container.translateYProperty(), sp_root.getScene().getHeight())));
+                  new KeyValue(hb_container.translateYProperty(), sp_root.getScene().getHeight(), Interpolator.EASE_BOTH)));
 
       // Play ani
       timeline.play();
@@ -157,9 +158,9 @@ public class EndController {
       gameScene.translateYProperty().set(sp_root.getScene().getHeight());
 
       Timeline timeline = new Timeline(new KeyFrame(javafx.util.Duration.seconds(1),
-            new KeyValue(gameScene.translateYProperty(), 0)),
+            new KeyValue(gameScene.translateYProperty(), 0, Interpolator.EASE_BOTH)),
             new KeyFrame(javafx.util.Duration.seconds(1),
-                  new KeyValue(hb_container.translateYProperty(), -sp_root.getScene().getHeight())));
+                  new KeyValue(hb_container.translateYProperty(), -sp_root.getScene().getHeight(), Interpolator.EASE_BOTH)));
 
       // Play ani
       timeline.play();

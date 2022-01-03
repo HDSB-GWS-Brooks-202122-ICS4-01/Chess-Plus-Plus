@@ -9,6 +9,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.UserRecord;
 import com.google.firebase.cloud.StorageClient;
 
+import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -138,9 +139,9 @@ public class Profile {
 
       Timeline timeline = new Timeline(
             new KeyFrame(javafx.util.Duration.seconds(1),
-                  new KeyValue(startScreen.translateXProperty(), 0)),
+                  new KeyValue(startScreen.translateXProperty(), 0, Interpolator.EASE_BOTH)),
             new KeyFrame(javafx.util.Duration.seconds(1),
-                  new KeyValue(pn_main.translateXProperty(), -sp_root.getScene().getWidth())));
+                  new KeyValue(pn_main.translateXProperty(), -sp_root.getScene().getWidth(), Interpolator.EASE_BOTH)));
 
       // Play ani
       timeline.play();

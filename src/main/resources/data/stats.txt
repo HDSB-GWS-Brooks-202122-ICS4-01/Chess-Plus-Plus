@@ -1,4 +1,4 @@
 wins=0
 losses=0
 playTime=0
-score=0
+score=100

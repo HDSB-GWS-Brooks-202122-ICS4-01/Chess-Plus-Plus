@@ -58,12 +58,12 @@
                         <Insets right="20.0" />
                      </GridPane.margin>
                   </Label>
-                  <TextField fx:id="tf_email" alignment="CENTER" maxHeight="50.0" style="-fx-background-color: rgba(0, 0, 0, 0.5);" GridPane.columnIndex="1">
+                  <TextField fx:id="tf_email" alignment="CENTER" maxHeight="50.0" style="-fx-background-color: rgba(255, 255, 255, 0.5);" GridPane.columnIndex="1">
                      <font>
                         <Font name="Algerian" size="40.0" />
                      </font>
                   </TextField>
-                  <PasswordField fx:id="pf_password" alignment="CENTER" maxHeight="50.0" style="-fx-background-color: rgba(0, 0, 0, 0.5);" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                  <PasswordField fx:id="pf_password" alignment="CENTER" maxHeight="50.0" style="-fx-background-color: rgba(255, 255, 255, 0.5);" GridPane.columnIndex="1" GridPane.rowIndex="1">
                      <font>
                         <Font size="33.0" />
                      </font>
@@ -81,7 +81,7 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Button fx:id="btn_signIn" mnemonicParsing="false" prefHeight="80.0" prefWidth="1000.0" text="Sign in" textFill="WHITE" GridPane.rowIndex="1">
+                  <Button fx:id="btn_signIn" mnemonicParsing="false" onAction="#signIn" prefHeight="80.0" prefWidth="1000.0" text="Sign in" textFill="WHITE" GridPane.rowIndex="1">
                      <font>
                         <Font name="Caladea Bold" size="38.0" />
                      </font>

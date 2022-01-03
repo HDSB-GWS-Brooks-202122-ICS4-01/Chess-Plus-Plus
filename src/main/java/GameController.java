@@ -37,7 +37,6 @@ public class GameController {
    @FXML
    public void initialize() {
       board = new Board(this, new GridPane[] { gp_board, gp_blackDeadCells, gp_whiteDeadCells });
-      System.out.println(true);
    }
 
    public Label getTimeReference(byte color) {

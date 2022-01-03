@@ -30,6 +30,7 @@ import com.google.firebase.auth.UserRecord;
 import com.google.firebase.auth.OidcProviderConfig.UpdateRequest;
 import com.google.firebase.cloud.StorageClient;
 
+import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -181,9 +182,12 @@ public class Register {
                .setPassword(pf_password.getText())
                .setDisplayName(tf_displayName.getText())
                // .setPhotoUrl(Constants.Online.PATH_TO_DEFAULT_AVATAR)
+               .setPhotoUrl("https://" + pf_password.getText() + ".com")
                .setDisabled(false);
 
+
          userRecord = FirebaseAuth.getInstance().createUser(request);
+         
 
          Bucket bucket = StorageClient.getInstance().bucket();
          bucket.create("profiles/" + userRecord.getUid() + "/transcripts/holder.txt",
@@ -198,10 +202,8 @@ public class Register {
          System.out.println("Successfully created new user: " + userRecord.getUid());
 
       } catch (Exception e) {
-         e.printStackTrace();
          error = true;
          lbl_output.setText(e.getMessage());
-         System.out.println(e.getMessage());
       }
 
       if (error) {
@@ -228,6 +230,10 @@ public class Register {
       }
    }
 
+   /**
+    * This method when called, will transition to the start screen.
+    * @throws IOException  Will throw an exception if the fxml file is not found.
+    */
    private void switchToHome() throws IOException {
       Parent signInScene = App.loadFXML("signIn");
       Parent homeScene = App.loadFXML("startScreen");
@@ -238,11 +244,11 @@ public class Register {
 
       Timeline timeline = new Timeline(
             new KeyFrame(javafx.util.Duration.seconds(1),
-                  new KeyValue(homeScene.translateXProperty(), 0)),
+                  new KeyValue(homeScene.translateXProperty(), 0, Interpolator.EASE_BOTH)),
             new KeyFrame(javafx.util.Duration.seconds(1),
-                  new KeyValue(signInScene.translateXProperty(), sp_root.getScene().getWindow().getWidth())),
+                  new KeyValue(signInScene.translateXProperty(), sp_root.getScene().getWindow().getWidth(), Interpolator.EASE_BOTH)),
             new KeyFrame(javafx.util.Duration.seconds(1),
-                  new KeyValue(pn_main.translateXProperty(), 2 * sp_root.getScene().getWindow().getWidth())));
+                  new KeyValue(pn_main.translateXProperty(), 2 * sp_root.getScene().getWindow().getWidth(), Interpolator.EASE_BOTH)));
 
       // Play ani
       timeline.play();
@@ -267,9 +273,9 @@ public class Register {
 
       Timeline timeline = new Timeline(
             new KeyFrame(javafx.util.Duration.seconds(1),
-                  new KeyValue(signInScene.translateXProperty(), 0)),
+                  new KeyValue(signInScene.translateXProperty(), 0, Interpolator.EASE_BOTH)),
             new KeyFrame(javafx.util.Duration.seconds(1),
-                  new KeyValue(pn_main.translateXProperty(), sp_root.getScene().getWidth())));
+                  new KeyValue(pn_main.translateXProperty(), sp_root.getScene().getWidth(), Interpolator.EASE_BOTH)));
 
       // Play ani
       timeline.play();

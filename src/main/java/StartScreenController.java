@@ -15,6 +15,7 @@ import com.google.firebase.auth.UserRecord;
 import com.google.firebase.cloud.StorageClient;
 
 import javafx.animation.FadeTransition;
+import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -78,6 +79,7 @@ public class StartScreenController {
 
         for (Region element : elements) {
             element.setOpacity(0);
+            element.setDisable(true);
             element.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, null, null)));
 
             RegionFillTransition hoverEffect = new RegionFillTransition(element, Color.TRANSPARENT,
@@ -115,7 +117,8 @@ public class StartScreenController {
 
                 com.google.cloud.storage.Bucket bucket = StorageClient.getInstance().bucket();
 
-                Image avatar = new Image(new ByteArrayInputStream(bucket.get("profiles/" + userRecord.getUid() + "/avatar.jpg").getContent()));
+                Image avatar = new Image(new ByteArrayInputStream(
+                        bucket.get("profiles/" + userRecord.getUid() + "/avatar.jpg").getContent()));
 
                 imgv_avatar.setImage(avatar);
                 imgv_avatar.setFitWidth(150);
@@ -158,6 +161,7 @@ public class StartScreenController {
                     btn_signOut };
 
             for (Region element : elements) {
+                element.setDisable(false);
                 FadeTransition fade = new FadeTransition(Duration.millis(600), element);
                 fade.setToValue(1);
                 fade.play();
@@ -237,9 +241,10 @@ public class StartScreenController {
         signInScene.translateXProperty().set(sp_root.getScene().getWidth());
 
         Timeline timeline = new Timeline(new KeyFrame(javafx.util.Duration.seconds(1),
-                new KeyValue(signInScene.translateXProperty(), 0)),
+                new KeyValue(signInScene.translateXProperty(), 0, Interpolator.EASE_BOTH)),
                 new KeyFrame(javafx.util.Duration.seconds(1),
-                        new KeyValue(mainPane.translateXProperty(), -sp_root.getScene().getWidth())));
+                        new KeyValue(mainPane.translateXProperty(), -sp_root.getScene().getWidth(),
+                                Interpolator.EASE_BOTH)));
 
         // Play ani
         timeline.play();
@@ -265,11 +270,13 @@ public class StartScreenController {
 
         Timeline timeline = new Timeline(
                 new KeyFrame(javafx.util.Duration.seconds(1),
-                        new KeyValue(registerScene.translateXProperty(), 0)),
+                        new KeyValue(registerScene.translateXProperty(), 0, Interpolator.EASE_BOTH)),
                 new KeyFrame(javafx.util.Duration.seconds(1),
-                        new KeyValue(signInScene.translateXProperty(), -sp_root.getScene().getWidth())),
+                        new KeyValue(signInScene.translateXProperty(), -sp_root.getScene().getWidth(),
+                                Interpolator.EASE_BOTH)),
                 new KeyFrame(javafx.util.Duration.seconds(1),
-                        new KeyValue(mainPane.translateXProperty(), -2 * sp_root.getScene().getWidth())));
+                        new KeyValue(mainPane.translateXProperty(), -2 * sp_root.getScene().getWidth(),
+                                Interpolator.EASE_BOTH)));
 
         // Play ani
         timeline.play();
@@ -301,9 +308,10 @@ public class StartScreenController {
         profileScene.translateXProperty().set(-sp_root.getScene().getWidth());
 
         Timeline timeline = new Timeline(new KeyFrame(javafx.util.Duration.seconds(1),
-                new KeyValue(profileScene.translateXProperty(), 0)),
+                new KeyValue(profileScene.translateXProperty(), 0, Interpolator.EASE_BOTH)),
                 new KeyFrame(javafx.util.Duration.seconds(1),
-                        new KeyValue(mainPane.translateXProperty(), sp_root.getScene().getWidth())));
+                        new KeyValue(mainPane.translateXProperty(), sp_root.getScene().getWidth(),
+                                Interpolator.EASE_BOTH)));
 
         // Play ani
         timeline.play();
