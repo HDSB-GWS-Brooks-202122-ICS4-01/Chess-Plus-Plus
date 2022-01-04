@@ -50,6 +50,18 @@ public class Constants {
                 public static final byte PAWN = 5;
         }
 
+        public static class moveTypes{
+                public static final byte REGULAR = 0;
+                public static final byte CASTLE_LEFT = 1;
+                public static final byte CASTLE_RIGHT = 2;
+                public static final byte EN_PASSANT = 3;
+                public static final byte PROMOTION_QUEEN = 4;
+                public static final byte PROMOTION_KING = 5;
+                public static final byte PROMOTION_KNIGHT = 6;
+                public static final byte PROMOTION_ROOK = 7;
+                public static final byte PROMOTION_BISHOP = 8;
+        }
+
         public static final class boardData {
                 public static final byte[][] DEFAULT_GAME_SETUP = {
                                 { pieceIDs.BLACK_QUEENS_ROOK, pieceIDs.BLACK_PAWN_ZERO, pieceIDs.EMPTY_CELL,
