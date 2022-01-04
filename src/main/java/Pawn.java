@@ -39,10 +39,6 @@ public class Pawn extends Piece {
     @Override
     public byte[][] getPossibleMoves(byte[][] boardPositions) {
         ArrayList<byte[]> possibleMoves = new ArrayList<byte[]>();
-        System.out.println("pieceType: " + this.pieceType);
-        System.out.println("color: " + this.color);
-        System.out.println("gridx :" + gridX);
-        System.out.println("gridy: " + gridY);
 
         if (color == Constants.pieceIDs.BLACK) {
             // if the pawn can move forward

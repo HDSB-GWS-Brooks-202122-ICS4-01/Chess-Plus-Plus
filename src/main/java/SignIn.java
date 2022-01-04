@@ -1,14 +1,8 @@
 import java.io.IOException;
-import java.io.ObjectInputFilter.Config;
 import java.util.Properties;
-
-import com.google.cloud.storage.Acl.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
-import com.google.firebase.auth.UserMetadata;
 import com.google.firebase.auth.UserRecord;
-
-import javafx.animation.Interpolatable;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -22,7 +16,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;

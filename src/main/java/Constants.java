@@ -51,15 +51,12 @@ public class Constants {
         }
 
         public static class moveTypes{
-                public static final byte REGULAR = 0;
-                public static final byte CASTLE_LEFT = 1;
-                public static final byte CASTLE_RIGHT = 2;
-                public static final byte EN_PASSANT = 3;
-                public static final byte PROMOTION_QUEEN = 4;
-                public static final byte PROMOTION_KING = 5;
-                public static final byte PROMOTION_KNIGHT = 6;
-                public static final byte PROMOTION_ROOK = 7;
-                public static final byte PROMOTION_BISHOP = 8;
+                public static final String REGULAR = "R";
+                public static final String CASTLE_LEFT = "c";
+                public static final String CASTLE_RIGHT = "C";
+                public static final String PASSANT_LEFT = "e";
+                public static final String PASSANT_RIGHT = "E";
+                public static final String PROMOTION = "P";
         }
 
         public static final class boardData {
