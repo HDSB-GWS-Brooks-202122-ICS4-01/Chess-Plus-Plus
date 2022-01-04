@@ -5,10 +5,10 @@ public class Bot {
     final boolean black;
 
     /**
-     * Constructor for the bot. 
+     * Constructor for the bot.
      * 
-     * @param diff The difficulty the bot is set to.
-     * @param black The color the bot is playing as. 
+     * @param diff  The difficulty the bot is set to.
+     * @param black The color the bot is playing as.
      */
     public Bot(String diff, boolean black) {
         switch (diff) {
@@ -63,8 +63,10 @@ public class Bot {
         }
 
         BoardInfo boardInfo = new BoardInfo(boardPositions, passant, hasMoved, deadPieces);
-        boardInfo.setKingPos(true, App.GAME_PIECES[Constants.pieceIDs.BLACK_KING].gridX, App.GAME_PIECES[Constants.pieceIDs.BLACK_KING].gridY);
-        boardInfo.setKingPos(false, App.GAME_PIECES[Constants.pieceIDs.WHITE_KING].gridX, App.GAME_PIECES[Constants.pieceIDs.WHITE_KING].gridY);
+        boardInfo.setKingPos(true, App.GAME_PIECES[Constants.pieceIDs.BLACK_KING].gridX,
+                App.GAME_PIECES[Constants.pieceIDs.BLACK_KING].gridY);
+        boardInfo.setKingPos(false, App.GAME_PIECES[Constants.pieceIDs.WHITE_KING].gridX,
+                App.GAME_PIECES[Constants.pieceIDs.WHITE_KING].gridY);
 
         return minimax(depth, true, boardInfo).previousMove;
     }
@@ -196,26 +198,59 @@ public class Bot {
         return (BoardInfo[]) generatedBoards.toArray();
     }
 
-    boolean isNotUnderCheck(BoardInfo board){
+    boolean isNotUnderCheck(BoardInfo boardInfo, boolean color) {
+        // if the color it is checking is black.
+        if (color) {
+            int x = boardInfo.blackKingX;
+            int y = boardInfo.blackKingY;
+            byte[][] boardPositions = boardInfo.board;
+            // iterator for going up
+            int j = y - 1;
+
+            // iterator for going down
+            int k = y + 1;
+
+            // iterator for going to the right
+            int i = x + 1;
+
+            // iterator for going to the left
+            int l = x - 1;
+            int count = 0;
+            while (count < 8) {
+                // left check
+                if (l > -1 && (boardPositions[l][y] == Constants.pieceIDs.WHITE_QUEEN
+                        || boardPositions[l][y] == Constants.pieceIDs.WHITE_KINGS_ROOK
+                        || boardPositions[l][y] == Constants.pieceIDs.WHITE_QUEENS_ROOK)) {
+
+                }
+
+            }
+
+        } else {
+
+        }
         return false;
     }
 
-    private ArrayList<BoardInfo> movesPawn(ArrayList<BoardInfo> boards, BoardInfo initialBoard, int x, int y, boolean color, byte id){
+    private ArrayList<BoardInfo> movesPawn(ArrayList<BoardInfo> boards, BoardInfo initialBoard, int x, int y,
+            boolean color, byte id) {
         return boards;
     }
 
+    private ArrayList<BoardInfo> movesKing(ArrayList<BoardInfo> boards, BoardInfo initialBoard, int x, int y,
+            boolean color, byte id) {
+        // if the color of the king is black
+        if (color) {
 
-    private ArrayList<BoardInfo> movesKing(ArrayList<BoardInfo> boards, BoardInfo initialBoard, int x, int y, boolean color, byte id){
-        //if the color of the king is black
-        if(color){
+        } else {
 
         }
 
         return boards;
     }
 
-
-    private ArrayList<BoardInfo> movesKnight(ArrayList<BoardInfo> boards, BoardInfo initialBoard, int x, int y, boolean color, byte id){
+    private ArrayList<BoardInfo> movesKnight(ArrayList<BoardInfo> boards, BoardInfo initialBoard, int x, int y,
+            boolean color, byte id) {
         return boards;
     }
 
@@ -262,7 +297,7 @@ public class Bot {
             }
 
         } else {
-            for (int i = x + 1; i < 8; i++) {
+            for (int i = x - 1; i > -1; i--) {
                 for (int j = y - 1; j > -1; j--) {
                     if (initialBoard.board[i][j] > 15 && initialBoard.board[i][j] < 32) {
                         break;
@@ -378,7 +413,7 @@ public class Bot {
     private ArrayList<BoardInfo> movesUpLeft(ArrayList<BoardInfo> boards, BoardInfo initialBoard, int x, int y,
             boolean color, byte id) {
         if (color) {
-            for (int i = x - 1; i < 8; i--) {
+            for (int i = x - 1; i > -1; i--) {
                 for (int j = y - 1; j > -1; j--) {
                     if (initialBoard.board[i][j] > -1 && initialBoard.board[i][j] < 16) {
                         break;
@@ -400,7 +435,7 @@ public class Bot {
             }
 
         } else {
-            for (int i = x - 1; i < 8; i--) {
+            for (int i = x - 1; i > -1; i--) {
                 for (int j = y - 1; j > -1; j--) {
                     if (initialBoard.board[i][j] > 15 && initialBoard.board[i][j] < 32) {
                         break;
@@ -799,15 +834,14 @@ public class Bot {
         return boards;
     }
 
-
-    private byte getPassantIndex(byte id){
-        byte index = (id/2 == 1) ? (byte) (id%8): (byte) (id%8 + 8);
+    private byte getPassantIndex(byte id) {
+        byte index = (id / 2 == 1) ? (byte) (id % 8) : (byte) (id % 8 + 8);
         System.out.println("Pawn index for id: " + id + ", is " + index);
         return index;
     }
 
-    private byte getHasMovedIndex(byte id){
-        switch(id){
+    private byte getHasMovedIndex(byte id) {
+        switch (id) {
             case Constants.pieceIDs.BLACK_KINGS_ROOK:
                 return 0;
             case Constants.pieceIDs.BLACK_QUEENS_ROOK:
@@ -823,7 +857,7 @@ public class Bot {
             default:
                 System.out.println("Wrong id in getHasMovedIndex() of Bot class");
                 return -1;
-            
+
         }
 
     }
