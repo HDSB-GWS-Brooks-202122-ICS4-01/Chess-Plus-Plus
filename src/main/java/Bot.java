@@ -63,6 +63,8 @@ public class Bot {
         }
 
         BoardInfo boardInfo = new BoardInfo(boardPositions, passant, hasMoved, deadPieces);
+        boardInfo.setKingPos(true, App.GAME_PIECES[Constants.pieceIDs.BLACK_KING].gridX, App.GAME_PIECES[Constants.pieceIDs.BLACK_KING].gridY);
+        boardInfo.setKingPos(false, App.GAME_PIECES[Constants.pieceIDs.WHITE_KING].gridX, App.GAME_PIECES[Constants.pieceIDs.WHITE_KING].gridY);
 
         return minimax(depth, true, boardInfo).previousMove;
     }
@@ -194,6 +196,9 @@ public class Bot {
         return (BoardInfo[]) generatedBoards.toArray();
     }
 
+    boolean isNotUnderCheck(BoardInfo board){
+        return false;
+    }
 
     private ArrayList<BoardInfo> movesPawn(ArrayList<BoardInfo> boards, BoardInfo initialBoard, int x, int y, boolean color, byte id){
         return boards;
@@ -201,6 +206,11 @@ public class Bot {
 
 
     private ArrayList<BoardInfo> movesKing(ArrayList<BoardInfo> boards, BoardInfo initialBoard, int x, int y, boolean color, byte id){
+        //if the color of the king is black
+        if(color){
+
+        }
+
         return boards;
     }
 

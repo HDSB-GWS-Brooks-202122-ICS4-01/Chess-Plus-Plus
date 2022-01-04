@@ -8,6 +8,12 @@ public class BoardInfo {
     ArrayList<Byte> deadPieces;
     String previousMove;
 
+    byte whiteKingX;
+    byte whiteKingY;
+
+    byte blackKingX;
+    byte blackKingY; 
+
     public BoardInfo(byte[][] board, int[] passant, boolean[] hasMoved, ArrayList<Byte> deadPieces){
 
         this.board = board;
@@ -16,10 +22,12 @@ public class BoardInfo {
         this.deadPieces = deadPieces;
     }
 
+    /**
+     * Method for deep copying a BoardInfo object. 
+     * @return A new BoardInfo object that is a deep copy of the original. 
+     */
     public BoardInfo copy(){
-
-        return new BoardInfo(deepCopy(board), Arrays.copyOf(passant, passant.length), Arrays.copyOf(hasMoved, hasMoved.length), (ArrayList<Byte>) deadPieces.clone());
-
+        return new BoardInfo(deepCopy(board), Arrays.copyOf(passant, passant.length), Arrays.copyOf(hasMoved, hasMoved.length), new ArrayList<Byte>(deadPieces));
     }
 
     /**
@@ -35,13 +43,23 @@ public class BoardInfo {
 
     }
 
-    public static byte[][] deepCopy(byte[][] original){
+    public byte[][] deepCopy(byte[][] original){
         byte[][] newArray = new byte[original.length][original[0].length];
         for(int i = 0; i < original.length; i++){
             newArray[i] = Arrays.copyOf(original[i], original[i].length);
         }
         return newArray;
 
+    }
+
+    public void setKingPos(boolean black, byte x, byte y){
+        if(black){
+            blackKingX = x;
+            blackKingY = y;
+        } else {
+            whiteKingX = x;
+            whiteKingY = y;
+        }
     }
     
 }
