@@ -1,4 +1,9 @@
 import java.io.IOException;
+import java.util.Properties;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.UserRecord;
 
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
@@ -11,20 +16,27 @@ import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 /**
  * Controller of the game scene, also initializes the Board class.
+ * 
  * @author Selim Abdelwahab
- * @version 1.0 
+ * @version 1.0
  */
 public class GameController {
+   Properties config = App.getConfig();
+
    @FXML
    StackPane sp_root, sp_container;
 
    @FXML
    GridPane gp_board, gp_blackDeadCells, gp_whiteDeadCells;
+
+   @FXML
+   Pane pn_dev;
 
    @FXML
    Label lbl_bTimer, lbl_wTimer;
@@ -35,8 +47,25 @@ public class GameController {
    private Board board;
 
    @FXML
-   public void initialize() {
-      board = new Board(this, new GridPane[] { gp_board, gp_blackDeadCells, gp_whiteDeadCells });
+   public void initialize() throws FirebaseAuthException {
+      board = new Board(this, new GridPane[] { gp_board, gp_blackDeadCells, gp_whiteDeadCells }, App.getGameMode());
+
+      if (config.getProperty("signedIn").equalsIgnoreCase("t")) {
+         UserRecord userRecord = FirebaseAuth.getInstance().getUser(config.getProperty("UID"));
+
+         boolean userIsDev = false;
+
+         for (String dev : Constants.Online.DEV_EMAILS) {
+            if (userRecord.getEmail().equalsIgnoreCase(dev)) {
+               userIsDev = true;
+               break;
+            }
+         }
+
+         if (userIsDev) {
+            pn_dev.setVisible(true);
+         }
+      }
    }
 
    public Label getTimeReference(byte color) {
@@ -130,8 +159,7 @@ public class GameController {
       Timeline[] timelines = new Timeline[] {
             new Timeline(
                   new KeyFrame(javafx.util.Duration.seconds(1),
-                        new KeyValue(vb_gameover.translateYProperty(), 0, Interpolator.EASE_BOTH))
-            ),
+                        new KeyValue(vb_gameover.translateYProperty(), 0, Interpolator.EASE_BOTH))),
             new Timeline(
                   new KeyFrame(javafx.util.Duration.seconds(1),
                         new KeyValue(endScene.translateYProperty(), 0)),

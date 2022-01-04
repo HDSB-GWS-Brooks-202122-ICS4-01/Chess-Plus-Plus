@@ -31,6 +31,7 @@ import com.google.firebase.auth.UserRecord;
  */
 
 public class App extends Application {
+    private static Properties config = App.getConfig();
 
     private static Scene scene;
     private static Image SPRITESHEET = new Image(App.class.getResource("assets\\chess_spritesheet.png").toString());
@@ -42,6 +43,9 @@ public class App extends Application {
     private static String matchTranscript;
 
     private static Map[] matchStats = null;
+
+    private static String aiDiff = config.getProperty("aidiff");
+    private static byte gameMode;
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -169,4 +173,15 @@ public class App extends Application {
         return scene;
     }
 
+    public static String getDiff() {
+        return App.aiDiff;
+    }
+
+    public static void setGameMode(byte gm) {
+        gameMode = gm;
+    }
+
+    public static byte getGameMode() {
+        return gameMode;
+    }
 }

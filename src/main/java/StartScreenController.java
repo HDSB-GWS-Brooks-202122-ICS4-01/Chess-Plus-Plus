@@ -167,6 +167,7 @@ public class StartScreenController {
      */
     @FXML
     public void switchToGame() {
+        App.setGameMode(Constants.boardData.MODE_PASS_N_PLAY);
         transition("game");
     }
 
@@ -183,7 +184,8 @@ public class StartScreenController {
      */
     @FXML
     public void switchToAi() {
-
+        App.setGameMode(Constants.boardData.MODE_AI);
+        transition("game");
     }
 
     /**

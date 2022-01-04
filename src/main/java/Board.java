@@ -22,6 +22,8 @@ import javafx.scene.layout.StackPane;
  * @version 1.0 
  */
 public class Board {
+   Properties config = new Properties();
+
    private static final ArrayList<String> MATCH_TRANSCRIPT = new ArrayList<String>();
    private final GameController GAME;
    private final GridPane gp_CHESS_BOARD;
@@ -51,14 +53,19 @@ public class Board {
    private final Map[] STATS = new Map[]{new HashMap<String, Integer>(), new HashMap<String, Integer>(), new HashMap<String, String>()};
    private byte winner;
 
+   private Bot bot = new Bot(App.getDiff(), true);
+
+   private final byte GAME_MODE;
+
    /**
     * Constructor for the Board class
     * 
     * @param game       Reference to the GameController class.
     * @param chessBoard GridPane element containing the rows, and columns of
     *                   StackPane.
+    * @param gm         The game mode; Ai, pass n play
     */
-   public Board(GameController game, GridPane[] cells) {
+   public Board(GameController game, GridPane[] cells, byte gm) {
       for (byte x = 0; x < 8; x++) {
          for (byte y = 0; y < 8; y++) {
             GRID[x][y] = Constants.boardData.DEFAULT_GAME_SETUP[x][y];
@@ -68,8 +75,8 @@ public class Board {
       gp_CHESS_BOARD = cells[0];
       gp_DEAD_BLACK_CELLS = cells[1];
       gp_DEAD_WHITE_CELLS = cells[2];
+      GAME_MODE = gm;
 
-      Properties config = new Properties();
       int gameTime = 600000;
       Label blackLabel = GAME.getTimeReference(Constants.pieceIDs.BLACK);
       Label whiteLabel = GAME.getTimeReference(Constants.pieceIDs.WHITE);
@@ -469,6 +476,14 @@ public class Board {
       }
 
       System.out.println("Next turn: " + turn);
+
+      if (GAME_MODE == Constants.boardData.MODE_AI) {
+         parseAiMove(bot.getMove(GRID, DEAD_PIECES));
+      }
+   }
+
+   private void parseAiMove(String move) {
+      System.out.println(move);
    }
 
    /**

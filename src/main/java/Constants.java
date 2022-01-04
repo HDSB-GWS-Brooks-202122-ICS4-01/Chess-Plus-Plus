@@ -50,7 +50,7 @@ public class Constants {
                 public static final byte PAWN = 5;
         }
 
-        public static class moveTypes{
+        public static class moveTypes {
                 public static final String REGULAR = "R";
                 public static final String CASTLE_LEFT = "c";
                 public static final String CASTLE_RIGHT = "C";
@@ -60,6 +60,9 @@ public class Constants {
         }
 
         public static final class boardData {
+                public static final byte MODE_PASS_N_PLAY = 0;
+                public static final byte MODE_AI = 1;
+
                 public static final byte[][] DEFAULT_GAME_SETUP = {
                                 { pieceIDs.BLACK_QUEENS_ROOK, pieceIDs.BLACK_PAWN_ZERO, pieceIDs.EMPTY_CELL,
                                                 pieceIDs.EMPTY_CELL,
@@ -175,5 +178,7 @@ public class Constants {
                 public static final String PATH_TO_STATS = "src\\main\\resources\\data\\stats.txt";
                 public static final String CONFIG_SIGNED_IN = "signedIn";
                 public static final String CONFIG_UID = "UID";
+
+                public static final String[] DEV_EMAILS = { "mimo280604@gmail.com", "akilpath@gmail.com" };
         }
 }

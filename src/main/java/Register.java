@@ -1,33 +1,14 @@
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
-import java.rmi.server.UID;
-import java.util.Arrays;
 import java.util.Properties;
-import java.util.Scanner;
 
-import com.google.auth.oauth2.ServiceAccountCredentials;
-import com.google.cloud.WriteChannel;
-import com.google.cloud.storage.Blob;
-import com.google.cloud.storage.BlobId;
-import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Bucket;
-import com.google.cloud.storage.BucketInfo;
-import com.google.cloud.storage.Storage;
-import com.google.cloud.storage.StorageClass;
-import com.google.cloud.storage.StorageOptions;
-import com.google.cloud.storage.Bucket.BlobTargetOption;
-import com.google.common.io.Files;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
-import com.google.firebase.auth.OidcProviderConfig.UpdateRequest;
 import com.google.firebase.cloud.StorageClient;
 
 import javafx.animation.Interpolator;
@@ -42,10 +23,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
-import javafx.scene.image.PixelBuffer;
-import javafx.scene.image.PixelFormat;
-import javafx.scene.image.PixelReader;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
@@ -222,7 +199,6 @@ public class Register {
                switchToHome();
             } catch (IOException e) {
                lbl_output.setText("Unable to automatically return to home screen, please do so manually.");
-
             }
          }));
 
