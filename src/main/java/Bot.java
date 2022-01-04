@@ -1,16 +1,14 @@
 import java.util.ArrayList;
 
-import com.google.api.client.util.store.FileDataStoreFactory;
-import com.google.common.eventbus.DeadEvent;
-
-import javafx.animation.FadeTransition;
-
 public class Bot {
     final int depth;
     final boolean black;
 
     /**
      * Constructor for the bot. 
+     * 
+     * @param diff The difficulty the bot is set to.
+     * @param black The color the bot is playing as. 
      */
     public Bot(String diff, boolean black) {
         switch (diff) {
@@ -31,7 +29,8 @@ public class Bot {
     }
 
     /**
-     * Method for getting the move the bot wants to perform. 
+     * Method for getting the move the bot wants to perform.
+     * 
      * @param boardPositions
      * @param deadPiecesObjects
      * @return
@@ -69,17 +68,20 @@ public class Bot {
     }
 
     /**
-     * Method for evaluating the value of the board. Evaluating a board means to apply a value for it,
+     * Method for evaluating the value of the board. Evaluating a board means to
+     * apply a value for it,
      * this is used in the minimax algorithm.
+     * 
      * @param boardInfo The board to evaluate.
-     * @return an Integer represnting the score for this board. 
+     * @return an Integer represnting the score for this board.
      */
     private int evaluate(BoardInfo boardInfo) {
         return 0;
     }
 
     /**
-     * Minimax algorithm used for the A.I. 
+     * Minimax algorithm used for the A.I.
+     * 
      * @param depth
      * @param max
      * @param boardInfo
@@ -111,69 +113,395 @@ public class Bot {
     }
 
     /**
-     * Method for generating all the possible boards/outcomes from this board. 
+     * Method for generating all the possible boards/outcomes from this board.
+     * 
      * @param boardInfo The original board to generate from.
-     * @return An array of BoardInfo objects, representing all the possible moves generated from the original board.
+     * @return An array of BoardInfo objects, representing all the possible moves
+     *         generated from the original board.
      */
     private BoardInfo[] generateBoards(BoardInfo boardInfo) {
         ArrayList<BoardInfo> generatedBoards = new ArrayList<BoardInfo>();
-        if (black) {
-            for (int x = 0; x < 8; x++) {
-                for (int y = 0; y < 8; y++) {
-                    if (boardInfo.board[x][y] == Constants.pieceIDs.EMPTY_CELL) {
+        for (int x = 0; x < 8; x++) {
+            for (int y = 0; y < 8; y++) {
+                byte id = boardInfo.board[x][y];
+                if (id == Constants.pieceIDs.EMPTY_CELL) {
+                    continue;
+                } else if (id == Constants.pieceIDs.BLACK_KINGS_ROOK
+                        || id == Constants.pieceIDs.BLACK_QUEENS_ROOK
+                        || id == Constants.pieceIDs.WHITE_QUEENS_ROOK
+                        || id == Constants.pieceIDs.WHITE_KINGS_ROOK) {
 
-                    } else if (boardInfo.board[x][y] == Constants.pieceIDs.BLACK_KINGS_ROOK
-                            || boardInfo.board[x][y] == Constants.pieceIDs.BLACK_QUEENS_ROOK) {
-                        generatedBoards = movesLeft(generatedBoards, boardInfo, x, y,
-                                (boardInfo.board[x][y] % 16 == Constants.pieceIDs.BLACK), boardInfo.board[x][y]);
-                        generatedBoards = movesRight(generatedBoards, boardInfo, x, y,
-                                (boardInfo.board[x][y] % 16 == Constants.pieceIDs.BLACK), boardInfo.board[x][y]);
-                        generatedBoards = movesUp(generatedBoards, boardInfo, x, y,
-                                (boardInfo.board[x][y] % 16 == Constants.pieceIDs.BLACK), boardInfo.board[x][y]);
-                        generatedBoards = movesDown(generatedBoards, boardInfo, x, y,
-                                (boardInfo.board[x][y] % 16 == Constants.pieceIDs.BLACK), boardInfo.board[x][y]);
-                            System.out.println("Moves generated after looking at black castle: " + generatedBoards.size());
-                        
+                    generatedBoards = movesLeft(generatedBoards, boardInfo, x, y,
+                            (id / 2 == Constants.pieceIDs.BLACK), id);
+                    generatedBoards = movesRight(generatedBoards, boardInfo, x, y,
+                            (id / 2 == Constants.pieceIDs.BLACK), id);
+                    generatedBoards = movesUp(generatedBoards, boardInfo, x, y,
+                            (id / 2 == Constants.pieceIDs.BLACK), id);
+                    generatedBoards = movesDown(generatedBoards, boardInfo, x, y,
+                            (id / 2 == Constants.pieceIDs.BLACK), id);
+                    System.out.println("Moves generated after looking at black castle: " + generatedBoards.size());
 
-                    } else if (boardInfo.board[x][y] == Constants.pieceIDs.BLACK_KINGS_KNIGHT
-                            || boardInfo.board[x][y] == Constants.pieceIDs.BLACK_QUEENS_KNIGHT) {
+                } else if (id == Constants.pieceIDs.BLACK_KINGS_KNIGHT
+                        || id == Constants.pieceIDs.BLACK_QUEENS_KNIGHT
+                        || id == Constants.pieceIDs.WHITE_KINGS_KNIGHT
+                        || id == Constants.pieceIDs.WHITE_QUEENS_KNIGHT) {
 
-                    } else if (boardInfo.board[x][y] == Constants.pieceIDs.BLACK_QUEEN) {
+                } else if (id == Constants.pieceIDs.BLACK_QUEEN
+                        || id == Constants.pieceIDs.WHITE_QUEEN) {
+                    generatedBoards = movesLeft(generatedBoards, boardInfo, x, y,
+                            (id / 2 == Constants.pieceIDs.BLACK), id);
+                    generatedBoards = movesRight(generatedBoards, boardInfo, x, y,
+                            (id / 2 == Constants.pieceIDs.BLACK), id);
+                    generatedBoards = movesUp(generatedBoards, boardInfo, x, y,
+                            (id / 2 == Constants.pieceIDs.BLACK), id);
+                    generatedBoards = movesDown(generatedBoards, boardInfo, x, y,
+                            (id / 2 == Constants.pieceIDs.BLACK), id);
+                    generatedBoards = movesUpRight(generatedBoards, boardInfo, x, y,
+                            (id / 2 == Constants.pieceIDs.BLACK), id);
+                    generatedBoards = movesUpLeft(generatedBoards, boardInfo, x, y,
+                            (id / 2 == Constants.pieceIDs.BLACK), id);
+                    generatedBoards = movesDownRight(generatedBoards, boardInfo, x, y,
+                            (id / 2 == Constants.pieceIDs.BLACK), id);
+                    generatedBoards = movesDownLeft(generatedBoards, boardInfo, x, y,
+                            (id / 2 == Constants.pieceIDs.BLACK), id);
+                    System.out.println("Moves generated after looking at queen: " + generatedBoards.size());
 
-                    } else if (boardInfo.board[x][y] == Constants.pieceIDs.BLACK_KINGS_BISHOP
-                            || boardInfo.board[x][y] == Constants.pieceIDs.BLACK_QUEENS_BISHOP) {
+                } else if (id == Constants.pieceIDs.BLACK_KINGS_BISHOP
+                        || id == Constants.pieceIDs.BLACK_QUEENS_BISHOP
+                        || id == Constants.pieceIDs.WHITE_KINGS_BISHOP
+                        || id == Constants.pieceIDs.WHITE_QUEENS_BISHOP) {
 
-                    } else if (boardInfo.board[x][y] == Constants.pieceIDs.BLACK_KINGS_ROOK
-                            || boardInfo.board[x][y] == Constants.pieceIDs.BLACK_QUEENS_ROOK) {
+                    generatedBoards = movesUpRight(generatedBoards, boardInfo, x, y,
+                            (id / 2 == Constants.pieceIDs.BLACK), id);
+                    generatedBoards = movesUpLeft(generatedBoards, boardInfo, x, y,
+                            (id / 2 == Constants.pieceIDs.BLACK), id);
+                    generatedBoards = movesDownRight(generatedBoards, boardInfo, x, y,
+                            (id / 2 == Constants.pieceIDs.BLACK), id);
+                    generatedBoards = movesDownLeft(generatedBoards, boardInfo, x, y,
+                            (id / 2 == Constants.pieceIDs.BLACK), id);
+                    System.out.println("Moves generated after looking at bishop: " + generatedBoards.size());
 
-                    } else if (boardInfo.board[x][y] == Constants.pieceIDs.BLACK_KING) {
+                } else if (id == Constants.pieceIDs.BLACK_KING || id == Constants.pieceIDs.WHITE_KING) {
 
-                    } else if (boardInfo.board[x][y] > 7 && boardInfo.board[x][y] < 16) {
-
-                    }
+                } else if ((id > 7 && id < 16) || (id > 23 && id < 32)) {
 
                 }
 
             }
-
-        } else {
 
         }
 
         return (BoardInfo[]) generatedBoards.toArray();
     }
 
+
+    private ArrayList<BoardInfo> movesPawn(ArrayList<BoardInfo> boards, BoardInfo initialBoard, int x, int y, boolean color, byte id){
+        return boards;
+    }
+
+
+    private ArrayList<BoardInfo> movesKing(ArrayList<BoardInfo> boards, BoardInfo initialBoard, int x, int y, boolean color, byte id){
+        return boards;
+    }
+
+
+    private ArrayList<BoardInfo> movesKnight(ArrayList<BoardInfo> boards, BoardInfo initialBoard, int x, int y, boolean color, byte id){
+        return boards;
+    }
+
     /**
-     * Method for generating boards when a piece is moving to the left. It generates a new board when a piece is moving to a new position,
-     * the newly generated board contains no references to the original board or any fields inside of it. It also updates the deadPieces 
-     * field in the newBoard object when needed and records what move led to that board. 
-     * @param boards ArrayList of boards that it will add the newly generated boards to. 
-     * @param initialBoard The initial board it is generating moves from. 
-     * @param x Pieces location in the x axis on the board.
-     * @param y Pieces location in the y axis on the board. 
-     * @param color Color of the piece. 
-     * @param id Id of the piece. 
-     * @return An ArrayList of BoardInfo objects that contain the newly generated moves in this direction.
+     * Method for generating boards when a piece is moving to diagonally down to the
+     * left. It generates a new board when a piece is moving to a new position,
+     * the newly generated board contains no references to the original board or any
+     * fields inside of it. It also updates the deadPieces
+     * field in the newBoard object when needed and records what move led to that
+     * board.
+     * 
+     * @param boards       ArrayList of boards that it will add the newly generated
+     *                     boards to.
+     * @param initialBoard The initial board it is generating moves from.
+     * @param x            Pieces location in the x axis on the board.
+     * @param y            Pieces location in the y axis on the board.
+     * @param color        Color of the piece.
+     * @param id           Id of the piece.
+     * @return An ArrayList of BoardInfo objects that contain the newly generated
+     *         moves in this direction.
+     */
+    private ArrayList<BoardInfo> movesDownLeft(ArrayList<BoardInfo> boards, BoardInfo initialBoard, int x, int y,
+            boolean color, byte id) {
+        if (color) {
+            for (int i = x - 1; i > -1; i--) {
+                for (int j = y - 1; j > -1; j--) {
+                    if (initialBoard.board[i][j] > -1 && initialBoard.board[i][j] < 16) {
+                        break;
+                    } else {
+                        BoardInfo newBoard = initialBoard.copy();
+                        newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
+                        if (initialBoard.board[i][j] != Constants.pieceIDs.EMPTY_CELL) {
+                            newBoard.deadPieces.add(newBoard.board[i][j]);
+                            newBoard.board[i][j] = id;
+                            newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + i + j);
+                            boards.add(newBoard);
+                            break;
+                        }
+                        newBoard.board[i][j] = id;
+                        newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + i + j);
+                        boards.add(newBoard);
+                    }
+                }
+            }
+
+        } else {
+            for (int i = x + 1; i < 8; i++) {
+                for (int j = y - 1; j > -1; j--) {
+                    if (initialBoard.board[i][j] > 15 && initialBoard.board[i][j] < 32) {
+                        break;
+                    } else {
+                        BoardInfo newBoard = initialBoard.copy();
+                        newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
+                        if (initialBoard.board[i][j] != Constants.pieceIDs.EMPTY_CELL) {
+                            newBoard.deadPieces.add(newBoard.board[i][j]);
+                            newBoard.board[i][j] = id;
+                            newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + i + j);
+                            boards.add(newBoard);
+                            break;
+                        }
+                        newBoard.board[i][j] = id;
+                        newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + i + j);
+                        boards.add(newBoard);
+
+                    }
+                }
+            }
+
+        }
+        return boards;
+    }
+
+    /**
+     * Method for generating boards when a piece is moving to diagonally down to the
+     * right. It generates a new board when a piece is moving to a new position,
+     * the newly generated board contains no references to the original board or any
+     * fields inside of it. It also updates the deadPieces
+     * field in the newBoard object when needed and records what move led to that
+     * board.
+     * 
+     * @param boards       ArrayList of boards that it will add the newly generated
+     *                     boards to.
+     * @param initialBoard The initial board it is generating moves from.
+     * @param x            Pieces location in the x axis on the board.
+     * @param y            Pieces location in the y axis on the board.
+     * @param color        Color of the piece.
+     * @param id           Id of the piece.
+     * @return An ArrayList of BoardInfo objects that contain the newly generated
+     *         moves in this direction.
+     */
+    private ArrayList<BoardInfo> movesDownRight(ArrayList<BoardInfo> boards, BoardInfo initialBoard, int x, int y,
+            boolean color, byte id) {
+        if (color) {
+            for (int i = x + 1; i < 8; i++) {
+                for (int j = y + 1; j < 8; j++) {
+                    if (initialBoard.board[i][j] > -1 && initialBoard.board[i][j] < 16) {
+                        break;
+                    } else {
+                        BoardInfo newBoard = initialBoard.copy();
+                        newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
+                        if (initialBoard.board[i][j] != Constants.pieceIDs.EMPTY_CELL) {
+                            newBoard.deadPieces.add(newBoard.board[i][j]);
+                            newBoard.board[i][j] = id;
+                            newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + i + j);
+                            boards.add(newBoard);
+                            break;
+                        }
+                        newBoard.board[i][j] = id;
+                        newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + i + j);
+                        boards.add(newBoard);
+                    }
+                }
+            }
+
+        } else {
+            for (int i = x + 1; i < 8; i++) {
+                for (int j = y + 1; j < 8; j++) {
+                    if (initialBoard.board[i][j] > 15 && initialBoard.board[i][j] < 32) {
+                        break;
+                    } else {
+                        BoardInfo newBoard = initialBoard.copy();
+                        newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
+                        if (initialBoard.board[i][j] != Constants.pieceIDs.EMPTY_CELL) {
+                            newBoard.deadPieces.add(newBoard.board[i][j]);
+                            newBoard.board[i][j] = id;
+                            newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + i + j);
+                            boards.add(newBoard);
+                            break;
+                        }
+                        newBoard.board[i][j] = id;
+                        newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + i + j);
+                        boards.add(newBoard);
+
+                    }
+                }
+            }
+
+        }
+        return boards;
+    }
+
+    /**
+     * Method for generating boards when a piece is moving to diagonally up to the
+     * left. It generates a new board when a piece is moving to a new position,
+     * the newly generated board contains no references to the original board or any
+     * fields inside of it. It also updates the deadPieces
+     * field in the newBoard object when needed and records what move led to that
+     * board.
+     * 
+     * @param boards       ArrayList of boards that it will add the newly generated
+     *                     boards to.
+     * @param initialBoard The initial board it is generating moves from.
+     * @param x            Pieces location in the x axis on the board.
+     * @param y            Pieces location in the y axis on the board.
+     * @param color        Color of the piece.
+     * @param id           Id of the piece.
+     * @return An ArrayList of BoardInfo objects that contain the newly generated
+     *         moves in this direction.
+     */
+    private ArrayList<BoardInfo> movesUpLeft(ArrayList<BoardInfo> boards, BoardInfo initialBoard, int x, int y,
+            boolean color, byte id) {
+        if (color) {
+            for (int i = x - 1; i < 8; i--) {
+                for (int j = y - 1; j > -1; j--) {
+                    if (initialBoard.board[i][j] > -1 && initialBoard.board[i][j] < 16) {
+                        break;
+                    } else {
+                        BoardInfo newBoard = initialBoard.copy();
+                        newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
+                        if (initialBoard.board[i][j] != Constants.pieceIDs.EMPTY_CELL) {
+                            newBoard.deadPieces.add(newBoard.board[i][j]);
+                            newBoard.board[i][j] = id;
+                            newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + i + j);
+                            boards.add(newBoard);
+                            break;
+                        }
+                        newBoard.board[i][j] = id;
+                        newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + i + j);
+                        boards.add(newBoard);
+                    }
+                }
+            }
+
+        } else {
+            for (int i = x - 1; i < 8; i--) {
+                for (int j = y - 1; j > -1; j--) {
+                    if (initialBoard.board[i][j] > 15 && initialBoard.board[i][j] < 32) {
+                        break;
+                    } else {
+                        BoardInfo newBoard = initialBoard.copy();
+                        newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
+                        if (initialBoard.board[i][j] != Constants.pieceIDs.EMPTY_CELL) {
+                            newBoard.deadPieces.add(newBoard.board[i][j]);
+                            newBoard.board[i][j] = id;
+                            newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + i + j);
+                            boards.add(newBoard);
+                            break;
+                        }
+                        newBoard.board[i][j] = id;
+                        newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + i + j);
+                        boards.add(newBoard);
+
+                    }
+                }
+            }
+
+        }
+        return boards;
+    }
+
+    /**
+     * Method for generating boards when a piece is moving to diagonally up to the
+     * right. It generates a new board when a piece is moving to a new position,
+     * the newly generated board contains no references to the original board or any
+     * fields inside of it. It also updates the deadPieces
+     * field in the newBoard object when needed and records what move led to that
+     * board.
+     * 
+     * @param boards       ArrayList of boards that it will add the newly generated
+     *                     boards to.
+     * @param initialBoard The initial board it is generating moves from.
+     * @param x            Pieces location in the x axis on the board.
+     * @param y            Pieces location in the y axis on the board.
+     * @param color        Color of the piece.
+     * @param id           Id of the piece.
+     * @return An ArrayList of BoardInfo objects that contain the newly generated
+     *         moves in this direction.
+     */
+    private ArrayList<BoardInfo> movesUpRight(ArrayList<BoardInfo> boards, BoardInfo initialBoard, int x, int y,
+            boolean color, byte id) {
+        if (color) {
+            for (int i = x + 1; i < 8; i++) {
+                for (int j = y - 1; j > -1; j--) {
+                    if (initialBoard.board[i][j] > -1 && initialBoard.board[i][j] < 16) {
+                        break;
+                    } else {
+                        BoardInfo newBoard = initialBoard.copy();
+                        newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
+                        if (initialBoard.board[i][j] != Constants.pieceIDs.EMPTY_CELL) {
+                            newBoard.deadPieces.add(newBoard.board[i][j]);
+                            newBoard.board[i][j] = id;
+                            newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + i + j);
+                            boards.add(newBoard);
+                            break;
+                        }
+                        newBoard.board[i][j] = id;
+                        newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + i + j);
+                        boards.add(newBoard);
+                    }
+                }
+            }
+
+        } else {
+            for (int i = x + 1; i < 8; i++) {
+                for (int j = y - 1; j > -1; j--) {
+                    if (initialBoard.board[i][j] > 15 && initialBoard.board[i][j] < 32) {
+                        break;
+                    } else {
+                        BoardInfo newBoard = initialBoard.copy();
+                        newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
+                        if (initialBoard.board[i][j] != Constants.pieceIDs.EMPTY_CELL) {
+                            newBoard.deadPieces.add(newBoard.board[i][j]);
+                            newBoard.board[i][j] = id;
+                            newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + i + j);
+                            boards.add(newBoard);
+                            break;
+                        }
+                        newBoard.board[i][j] = id;
+                        newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + i + j);
+                        boards.add(newBoard);
+
+                    }
+                }
+            }
+
+        }
+        return boards;
+    }
+
+    /**
+     * Method for generating boards when a piece is moving to the left. It generates
+     * a new board when a piece is moving to a new position,
+     * the newly generated board contains no references to the original board or any
+     * fields inside of it. It also updates the deadPieces
+     * field in the newBoard object when needed and records what move led to that
+     * board.
+     * 
+     * @param boards       ArrayList of boards that it will add the newly generated
+     *                     boards to.
+     * @param initialBoard The initial board it is generating moves from.
+     * @param x            Pieces location in the x axis on the board.
+     * @param y            Pieces location in the y axis on the board.
+     * @param color        Color of the piece.
+     * @param id           Id of the piece.
+     * @return An ArrayList of BoardInfo objects that contain the newly generated
+     *         moves in this direction.
      */
     private ArrayList<BoardInfo> movesLeft(ArrayList<BoardInfo> boards, BoardInfo initialBoard, int x, int y,
             boolean color, byte id) {
@@ -185,13 +513,22 @@ public class Bot {
                 } else {
                     BoardInfo newBoard = initialBoard.copy();
                     newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
-                    if(initialBoard.board[i][y] != Constants.pieceIDs.EMPTY_CELL){
+                    if (initialBoard.board[i][y] != Constants.pieceIDs.EMPTY_CELL) {
                         newBoard.deadPieces.add(newBoard.board[i][y]);
+                        newBoard.board[i][y] = id;
+                        newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + i + y);
+                        if (id == Constants.pieceIDs.BLACK_KINGS_ROOK || id == Constants.pieceIDs.BLACK_QUEENS_ROOK) {
+                            newBoard.hasMoved[getHasMovedIndex(id)] = true;
+                        }
+                        boards.add(newBoard);
+                        break;
                     }
                     newBoard.board[i][y] = id;
-                    newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + x + y);
+                    newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + i + y);
+                    if (id == Constants.pieceIDs.BLACK_KINGS_ROOK || id == Constants.pieceIDs.BLACK_QUEENS_ROOK) {
+                        newBoard.hasMoved[getHasMovedIndex(id)] = true;
+                    }
                     boards.add(newBoard);
-                    break;
                 }
             }
         } else {
@@ -201,13 +538,19 @@ public class Bot {
                 } else {
                     BoardInfo newBoard = initialBoard.copy();
                     newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
-                    if(initialBoard.board[i][y] != Constants.pieceIDs.EMPTY_CELL){
+                    if (initialBoard.board[i][y] != Constants.pieceIDs.EMPTY_CELL) {
                         newBoard.deadPieces.add(newBoard.board[i][y]);
+                        newBoard.board[i][y] = id;
+                        newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + i + y);
+                        if (id == Constants.pieceIDs.WHITE_KINGS_ROOK || id == Constants.pieceIDs.WHITE_QUEENS_ROOK) {
+                            newBoard.hasMoved[getHasMovedIndex(id)] = true;
+                        }
+                        boards.add(newBoard);
+                        break;
                     }
                     newBoard.board[i][y] = id;
-                    newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + x + y);
+                    newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + i + y);
                     boards.add(newBoard);
-                    break;
                 }
             }
 
@@ -216,19 +559,23 @@ public class Bot {
         return boards;
     }
 
-
-
     /**
-     * Method for generating boards when a piece is moving to the right. It generates a new board when a piece is moving to a new position,
-     * the newly generated board contains no references to the original board or any fields inside of it. It also updates the deadPieces 
-     * field in the newBoard object when needed and records what move led to that board. 
-     * @param boards ArrayList of boards that it will add the newly generated boards to. 
-     * @param initialBoard The initial board it is generating moves from. 
-     * @param x Pieces location in the x axis on the board.
-     * @param y Pieces location in the y axis on the board. 
-     * @param color Color of the piece. 
-     * @param id Id of the piece. 
-     * @return An ArrayList of BoardInfo objects that contain the newly generated moves in this direction.
+     * Method for generating boards when a piece is moving to the right. It
+     * generates a new board when a piece is moving to a new position,
+     * the newly generated board contains no references to the original board or any
+     * fields inside of it. It also updates the deadPieces
+     * field in the newBoard object when needed and records what move led to that
+     * board.
+     * 
+     * @param boards       ArrayList of boards that it will add the newly generated
+     *                     boards to.
+     * @param initialBoard The initial board it is generating moves from.
+     * @param x            Pieces location in the x axis on the board.
+     * @param y            Pieces location in the y axis on the board.
+     * @param color        Color of the piece.
+     * @param id           Id of the piece.
+     * @return An ArrayList of BoardInfo objects that contain the newly generated
+     *         moves in this direction.
      */
     private ArrayList<BoardInfo> movesRight(ArrayList<BoardInfo> boards, BoardInfo initialBoard, int x, int y,
             boolean color, byte id) {
@@ -240,13 +587,22 @@ public class Bot {
                 } else {
                     BoardInfo newBoard = initialBoard.copy();
                     newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
-                    if(initialBoard.board[i][y] != Constants.pieceIDs.EMPTY_CELL){
+                    if (initialBoard.board[i][y] != Constants.pieceIDs.EMPTY_CELL) {
                         newBoard.deadPieces.add(newBoard.board[i][y]);
+                        newBoard.board[i][y] = id;
+                        newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + i + y);
+                        if (id == Constants.pieceIDs.BLACK_KINGS_ROOK || id == Constants.pieceIDs.BLACK_QUEENS_ROOK) {
+                            newBoard.hasMoved[getHasMovedIndex(id)] = true;
+                        }
+                        boards.add(newBoard);
+                        break;
                     }
                     newBoard.board[i][y] = id;
-                    newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + x + y);
+                    newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + i + y);
+                    if (id == Constants.pieceIDs.BLACK_KINGS_ROOK || id == Constants.pieceIDs.BLACK_QUEENS_ROOK) {
+                        newBoard.hasMoved[getHasMovedIndex(id)] = true;
+                    }
                     boards.add(newBoard);
-                    break;
                 }
             }
         } else {
@@ -256,13 +612,22 @@ public class Bot {
                 } else {
                     BoardInfo newBoard = initialBoard.copy();
                     newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
-                    if(initialBoard.board[i][y] != Constants.pieceIDs.EMPTY_CELL){
+                    if (initialBoard.board[i][y] != Constants.pieceIDs.EMPTY_CELL) {
                         newBoard.deadPieces.add(newBoard.board[i][y]);
+                        newBoard.board[i][y] = id;
+                        newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + i + y);
+                        if (id == Constants.pieceIDs.WHITE_KINGS_ROOK || id == Constants.pieceIDs.WHITE_QUEENS_ROOK) {
+                            newBoard.hasMoved[getHasMovedIndex(id)] = true;
+                        }
+                        boards.add(newBoard);
+                        break;
                     }
                     newBoard.board[i][y] = id;
-                    newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + x + y);
+                    newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + i + y);
+                    if (id == Constants.pieceIDs.WHITE_KINGS_ROOK || id == Constants.pieceIDs.WHITE_QUEENS_ROOK) {
+                        newBoard.hasMoved[getHasMovedIndex(id)] = true;
+                    }
                     boards.add(newBoard);
-                    break;
                 }
             }
         }
@@ -270,18 +635,23 @@ public class Bot {
         return boards;
     }
 
-
     /**
-     * Method for generating boards when a piece is moving up. It generates a new board when a piece is moving to a new position,
-     * the newly generated board contains no references to the original board or any fields inside of it. It also updates the deadPieces 
-     * field in the newBoard object when needed and records what move led to that board. 
-     * @param boards ArrayList of boards that it will add the newly generated boards to. 
-     * @param initialBoard The initial board it is generating moves from. 
-     * @param x Pieces location in the x axis on the board.
-     * @param y Pieces location in the y axis on the board. 
-     * @param color Color of the piece. 
-     * @param id Id of the piece. 
-     * @return An ArrayList of BoardInfo objects that contain the newly generated moves in this direction.
+     * Method for generating boards when a piece is moving up. It generates a new
+     * board when a piece is moving to a new position,
+     * the newly generated board contains no references to the original board or any
+     * fields inside of it. It also updates the deadPieces
+     * field in the newBoard object when needed and records what move led to that
+     * board.
+     * 
+     * @param boards       ArrayList of boards that it will add the newly generated
+     *                     boards to.
+     * @param initialBoard The initial board it is generating moves from.
+     * @param x            Pieces location in the x axis on the board.
+     * @param y            Pieces location in the y axis on the board.
+     * @param color        Color of the piece.
+     * @param id           Id of the piece.
+     * @return An ArrayList of BoardInfo objects that contain the newly generated
+     *         moves in this direction.
      */
     private ArrayList<BoardInfo> movesUp(ArrayList<BoardInfo> boards, BoardInfo initialBoard, int x, int y,
             boolean color, byte id) {
@@ -293,13 +663,22 @@ public class Bot {
                 } else {
                     BoardInfo newBoard = initialBoard.copy();
                     newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
-                    if(initialBoard.board[x][i] != Constants.pieceIDs.EMPTY_CELL){
+                    if (initialBoard.board[x][i] != Constants.pieceIDs.EMPTY_CELL) {
                         newBoard.deadPieces.add(newBoard.board[x][i]);
+                        newBoard.board[x][i] = id;
+                        newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + x + i);
+                        if (id == Constants.pieceIDs.BLACK_KINGS_ROOK || id == Constants.pieceIDs.BLACK_QUEENS_ROOK) {
+                            newBoard.hasMoved[getHasMovedIndex(id)] = true;
+                        }
+                        boards.add(newBoard);
+                        break;
                     }
                     newBoard.board[x][i] = id;
                     newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + x + i);
+                    if (id == Constants.pieceIDs.BLACK_KINGS_ROOK || id == Constants.pieceIDs.BLACK_QUEENS_ROOK) {
+                        newBoard.hasMoved[getHasMovedIndex(id)] = true;
+                    }
                     boards.add(newBoard);
-                    break;
                 }
             }
         } else {
@@ -309,13 +688,22 @@ public class Bot {
                 } else {
                     BoardInfo newBoard = initialBoard.copy();
                     newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
-                    if(initialBoard.board[x][i] != Constants.pieceIDs.EMPTY_CELL){
+                    if (initialBoard.board[x][i] != Constants.pieceIDs.EMPTY_CELL) {
                         newBoard.deadPieces.add(newBoard.board[x][i]);
+                        newBoard.board[x][i] = id;
+                        newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + x + i);
+                        if (id == Constants.pieceIDs.WHITE_KINGS_ROOK || id == Constants.pieceIDs.WHITE_QUEENS_ROOK) {
+                            newBoard.hasMoved[getHasMovedIndex(id)] = true;
+                        }
+                        boards.add(newBoard);
+                        break;
                     }
                     newBoard.board[x][i] = id;
                     newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + x + i);
+                    if (id == Constants.pieceIDs.WHITE_KINGS_ROOK || id == Constants.pieceIDs.WHITE_QUEENS_ROOK) {
+                        newBoard.hasMoved[getHasMovedIndex(id)] = true;
+                    }
                     boards.add(newBoard);
-                    break;
                 }
             }
 
@@ -324,18 +712,23 @@ public class Bot {
         return boards;
     }
 
-
     /**
-     * Method for generating boards when a piece is moving down. It generates a new board when a piece is moving to a new position,
-     * the newly generated board contains no references to the original board or any fields inside of it. It also updates the deadPieces 
-     * field in the newBoard object when needed and records what move led to that board. 
-     * @param boards ArrayList of boards that it will add the newly generated boards to. 
-     * @param initialBoard The initial board it is generating moves from. 
-     * @param x Pieces location in the x axis on the board.
-     * @param y Pieces location in the y axis on the board. 
-     * @param color Color of the piece. 
-     * @param id Id of the piece. 
-     * @return An ArrayList of BoardInfo objects that contain the newly generated moves in this direction.
+     * Method for generating boards when a piece is moving down. It generates a new
+     * board when a piece is moving to a new position,
+     * the newly generated board contains no references to the original board or any
+     * fields inside of it. It also updates the deadPieces
+     * field in the newBoard object when needed and records what move led to that
+     * board.
+     * 
+     * @param boards       ArrayList of boards that it will add the newly generated
+     *                     boards to.
+     * @param initialBoard The initial board it is generating moves from.
+     * @param x            Pieces location in the x axis on the board.
+     * @param y            Pieces location in the y axis on the board.
+     * @param color        Color of the piece.
+     * @param id           Id of the piece.
+     * @return An ArrayList of BoardInfo objects that contain the newly generated
+     *         moves in this direction.
      */
     private ArrayList<BoardInfo> movesDown(ArrayList<BoardInfo> boards, BoardInfo initialBoard, int x, int y,
             boolean color, byte id) {
@@ -347,29 +740,47 @@ public class Bot {
                 } else {
                     BoardInfo newBoard = initialBoard.copy();
                     newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
-                    if(initialBoard.board[x][i] != Constants.pieceIDs.EMPTY_CELL){
+                    if (initialBoard.board[x][i] != Constants.pieceIDs.EMPTY_CELL) {
                         newBoard.deadPieces.add(newBoard.board[x][i]);
+                        newBoard.board[x][i] = id;
+                        newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + x + i);
+                        if (id == Constants.pieceIDs.BLACK_KINGS_ROOK || id == Constants.pieceIDs.BLACK_QUEENS_ROOK) {
+                            newBoard.hasMoved[getHasMovedIndex(id)] = true;
+                        }
+                        boards.add(newBoard);
+                        break;
                     }
                     newBoard.board[x][i] = id;
                     newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + x + i);
+                    if (id == Constants.pieceIDs.BLACK_KINGS_ROOK || id == Constants.pieceIDs.BLACK_QUEENS_ROOK) {
+                        newBoard.hasMoved[getHasMovedIndex(id)] = true;
+                    }
                     boards.add(newBoard);
-                    break;
                 }
             }
         } else {
-            for (int i = y - 1; i > -1; i++) {
+            for (int i = y + 1; i < 8; i++) {
                 if (initialBoard.board[x][i] > 15 && initialBoard.board[x][i] < 32) {
                     break;
                 } else {
                     BoardInfo newBoard = initialBoard.copy();
                     newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
-                    if(initialBoard.board[x][i] != Constants.pieceIDs.EMPTY_CELL){
+                    if (initialBoard.board[x][i] != Constants.pieceIDs.EMPTY_CELL) {
                         newBoard.deadPieces.add(newBoard.board[x][i]);
+                        newBoard.board[x][i] = id;
+                        newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + x + i);
+                        if (id == Constants.pieceIDs.WHITE_KINGS_ROOK || id == Constants.pieceIDs.WHITE_QUEENS_ROOK) {
+                            newBoard.hasMoved[getHasMovedIndex(id)] = true;
+                        }
+                        boards.add(newBoard);
+                        break;
                     }
                     newBoard.board[x][i] = id;
                     newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + x + i);
+                    if (id == Constants.pieceIDs.WHITE_KINGS_ROOK || id == Constants.pieceIDs.WHITE_QUEENS_ROOK) {
+                        newBoard.hasMoved[getHasMovedIndex(id)] = true;
+                    }
                     boards.add(newBoard);
-                    break;
                 }
             }
 
@@ -378,5 +789,33 @@ public class Bot {
         return boards;
     }
 
+
+    private byte getPassantIndex(byte id){
+        byte index = (id/2 == 1) ? (byte) (id%8): (byte) (id%8 + 8);
+        System.out.println("Pawn index for id: " + id + ", is " + index);
+        return index;
+    }
+
+    private byte getHasMovedIndex(byte id){
+        switch(id){
+            case Constants.pieceIDs.BLACK_KINGS_ROOK:
+                return 0;
+            case Constants.pieceIDs.BLACK_QUEENS_ROOK:
+                return 1;
+            case Constants.pieceIDs.WHITE_KINGS_ROOK:
+                return 2;
+            case Constants.pieceIDs.WHITE_QUEENS_ROOK:
+                return 3;
+            case Constants.pieceIDs.BLACK_KING:
+                return 4;
+            case Constants.pieceIDs.WHITE_KING:
+                return 5;
+            default:
+                System.out.println("Wrong id in getHasMovedIndex() of Bot class");
+                return -1;
+            
+        }
+
+    }
 
 }
