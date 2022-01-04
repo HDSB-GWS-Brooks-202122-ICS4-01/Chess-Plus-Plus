@@ -204,32 +204,119 @@ public class Bot {
             int x = boardInfo.blackKingX;
             int y = boardInfo.blackKingY;
             byte[][] boardPositions = boardInfo.board;
+            boolean up = true, down = true, left = true, right = true, upRight = true, downRight =true, upLeft = true, downLeft = true;
+
             // iterator for going up
-            int j = y - 1;
+            int u = y - 1;
 
             // iterator for going down
-            int k = y + 1;
+            int d = y + 1;
 
             // iterator for going to the right
-            int i = x + 1;
+            int r = x + 1;
 
             // iterator for going to the left
             int l = x - 1;
-            int count = 0;
-            while (count < 8) {
-                // left check
-                if (l > -1 && (boardPositions[l][y] == Constants.pieceIDs.WHITE_QUEEN
-                        || boardPositions[l][y] == Constants.pieceIDs.WHITE_KINGS_ROOK
-                        || boardPositions[l][y] == Constants.pieceIDs.WHITE_QUEENS_ROOK)) {
 
+            while (left || right || up || down || upRight || upLeft || downRight || downLeft) {
+                // left check
+                if (l > -1  && left) {
+                    if (boardPositions[l][y] == Constants.pieceIDs.WHITE_QUEEN
+                            || boardPositions[l][y] == Constants.pieceIDs.WHITE_KINGS_ROOK
+                            || boardPositions[l][y] == Constants.pieceIDs.WHITE_QUEENS_ROOK) {
+                        return false;
+                    } else if (boardPositions[l][y] != Constants.pieceIDs.EMPTY_CELL) {
+                        left = false;
+                    }
                 }
+
+                // right check
+                if (r < 8 && right) {
+                    if (boardPositions[r][y] == Constants.pieceIDs.WHITE_QUEEN
+                            || boardPositions[r][y] == Constants.pieceIDs.WHITE_KINGS_ROOK
+                            || boardPositions[r][y] == Constants.pieceIDs.WHITE_QUEENS_ROOK) {
+                        return false;
+                    } else if (boardPositions[r][y] != Constants.pieceIDs.EMPTY_CELL) {
+                        right = false;
+                    }
+                }
+
+                // down check
+                if (d < 8 && down) {
+                    if (boardPositions[x][d] == Constants.pieceIDs.WHITE_QUEEN
+                            || boardPositions[x][d] == Constants.pieceIDs.WHITE_KINGS_ROOK
+                            || boardPositions[x][d] == Constants.pieceIDs.WHITE_QUEENS_ROOK) {
+                        return false;
+                    } else if (boardPositions[x][d] != Constants.pieceIDs.EMPTY_CELL) {
+                        down = false;
+                    }
+                }
+
+                // up check
+                if (u > -1 && up) {
+                    if (boardPositions[x][u] == Constants.pieceIDs.WHITE_QUEEN
+                            || boardPositions[x][u] == Constants.pieceIDs.WHITE_KINGS_ROOK
+                            || boardPositions[x][u] == Constants.pieceIDs.WHITE_QUEENS_ROOK) {
+                        return false;
+                    } else if (boardPositions[x][u] != Constants.pieceIDs.EMPTY_CELL) {
+                        up = false;
+                    }
+                }
+
+                // upright check
+                if (r < 8 && u > -1 && upRight) {
+                    if (boardPositions[r][u] == Constants.pieceIDs.WHITE_QUEEN
+                            || boardPositions[r][u] == Constants.pieceIDs.WHITE_QUEENS_BISHOP
+                            || boardPositions[r][u] == Constants.pieceIDs.WHITE_KINGS_BISHOP) {
+                        return false;
+                    } else if (boardPositions[r][u] != Constants.pieceIDs.EMPTY_CELL){
+                        upRight = false;
+                    }
+                }
+
+                //upLeft
+                if (l > -1 && u > -1 && upLeft) {
+                    if (boardPositions[l][u] == Constants.pieceIDs.WHITE_QUEEN
+                            || boardPositions[l][u] == Constants.pieceIDs.WHITE_QUEENS_BISHOP
+                            || boardPositions[l][u] == Constants.pieceIDs.WHITE_KINGS_BISHOP) {
+                        return false;
+                    } else if (boardPositions[l][u] != Constants.pieceIDs.EMPTY_CELL){
+                        upLeft = false;
+                    }
+                }
+
+                //downRight
+                if (r < 8 && d < 8 && downRight) {
+                    if (boardPositions[r][d] == Constants.pieceIDs.WHITE_QUEEN
+                            || boardPositions[r][d] == Constants.pieceIDs.WHITE_QUEENS_BISHOP
+                            || boardPositions[r][d] == Constants.pieceIDs.WHITE_KINGS_BISHOP) {
+                        return false;
+                    } else if (boardPositions[r][d] != Constants.pieceIDs.EMPTY_CELL){
+                        downRight = false;
+                    }
+                }
+
+                //downLeft
+                if (l < 8 && d < 8 && downLeft) {
+                    if (boardPositions[l][d] == Constants.pieceIDs.WHITE_QUEEN
+                            || boardPositions[l][d] == Constants.pieceIDs.WHITE_QUEENS_BISHOP
+                            || boardPositions[l][d] == Constants.pieceIDs.WHITE_KINGS_BISHOP) {
+                        return false;
+                    } else if (boardPositions[l][d] != Constants.pieceIDs.EMPTY_CELL){
+                        downLeft = false;
+                    }
+                }
+                d++;
+                l--;
+                r++;
+                u--;
 
             }
 
         } else {
 
         }
-        return false;
+        return true;
     }
 
     private ArrayList<BoardInfo> movesPawn(ArrayList<BoardInfo> boards, BoardInfo initialBoard, int x, int y,
