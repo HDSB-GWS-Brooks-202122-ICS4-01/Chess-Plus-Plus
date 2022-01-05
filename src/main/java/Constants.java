@@ -181,4 +181,8 @@ public class Constants {
 
                 public static final String[] DEV_EMAILS = { "mimo280604@gmail.com", "akilpath@gmail.com" };
         }
+
+        public static final class Dev {
+                public static final byte GET_AI_MOVES = 0;
+        }
 }

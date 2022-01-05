@@ -6,6 +6,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
@@ -34,6 +35,8 @@ public class App extends Application {
     private static Properties config = App.getConfig();
 
     private static Scene scene;
+    private static Stage stage;
+
     private static Image SPRITESHEET = new Image(App.class.getResource("assets\\chess_spritesheet.png").toString());
 
     private static byte winner = -1;
@@ -48,8 +51,10 @@ public class App extends Application {
     private static byte gameMode;
 
     @Override
-    public void start(Stage stage) throws IOException {
+    public void start(Stage st) throws IOException {
         scene = new Scene(loadFXML("startScreen"));
+        stage = st;
+        
         stage.setScene(scene);
         stage.show();
         stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
@@ -183,5 +188,9 @@ public class App extends Application {
 
     public static byte getGameMode() {
         return gameMode;
+    }
+
+    public static Stage getStage() {
+        return stage;
     }
 }

@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.sql.Time;
 import java.util.Properties;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -19,6 +20,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 
 /**
  * Controller of the game scene, also initializes the Board class.
@@ -63,6 +65,7 @@ public class GameController {
          }
 
          if (userIsDev) {
+            App.getStage().setHeight(1050);
             pn_dev.setVisible(true);
          }
       }
@@ -179,5 +182,11 @@ public class GameController {
          sp_root.getChildren().remove(endScene);
          App.setRoot(endScene);
       });
+   }
+
+   @FXML
+   private void devGetAiMoves() {
+      System.out.println(true);
+      board.devRequest(Constants.Dev.GET_AI_MOVES);
    }
 }

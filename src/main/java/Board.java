@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Scanner;
 
 import javafx.event.EventHandler;
+import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
@@ -18,8 +19,9 @@ import javafx.scene.layout.StackPane;
 
 /**
  * Board class, handles the interaction of pieces and displaying them.
+ * 
  * @author Selim Abdelwahab
- * @version 1.0 
+ * @version 1.0
  */
 public class Board {
    Properties config = new Properties();
@@ -50,7 +52,8 @@ public class Board {
    private final PlayerTimer TIMER_WHITE;
    private final PlayerTimer TIMER_BLACK;
 
-   private final Map[] STATS = new Map[]{new HashMap<String, Integer>(), new HashMap<String, Integer>(), new HashMap<String, String>()};
+   private final Map[] STATS = new Map[] { new HashMap<String, Integer>(), new HashMap<String, Integer>(),
+         new HashMap<String, String>() };
    private byte winner;
 
    private Bot bot = new Bot(App.getDiff(), true);
@@ -93,7 +96,7 @@ public class Board {
             gameTime = 180000;
             blackLabel.setText("3:00");
             whiteLabel.setText("3:00");
-         } else if (config.getProperty("gametime").equals("30")){
+         } else if (config.getProperty("gametime").equals("30")) {
             gameTime = 1800000;
             blackLabel.setText("30:00");
             whiteLabel.setText("30:00");
@@ -198,11 +201,11 @@ public class Board {
 
       App.GAME_PIECES = GAME_PIECES.clone();
 
-      STATS[Constants.pieceIDs.WHITE].put("remaining_time", (int)TIMER_WHITE.getTimeMillis());
+      STATS[Constants.pieceIDs.WHITE].put("remaining_time", (int) TIMER_WHITE.getTimeMillis());
       STATS[Constants.pieceIDs.WHITE].put("total_moves", 0);
       STATS[Constants.pieceIDs.WHITE].put("pieces_killed", 0);
 
-      STATS[Constants.pieceIDs.BLACK].put("remaining_time", (int)TIMER_BLACK.getTimeMillis());
+      STATS[Constants.pieceIDs.BLACK].put("remaining_time", (int) TIMER_BLACK.getTimeMillis());
       STATS[Constants.pieceIDs.BLACK].put("total_moves", 0);
       STATS[Constants.pieceIDs.BLACK].put("pieces_killed", 0);
    }
@@ -277,8 +280,8 @@ public class Board {
 
       App.setTranscript(ms);
 
-      STATS[Constants.pieceIDs.WHITE].replace("remaining_time", (int)TIMER_WHITE.getTimeMillis());
-      STATS[Constants.pieceIDs.BLACK].replace("remaining_time", (int)TIMER_BLACK.getTimeMillis());
+      STATS[Constants.pieceIDs.WHITE].replace("remaining_time", (int) TIMER_WHITE.getTimeMillis());
+      STATS[Constants.pieceIDs.BLACK].replace("remaining_time", (int) TIMER_BLACK.getTimeMillis());
 
       App.setMatchStats(STATS);
 
@@ -444,17 +447,16 @@ public class Board {
       boolean inCheck = true;
       winner = turn;
 
-      STATS[turn].replace("total_moves", (int)STATS[turn].get("total_moves") + 1);
+      STATS[turn].replace("total_moves", (int) STATS[turn].get("total_moves") + 1);
 
       if (turn == Constants.pieceIDs.WHITE) {
          TIMER_WHITE.pauseTimer();
          TIMER_BLACK.playTimer();
 
-
          turn = Constants.pieceIDs.BLACK;
       } else {
          TIMER_BLACK.pauseTimer();
-         TIMER_WHITE.playTimer(); 
+         TIMER_WHITE.playTimer();
 
          turn = Constants.pieceIDs.WHITE;
       }
@@ -478,12 +480,13 @@ public class Board {
       System.out.println("Next turn: " + turn);
 
       if (GAME_MODE == Constants.boardData.MODE_AI) {
-         parseAiMove(bot.getMove(GRID, DEAD_PIECES));
+         Bot.BoardInteractions bi = bot.BI.parseAiMove(bot.getMove(GRID, DEAD_PIECES));
+         playAi(bi.getMovedPiece(), bi.getMove());
       }
    }
 
-   private void parseAiMove(String move) {
-      System.out.println(move);
+
+   private void playAi(Piece piece, byte[] move) {
    }
 
    /**
@@ -649,7 +652,7 @@ public class Board {
             LIVE_PIECES.remove(p);
             DEAD_PIECES.add(p);
 
-            STATS[turn].replace("pieces_killed", (int)STATS[turn].get("pieces_killed") + 1);
+            STATS[turn].replace("pieces_killed", (int) STATS[turn].get("pieces_killed") + 1);
 
             displayDeadPiece(p);
             break;
@@ -666,9 +669,9 @@ public class Board {
       String moveTranscript = piece.getId() + Constants.boardData.X_ID[toX] + Constants.boardData.Y_ID[toY];
 
       // if (piece.getColor() == Constants.pieceIDs.BLACK)
-      //    BLACK_TRANSCRIPT.add(moveTranscript);
+      // BLACK_TRANSCRIPT.add(moveTranscript);
       // else
-      //    WHITE_TRANSCRIPT.add(moveTranscript);
+      // WHITE_TRANSCRIPT.add(moveTranscript);
 
       MATCH_TRANSCRIPT.add(moveTranscript);
 
@@ -760,13 +763,15 @@ public class Board {
 
    /**
     * 
-    * This method serves the same purpose as the setPossibleMoveMouseClicked() method does, except it is 
-    * attached to castling moves. Castling moves require multiple pieces to be removed so this method needed to be created. 
+    * This method serves the same purpose as the setPossibleMoveMouseClicked()
+    * method does, except it is
+    * attached to castling moves. Castling moves require multiple pieces to be
+    * removed so this method needed to be created.
     * 
-    * @param sp StackPane of the king. 
-    * @param piece King object. 
-    * @param color Color/team value. 
-    * @param left If true, castling to the left of the screen, false if not. 
+    * @param sp    StackPane of the king.
+    * @param piece King object.
+    * @param color Color/team value.
+    * @param left  If true, castling to the left of the screen, false if not.
     */
    private void setCastleMoveMouseClicked(StackPane sp, Piece piece, byte color, boolean left) {
       sp.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -803,18 +808,21 @@ public class Board {
    }
 
    /**
-    * This method serves the same purpose as setPossibleMoveMouseClicked, except it is only made for 
-    * en passant moves from pawns. This is because in en passant, a pawn moves to the square behind the other pawn and the other pawn still gets deleted. 
-    * @param sp StackPane of the primary pawn. 
-    * @param primaryPawn Pawn object of the primary pawn. 
-    * @param enemyPawn Pawn object of the enemy pawn. 
+    * This method serves the same purpose as setPossibleMoveMouseClicked, except it
+    * is only made for
+    * en passant moves from pawns. This is because in en passant, a pawn moves to
+    * the square behind the other pawn and the other pawn still gets deleted.
+    * 
+    * @param sp          StackPane of the primary pawn.
+    * @param primaryPawn Pawn object of the primary pawn.
+    * @param enemyPawn   Pawn object of the enemy pawn.
     */
    private void setPassantMoveMouseClicked(StackPane sp, Pawn primaryPawn, Pawn enemyPawn) {
       sp.setOnMouseClicked(new EventHandler<MouseEvent>() {
          @Override
          public void handle(MouseEvent event) {
 
-            //Moves the primary pawn to its new spot. 
+            // Moves the primary pawn to its new spot.
             if (primaryPawn.getColor() == Constants.pieceIDs.BLACK) {
                if (enemyPawn.getGridX() < primaryPawn.getGridX()) {
                   // pawn is to the left
@@ -839,7 +847,7 @@ public class Board {
 
             }
 
-            //Removes enemyPawn from the game. 
+            // Removes enemyPawn from the game.
             GRID[enemyPawn.gridX][enemyPawn.gridY] = Constants.pieceIDs.EMPTY_CELL;
             StackPane enemyPane = CELLS[enemyPawn.gridX][enemyPawn.gridY];
             enemyPane.getChildren().clear();
@@ -855,11 +863,13 @@ public class Board {
    }
 
    /**
-    * This method will promote a pawn piece. It will display a new prompt box allowing the player who reaches the end
-    * to choose a piece to replace the pawn. 
+    * This method will promote a pawn piece. It will display a new prompt box
+    * allowing the player who reaches the end
+    * to choose a piece to replace the pawn.
     * This method is called from the GameController class
-    * @param piece   The pawn piece to be promoted
-    * @param type    The type of piece to replace it.
+    * 
+    * @param piece The pawn piece to be promoted
+    * @param type  The type of piece to replace it.
     */
    public void promotePawn(Piece piece, String type) {
       byte x = piece.getGridX();
@@ -928,5 +938,16 @@ public class Board {
 
       movePiece(newPiece, x, y, x, y);
       LIVE_PIECES.set(LIVE_PIECES.indexOf(piece), newPiece);
+   }
+
+   public void devRequest(byte request) {
+      System.out.println(1);
+      switch (request) {
+         case Constants.Dev.GET_AI_MOVES:
+            Bot.BoardInteractions bi = bot.BI.parseAiMove(bot.getMove(GRID, DEAD_PIECES));
+
+            System.out.println(Arrays.toString(bi.getMove()));
+            break;
+      }
    }
 }

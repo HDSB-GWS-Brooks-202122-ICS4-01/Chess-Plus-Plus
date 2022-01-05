@@ -4,13 +4,16 @@
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.effect.Blend?>
 <?import javafx.scene.effect.Glow?>
+<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.shape.Arc?>
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Font?>
 
@@ -132,11 +135,20 @@
                </children>
             </GridPane>
             <ImageView fx:id="imgv_avatar" fitHeight="150.0" fitWidth="150.0" layoutX="550.0" layoutY="150.0" pickOnBounds="true" preserveRatio="true" />
-            <Circle fill="#8a8a8a00" layoutX="625.0" layoutY="225.0" radius="75.0" stroke="#808080" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeType="OUTSIDE" strokeWidth="10.0">
+            <Arc fill="#00000080" layoutX="624.0" layoutY="264.0" length="180.0" radiusX="68.0" radiusY="43.0" startAngle="180.0" stroke="TRANSPARENT" strokeType="INSIDE" type="ROUND" />
+            <Circle fill="#8a8a8a00" layoutX="625.0" layoutY="228.0" radius="75.0" stroke="#808080" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeType="OUTSIDE" strokeWidth="10.0">
                <effect>
                   <Glow level="0.5" />
                </effect>
             </Circle>
+            <ImageView fitHeight="150.0" fitWidth="20.0" layoutX="615.0" layoutY="276.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@assets/edit_icon_white.png" />
+               </image>
+               <effect>
+                  <Blend />
+               </effect>
+            </ImageView>
          </children>
       </Pane>
    </children>

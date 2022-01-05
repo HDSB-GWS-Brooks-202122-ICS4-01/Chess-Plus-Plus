@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 
 public class Bot {
+    public final BoardInteractions BI = new BoardInteractions();
     final int depth;
     final boolean black;
 
@@ -1063,6 +1064,30 @@ public class Bot {
 
         }
 
+    }
+
+    public class BoardInteractions {
+        private String rawAIMoves;
+        private Piece piece;
+        private byte[] move;
+
+        private boolean moveMade = false;
+
+        public BoardInteractions parseAiMove(String move) {
+            System.out.println(move);
+            rawAIMoves = move;
+            moveMade = true;
+
+            return this;
+        }
+
+        public Piece getMovedPiece() {
+            return piece;
+        }
+
+        public byte[] getMove() {
+            return move;
+        }
     }
 
 }
