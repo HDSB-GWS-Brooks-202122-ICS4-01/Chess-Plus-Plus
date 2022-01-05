@@ -920,17 +920,10 @@ public class Board {
          newPiece = new Knight(id);
       } else {
          if (piece.getColor() == Constants.pieceIDs.BLACK) {
-            if (x % 2 == 0)
-               id = Constants.pieceIDs.BLACK_QUEENS_ROOK;
-            else
-               id = Constants.pieceIDs.BLACK_KINGS_ROOK;
+            id = Constants.pieceIDs.BLACK_PROMOTED_ROOK;
          }
-
          else {
-            if (x % 2 == 0)
-               id = Constants.pieceIDs.WHITE_QUEENS_ROOK;
-            else
-               id = Constants.pieceIDs.WHITE_KINGS_ROOK;
+            id = Constants.pieceIDs.WHITE_PROMOTED_ROOK;
          }
 
          newPiece = new Rook(id);

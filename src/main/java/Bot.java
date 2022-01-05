@@ -73,24 +73,12 @@ public class Bot {
     }
 
     /**
-     * Method for evaluating the value of the board. Evaluating a board means to
-     * apply a value for it,
-     * this is used in the minimax algorithm.
-     * 
-     * @param boardInfo The board to evaluate.
-     * @return an Integer represnting the score for this board.
-     */
-    private int evaluate(BoardInfo boardInfo) {
-        return 0;
-    }
-
-    /**
      * Minimax algorithm used for the A.I.
      * 
-     * @param depth
-     * @param max
-     * @param boardInfo
-     * @return
+     * @param depth The depth to continue the recursion to. 
+     * @param max Variable for determining whether it is maximizing, or minimizing, true if maximizing, false if minimizing,
+     * @param boardInfo The board to generate from. 
+     * @return The best board. 
      */
     private BoardInfo minimax(int depth, boolean max, BoardInfo boardInfo) {
         if (depth == 0) {
@@ -98,21 +86,35 @@ public class Bot {
             return boardInfo;
         }
 
-        int lastEval = -1000;
+        //If it is trying to maximize, the initial eval is set to the lowest so that any eval that comes after is higher
+        //If it is trying to minimize, the intial eval is set to the highest so that any eval that comes after is lower
+        int lastEval;
+        if(max){
+            lastEval = -1000;
+        } else {
+            lastEval = 1000;
+        }
         int thisEval;
         BoardInfo lastChild = null;
+        
+        //Generates boards that come after this board.
         BoardInfo[] children = generateBoards(boardInfo);
+
+
         BoardInfo boardToEvaluate;
 
         for (BoardInfo child : children) {
+            //Sorts through the children to find the highest or lowest one, returns the highest/lowest.
             boardToEvaluate = minimax(depth - 1, !max, child);
-            thisEval = evaluate(boardToEvaluate);
+            thisEval = boardToEvaluate.evaluate();
             if ((max && thisEval > lastEval) || (!max && thisEval < lastEval)) {
                 lastEval = thisEval;
                 lastChild = boardToEvaluate;
             }
 
         }
+
+
         return lastChild;
 
     }
@@ -133,17 +135,19 @@ public class Bot {
                     continue;
                 } else if (id == Constants.pieceIDs.BLACK_KINGS_ROOK
                         || id == Constants.pieceIDs.BLACK_QUEENS_ROOK
+                        || id == Constants.pieceIDs.BLACK_PROMOTED_ROOK
                         || id == Constants.pieceIDs.WHITE_QUEENS_ROOK
-                        || id == Constants.pieceIDs.WHITE_KINGS_ROOK) {
+                        || id == Constants.pieceIDs.WHITE_KINGS_ROOK
+                        || id == Constants.pieceIDs.WHITE_PROMOTED_ROOK) {
 
                     generatedBoards = movesLeft(generatedBoards, boardInfo, x, y,
-                            (id / 2 == Constants.pieceIDs.BLACK), id);
+                            (id / 16 == Constants.pieceIDs.BLACK), id);
                     generatedBoards = movesRight(generatedBoards, boardInfo, x, y,
-                            (id / 2 == Constants.pieceIDs.BLACK), id);
+                            (id / 16 == Constants.pieceIDs.BLACK), id);
                     generatedBoards = movesUp(generatedBoards, boardInfo, x, y,
-                            (id / 2 == Constants.pieceIDs.BLACK), id);
+                            (id / 16 == Constants.pieceIDs.BLACK), id);
                     generatedBoards = movesDown(generatedBoards, boardInfo, x, y,
-                            (id / 2 == Constants.pieceIDs.BLACK), id);
+                            (id / 16 == Constants.pieceIDs.BLACK), id);
                     System.out.println("Moves generated after looking at black castle: " + generatedBoards.size());
 
                 } else if (id == Constants.pieceIDs.BLACK_KINGS_KNIGHT
@@ -154,21 +158,21 @@ public class Bot {
                 } else if (id == Constants.pieceIDs.BLACK_QUEEN
                         || id == Constants.pieceIDs.WHITE_QUEEN) {
                     generatedBoards = movesLeft(generatedBoards, boardInfo, x, y,
-                            (id / 2 == Constants.pieceIDs.BLACK), id);
+                            (id / 16 == Constants.pieceIDs.BLACK), id);
                     generatedBoards = movesRight(generatedBoards, boardInfo, x, y,
-                            (id / 2 == Constants.pieceIDs.BLACK), id);
+                            (id / 16 == Constants.pieceIDs.BLACK), id);
                     generatedBoards = movesUp(generatedBoards, boardInfo, x, y,
-                            (id / 2 == Constants.pieceIDs.BLACK), id);
+                            (id / 16 == Constants.pieceIDs.BLACK), id);
                     generatedBoards = movesDown(generatedBoards, boardInfo, x, y,
-                            (id / 2 == Constants.pieceIDs.BLACK), id);
+                            (id / 16 == Constants.pieceIDs.BLACK), id);
                     generatedBoards = movesUpRight(generatedBoards, boardInfo, x, y,
-                            (id / 2 == Constants.pieceIDs.BLACK), id);
+                            (id / 16 == Constants.pieceIDs.BLACK), id);
                     generatedBoards = movesUpLeft(generatedBoards, boardInfo, x, y,
-                            (id / 2 == Constants.pieceIDs.BLACK), id);
+                            (id / 16 == Constants.pieceIDs.BLACK), id);
                     generatedBoards = movesDownRight(generatedBoards, boardInfo, x, y,
-                            (id / 2 == Constants.pieceIDs.BLACK), id);
+                            (id / 16 == Constants.pieceIDs.BLACK), id);
                     generatedBoards = movesDownLeft(generatedBoards, boardInfo, x, y,
-                            (id / 2 == Constants.pieceIDs.BLACK), id);
+                            (id / 16 == Constants.pieceIDs.BLACK), id);
                     System.out.println("Moves generated after looking at queen: " + generatedBoards.size());
 
                 } else if (id == Constants.pieceIDs.BLACK_KINGS_BISHOP
@@ -177,13 +181,13 @@ public class Bot {
                         || id == Constants.pieceIDs.WHITE_QUEENS_BISHOP) {
 
                     generatedBoards = movesUpRight(generatedBoards, boardInfo, x, y,
-                            (id / 2 == Constants.pieceIDs.BLACK), id);
+                            (id / 16 == Constants.pieceIDs.BLACK), id);
                     generatedBoards = movesUpLeft(generatedBoards, boardInfo, x, y,
-                            (id / 2 == Constants.pieceIDs.BLACK), id);
+                            (id / 16 == Constants.pieceIDs.BLACK), id);
                     generatedBoards = movesDownRight(generatedBoards, boardInfo, x, y,
-                            (id / 2 == Constants.pieceIDs.BLACK), id);
+                            (id / 16 == Constants.pieceIDs.BLACK), id);
                     generatedBoards = movesDownLeft(generatedBoards, boardInfo, x, y,
-                            (id / 2 == Constants.pieceIDs.BLACK), id);
+                            (id / 16 == Constants.pieceIDs.BLACK), id);
                     System.out.println("Moves generated after looking at bishop: " + generatedBoards.size());
 
                 } else if (id == Constants.pieceIDs.BLACK_KING || id == Constants.pieceIDs.WHITE_KING) {
@@ -214,6 +218,16 @@ public class Bot {
             int y = boardInfo.blackKingY;
             byte[][] boardPositions = boardInfo.board;
             boolean up = true, down = true, left = true, right = true, upRight = true, downRight =true, upLeft = true, downLeft = true;
+            byte[][] knightPositions = {
+                {(byte) (x+1), (byte) (y+2)},
+                {(byte) (x+1), (byte) (y-2)},
+                {(byte) (x-1), (byte) (y+2)},
+                {(byte) (x-1), (byte) (y-2)},
+                {(byte) (x-2), (byte) (y+1)},
+                {(byte) (x+2), (byte) (y+1)},
+                {(byte) (x-2), (byte) (y-1)},
+                {(byte) (x+2), (byte) (y-1)},
+            };
 
             // iterator for going up
             int u = y - 1;
@@ -232,7 +246,8 @@ public class Bot {
                 if (l > -1  && left) {
                     if (boardPositions[l][y] == Constants.pieceIDs.WHITE_QUEEN
                             || boardPositions[l][y] == Constants.pieceIDs.WHITE_KINGS_ROOK
-                            || boardPositions[l][y] == Constants.pieceIDs.WHITE_QUEENS_ROOK) {
+                            || boardPositions[l][y] == Constants.pieceIDs.WHITE_QUEENS_ROOK
+                            || boardPositions[l][y] == Constants.pieceIDs.WHITE_PROMOTED_ROOK) {
                         return false;
                     } else if (boardPositions[l][y] != Constants.pieceIDs.EMPTY_CELL) {
                         left = false;
@@ -243,7 +258,8 @@ public class Bot {
                 if (r < 8 && right) {
                     if (boardPositions[r][y] == Constants.pieceIDs.WHITE_QUEEN
                             || boardPositions[r][y] == Constants.pieceIDs.WHITE_KINGS_ROOK
-                            || boardPositions[r][y] == Constants.pieceIDs.WHITE_QUEENS_ROOK) {
+                            || boardPositions[r][y] == Constants.pieceIDs.WHITE_QUEENS_ROOK
+                            || boardPositions[r][y] == Constants.pieceIDs.WHITE_PROMOTED_ROOK){
                         return false;
                     } else if (boardPositions[r][y] != Constants.pieceIDs.EMPTY_CELL) {
                         right = false;
@@ -254,7 +270,8 @@ public class Bot {
                 if (d < 8 && down) {
                     if (boardPositions[x][d] == Constants.pieceIDs.WHITE_QUEEN
                             || boardPositions[x][d] == Constants.pieceIDs.WHITE_KINGS_ROOK
-                            || boardPositions[x][d] == Constants.pieceIDs.WHITE_QUEENS_ROOK) {
+                            || boardPositions[x][d] == Constants.pieceIDs.WHITE_QUEENS_ROOK
+                            || boardPositions[x][d] == Constants.pieceIDs.WHITE_PROMOTED_ROOK) {
                         return false;
                     } else if (boardPositions[x][d] != Constants.pieceIDs.EMPTY_CELL) {
                         down = false;
@@ -265,7 +282,8 @@ public class Bot {
                 if (u > -1 && up) {
                     if (boardPositions[x][u] == Constants.pieceIDs.WHITE_QUEEN
                             || boardPositions[x][u] == Constants.pieceIDs.WHITE_KINGS_ROOK
-                            || boardPositions[x][u] == Constants.pieceIDs.WHITE_QUEENS_ROOK) {
+                            || boardPositions[x][u] == Constants.pieceIDs.WHITE_QUEENS_ROOK
+                            || boardPositions[x][u] == Constants.pieceIDs.WHITE_PROMOTED_ROOK) {
                         return false;
                     } else if (boardPositions[x][u] != Constants.pieceIDs.EMPTY_CELL) {
                         up = false;
@@ -320,6 +338,7 @@ public class Bot {
                 r++;
                 u--;
             }
+            
         } else {
             int x = boardInfo.whiteKingX;
             int y = boardInfo.whiteKingY;
@@ -343,7 +362,8 @@ public class Bot {
                 if (l > -1  && left) {
                     if (boardPositions[l][y] == Constants.pieceIDs.BLACK_QUEEN
                             || boardPositions[l][y] == Constants.pieceIDs.BLACK_KINGS_ROOK
-                            || boardPositions[l][y] == Constants.pieceIDs.BLACK_QUEENS_ROOK) {
+                            || boardPositions[l][y] == Constants.pieceIDs.BLACK_QUEENS_ROOK
+                            || boardPositions[l][y] == Constants.pieceIDs.BLACK_PROMOTED_ROOK) {
                         return false;
                     } else if (boardPositions[l][y] != Constants.pieceIDs.EMPTY_CELL) {
                         left = false;
@@ -354,7 +374,8 @@ public class Bot {
                 if (r < 8 && right) {
                     if (boardPositions[r][y] == Constants.pieceIDs.BLACK_QUEEN
                             || boardPositions[r][y] == Constants.pieceIDs.BLACK_KINGS_ROOK
-                            || boardPositions[r][y] == Constants.pieceIDs.BLACK_QUEENS_ROOK) {
+                            || boardPositions[r][y] == Constants.pieceIDs.BLACK_QUEENS_ROOK
+                            || boardPositions[r][y] == Constants.pieceIDs.BLACK_PROMOTED_ROOK) {
                         return false;
                     } else if (boardPositions[r][y] != Constants.pieceIDs.EMPTY_CELL) {
                         right = false;
@@ -365,7 +386,8 @@ public class Bot {
                 if (d < 8 && down) {
                     if (boardPositions[x][d] == Constants.pieceIDs.BLACK_QUEEN
                             || boardPositions[x][d] == Constants.pieceIDs.BLACK_KINGS_ROOK
-                            || boardPositions[x][d] == Constants.pieceIDs.BLACK_QUEENS_ROOK) {
+                            || boardPositions[x][d] == Constants.pieceIDs.BLACK_QUEENS_ROOK
+                            || boardPositions[x][d] == Constants.pieceIDs.BLACK_PROMOTED_ROOK) {
                         return false;
                     } else if (boardPositions[x][d] != Constants.pieceIDs.EMPTY_CELL) {
                         down = false;
@@ -376,7 +398,8 @@ public class Bot {
                 if (u > -1 && up) {
                     if (boardPositions[x][u] == Constants.pieceIDs.BLACK_QUEEN
                             || boardPositions[x][u] == Constants.pieceIDs.BLACK_KINGS_ROOK
-                            || boardPositions[x][u] == Constants.pieceIDs.BLACK_QUEENS_ROOK) {
+                            || boardPositions[x][u] == Constants.pieceIDs.BLACK_QUEENS_ROOK
+                            || boardPositions[x][u] == Constants.pieceIDs.BLACK_PROMOTED_ROOK) {
                         return false;
                     } else if (boardPositions[x][u] != Constants.pieceIDs.EMPTY_CELL) {
                         up = false;
@@ -481,7 +504,7 @@ public class Bot {
         if (color) {
             for (int i = x - 1; i > -1; i--) {
                 for (int j = y - 1; j > -1; j--) {
-                    if (initialBoard.board[i][j] > -1 && initialBoard.board[i][j] < 16) {
+                    if ((initialBoard.board[i][j] > -1 && initialBoard.board[i][j] < 16 )|| initialBoard.board[i][j] == Constants.pieceIDs.BLACK_PROMOTED_ROOK) {
                         break;
                     } else {
                         BoardInfo newBoard = initialBoard.copy();
@@ -503,7 +526,7 @@ public class Bot {
         } else {
             for (int i = x - 1; i > -1; i--) {
                 for (int j = y - 1; j > -1; j--) {
-                    if (initialBoard.board[i][j] > 15 && initialBoard.board[i][j] < 32) {
+                    if ((initialBoard.board[i][j] > 15 && initialBoard.board[i][j] < 32) || initialBoard.board[i][j] == Constants.pieceIDs.WHITE_PROMOTED_ROOK) {
                         break;
                     } else {
                         BoardInfo newBoard = initialBoard.copy();
@@ -550,7 +573,7 @@ public class Bot {
         if (color) {
             for (int i = x + 1; i < 8; i++) {
                 for (int j = y + 1; j < 8; j++) {
-                    if (initialBoard.board[i][j] > -1 && initialBoard.board[i][j] < 16) {
+                    if ((initialBoard.board[i][j] > -1 && initialBoard.board[i][j] < 16)|| initialBoard.board[i][j] == Constants.pieceIDs.BLACK_PROMOTED_ROOK) {
                         break;
                     } else {
                         BoardInfo newBoard = initialBoard.copy();
@@ -572,7 +595,7 @@ public class Bot {
         } else {
             for (int i = x + 1; i < 8; i++) {
                 for (int j = y + 1; j < 8; j++) {
-                    if (initialBoard.board[i][j] > 15 && initialBoard.board[i][j] < 32) {
+                    if ((initialBoard.board[i][j] > 15 && initialBoard.board[i][j] < 32) || initialBoard.board[i][j] == Constants.pieceIDs.WHITE_PROMOTED_ROOK) {
                         break;
                     } else {
                         BoardInfo newBoard = initialBoard.copy();
@@ -619,7 +642,7 @@ public class Bot {
         if (color) {
             for (int i = x - 1; i > -1; i--) {
                 for (int j = y - 1; j > -1; j--) {
-                    if (initialBoard.board[i][j] > -1 && initialBoard.board[i][j] < 16) {
+                    if ((initialBoard.board[i][j] > -1 && initialBoard.board[i][j] < 16) || initialBoard.board[i][j] == Constants.pieceIDs.BLACK_PROMOTED_ROOK) {
                         break;
                     } else {
                         BoardInfo newBoard = initialBoard.copy();
@@ -641,7 +664,7 @@ public class Bot {
         } else {
             for (int i = x - 1; i > -1; i--) {
                 for (int j = y - 1; j > -1; j--) {
-                    if (initialBoard.board[i][j] > 15 && initialBoard.board[i][j] < 32) {
+                    if ((initialBoard.board[i][j] > 15 && initialBoard.board[i][j] < 32)|| initialBoard.board[i][j] == Constants.pieceIDs.WHITE_PROMOTED_ROOK) {
                         break;
                     } else {
                         BoardInfo newBoard = initialBoard.copy();
@@ -688,7 +711,7 @@ public class Bot {
         if (color) {
             for (int i = x + 1; i < 8; i++) {
                 for (int j = y - 1; j > -1; j--) {
-                    if (initialBoard.board[i][j] > -1 && initialBoard.board[i][j] < 16) {
+                    if ((initialBoard.board[i][j] > -1 && initialBoard.board[i][j] < 16) || initialBoard.board[i][j] == Constants.pieceIDs.BLACK_PROMOTED_ROOK) {
                         break;
                     } else {
                         BoardInfo newBoard = initialBoard.copy();
@@ -710,7 +733,7 @@ public class Bot {
         } else {
             for (int i = x + 1; i < 8; i++) {
                 for (int j = y - 1; j > -1; j--) {
-                    if (initialBoard.board[i][j] > 15 && initialBoard.board[i][j] < 32) {
+                    if ((initialBoard.board[i][j] > 15 && initialBoard.board[i][j] < 32)|| initialBoard.board[i][j] == Constants.pieceIDs.WHITE_PROMOTED_ROOK) {
                         break;
                     } else {
                         BoardInfo newBoard = initialBoard.copy();
@@ -757,7 +780,7 @@ public class Bot {
         // if the color of the piece is black
         if (color) {
             for (int i = x - 1; i > -1; i--) {
-                if (initialBoard.board[i][y] > -1 && initialBoard.board[i][y] < 16) {
+                if ((initialBoard.board[i][y] > -1 && initialBoard.board[i][y] < 16) || initialBoard.board[i][y] == Constants.pieceIDs.BLACK_PROMOTED_ROOK) {
                     break;
                 } else {
                     BoardInfo newBoard = initialBoard.copy();
@@ -782,7 +805,7 @@ public class Bot {
             }
         } else {
             for (int i = x - 1; i > -1; i--) {
-                if (initialBoard.board[i][y] > 15 && initialBoard.board[i][y] < 32) {
+                if ((initialBoard.board[i][y] > 15 && initialBoard.board[i][y] < 32) || initialBoard.board[i][y] == Constants.pieceIDs.WHITE_PROMOTED_ROOK) {
                     break;
                 } else {
                     BoardInfo newBoard = initialBoard.copy();
@@ -831,7 +854,7 @@ public class Bot {
         // if the color of the piece is black
         if (color) {
             for (int i = x + 1; i < 8; i++) {
-                if (initialBoard.board[i][y] > -1 && initialBoard.board[i][y] < 16) {
+                if ((initialBoard.board[i][y] > -1 && initialBoard.board[i][y] < 16)|| initialBoard.board[i][y] == Constants.pieceIDs.BLACK_PROMOTED_ROOK) {
                     break;
                 } else {
                     BoardInfo newBoard = initialBoard.copy();
@@ -856,7 +879,7 @@ public class Bot {
             }
         } else {
             for (int i = x + 1; i < 8; i++) {
-                if (initialBoard.board[i][y] > 15 && initialBoard.board[i][y] < 32) {
+                if ((initialBoard.board[i][y] > 15 && initialBoard.board[i][y] < 32)|| initialBoard.board[i][y] == Constants.pieceIDs.WHITE_PROMOTED_ROOK) {
                     break;
                 } else {
                     BoardInfo newBoard = initialBoard.copy();
@@ -907,7 +930,7 @@ public class Bot {
         // if the color of the piece is black
         if (color) {
             for (int i = y - 1; i > -1; i--) {
-                if (initialBoard.board[x][i] > -1 && initialBoard.board[x][i] < 16) {
+                if ((initialBoard.board[x][i] > -1 && initialBoard.board[x][i] < 16) || initialBoard.board[i][y] == Constants.pieceIDs.BLACK_PROMOTED_ROOK) {
                     break;
                 } else {
                     BoardInfo newBoard = initialBoard.copy();
@@ -932,7 +955,7 @@ public class Bot {
             }
         } else {
             for (int i = y - 1; i > -1; i--) {
-                if (initialBoard.board[x][i] > 15 && initialBoard.board[x][i] < 32) {
+                if ((initialBoard.board[x][i] > 15 && initialBoard.board[x][i] < 32) || initialBoard.board[i][y] == Constants.pieceIDs.WHITE_PROMOTED_ROOK) {
                     break;
                 } else {
                     BoardInfo newBoard = initialBoard.copy();
@@ -984,7 +1007,7 @@ public class Bot {
         // if the color of the piece is black
         if (color) {
             for (int i = y + 1; i < 8; i++) {
-                if (initialBoard.board[x][i] > -1 && initialBoard.board[x][i] < 16) {
+                if ((initialBoard.board[x][i] > -1 && initialBoard.board[x][i] < 16) || initialBoard.board[i][y] == Constants.pieceIDs.BLACK_PROMOTED_ROOK) {
                     break;
                 } else {
                     BoardInfo newBoard = initialBoard.copy();
@@ -1009,7 +1032,7 @@ public class Bot {
             }
         } else {
             for (int i = y + 1; i < 8; i++) {
-                if (initialBoard.board[x][i] > 15 && initialBoard.board[x][i] < 32) {
+                if ((initialBoard.board[x][i] > 15 && initialBoard.board[x][i] < 32)|| initialBoard.board[i][y] == Constants.pieceIDs.WHITE_PROMOTED_ROOK) {
                     break;
                 } else {
                     BoardInfo newBoard = initialBoard.copy();
@@ -1038,12 +1061,24 @@ public class Bot {
         return boards;
     }
 
+    /**
+     * Method for getting the index for a pawn's passant value. This is the index for the int[] passant array attribute in any BoardInfo object. 
+     * 
+     * @param id The id of the pawn. 
+     * @return The indexe where the passant value is stored at. 
+     */
     private byte getPassantIndex(byte id) {
-        byte index = (id / 2 == 1) ? (byte) (id % 8) : (byte) (id % 8 + 8);
+        //if the pawn is black, the index will be from 0-7, if the pawn is white the index is from 8-15
+        byte index = (id / 16 == Constants.pieceIDs.BLACK) ? (byte) (id - 8) : (byte) (id-24+ 8);
         System.out.println("Pawn index for id: " + id + ", is " + index);
         return index;
     }
 
+    /**
+     * Method for getting the index for a castles hasMoved variable. This is the index for the boolean[] hasMoved array in any BoardInfo object. 
+     * @param id The id of the castle.
+     * @return The index where the hasMoved for that castle is stored at. 
+     */
     private byte getHasMovedIndex(byte id) {
         switch (id) {
             case Constants.pieceIDs.BLACK_KINGS_ROOK:
