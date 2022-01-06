@@ -64,7 +64,7 @@ public class Bot {
         boardInfo.setKingPos(false, App.GAME_PIECES[Constants.pieceIDs.WHITE_KING].gridX,
                 App.GAME_PIECES[Constants.pieceIDs.WHITE_KING].gridY);
 
-        BoardInfo[] boards = generateBoards(boardInfo, true);
+        BoardInfo[] boards = generateBoards(boardInfo, black);
         if (boards.length == 0) {
             return Constants.moveTypes.NO_MOVES;
         } else {
@@ -148,7 +148,7 @@ public class Bot {
                             || id == Constants.pieceIDs.BLACK_PROMOTED_ROOK
                             || id == Constants.pieceIDs.WHITE_PROMOTED_ROOK) {
 
-                        //if the piece it is generating for is a rook
+                        // if the piece it is generating for is a rook
 
                         generatedBoards = movesRook(generatedBoards, boardInfo, x, y, color, id);
                         System.out.println("Boards generated for rook " + id + ": " + generatedBoards.size());
@@ -169,7 +169,7 @@ public class Bot {
                         }
 
                     } else if (id == Constants.pieceIDs.BLACK_QUEEN || id == Constants.pieceIDs.WHITE_QUEEN) {
-                        //if the piece it is generating for is a queen
+                        // if the piece it is generating for is a queen
                         generatedBoards = movesRook(generatedBoards, boardInfo, x, y, color, id);
                         generatedBoards = movesBishop(generatedBoards, boardInfo, x, y, color, id);
                         System.out.println("Boards generated for queen " + id + ": " + generatedBoards.size());
@@ -180,14 +180,15 @@ public class Bot {
                             || id == Constants.pieceIDs.BLACK_QUEENS_KNIGHT
                             || id == Constants.pieceIDs.WHITE_QUEENS_KNIGHT
                             || id == Constants.pieceIDs.WHITE_KINGS_KNIGHT) {
+                        // if the piece it is generating for is a knight
                         generatedBoards = movesKnight(generatedBoards, boardInfo, x, y, color, id);
                         System.out.println("Boards generated for kngiht " + id + ": " + generatedBoards.size());
                         for (int i = 0; i < generatedBoards.size(); i++) {
                             System.out.println(generatedBoards.get(i).previousMove);
                         }
-
-                        //if the piece it is generating for is a knight
-
+                    } else if (id == Constants.pieceIDs.BLACK_KING || id == Constants.pieceIDs.WHITE_KING) {
+                        generatedBoards = movesKing(generatedBoards, boardInfo, x, y, color, id);
+                        System.out.println("Boards generated for king " + id + ": " + generatedBoards.size());
                     }
 
                 }
@@ -438,6 +439,21 @@ public class Bot {
         return true;
     }
 
+    /**
+     * Method responsible for generating moves for rooks and queens, focuses on
+     * horizonotal and vertical moves.
+     * 
+     * @param boards       An ArrayList of BoardInfo objects to add the generated
+     *                     boards to.
+     * @param initialBoard The original board to generate from.
+     * @param x            The x location of the piece.
+     * @param y            The y location of the piece.
+     * @param color        The color of the piece, true if the piece is black, false
+     *                     if not.
+     * @param id           The id of the piece.
+     * @return An ArrayList of BoardInfo objects that contain the newly generated
+     *         boards.
+     */
     private ArrayList<BoardInfo> movesRook(ArrayList<BoardInfo> boards, BoardInfo initialBoard, int x, int y,
             boolean color, byte id) {
         byte teamRook;
@@ -476,7 +492,6 @@ public class Bot {
                     // moves this piece to there.
                     newBoard.board[x][u] = id;
                     newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
-
 
                     // sets the string for the previous move
                     newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + x + u);
@@ -664,6 +679,21 @@ public class Bot {
         return boards;
     }
 
+    /**
+     * Method responsible for generating moves for bishops and queens, focuses on
+     * diagonal moves.
+     * 
+     * @param boards       An ArrayList of BoardInfo objects to add the generated
+     *                     boards to.
+     * @param initialBoard The original board to generate from.
+     * @param x            The x location of the piece.
+     * @param y            The y location of the piece.
+     * @param color        The color of the piece, true if the piece is black, false
+     *                     if not.
+     * @param id           The id of the piece.
+     * @return An ArrayList of BoardInfo objects that contain the newly generated
+     *         boards.
+     */
     private ArrayList<BoardInfo> movesBishop(ArrayList<BoardInfo> boards, BoardInfo initialBoard, int x, int y,
             boolean color, byte id) {
 
@@ -864,12 +894,133 @@ public class Bot {
         return boards;
     }
 
+    /**
+     * Method responsible for generating the moves from a king.
+     * 
+     * @param boards       The ArrayList of BoardInfo objects to add to.
+     * @param initialBoard The initial board to generate from.
+     * @param x            The x location of the king.
+     * @param y            The y location of the king.
+     * @param color        The color of the king, true if the king is black, false
+     *                     if not.
+     * @param id           The id of the king.
+     * @return An ArrayList of BoardInfo objects containing the newly generated
+     *         moves.
+     */
     private ArrayList<BoardInfo> movesKing(ArrayList<BoardInfo> boards, BoardInfo initialBoard, int x, int y,
             boolean color, byte id) {
-        // if the color of the king is black
-        if (color) {
 
+        BoardInfo newBoard;
+        byte[][] kingPossibleMoves = {
+                { (byte) (x - 1), (byte) y },
+                { (byte) (x + 1), (byte) y },
+                { (byte) (x - 1), (byte) (y + 1) },
+                { (byte) (x + 1), (byte) (y + 1) },
+                { (byte) (x - 1), (byte) (y - 1) },
+                { (byte) (x + 1), (byte) (y - 1) },
+                { (byte) x, (byte) (y + 1) },
+                { (byte) x, (byte) (y - 1) }
+
+        };
+        byte queensRook;
+        byte kingsRook;
+        byte teamPromotedRook;
+        byte beginTeamRange;
+        byte endTeamRange;
+
+        if (color) {
+            queensRook = Constants.pieceIDs.BLACK_QUEENS_ROOK;
+            kingsRook = Constants.pieceIDs.BLACK_KINGS_ROOK;
+            teamPromotedRook = Constants.pieceIDs.BLACK_PROMOTED_ROOK;
+            beginTeamRange = -1;
+            endTeamRange = 16;
         } else {
+            queensRook = Constants.pieceIDs.WHITE_QUEENS_ROOK;
+            kingsRook = Constants.pieceIDs.WHITE_KINGS_ROOK;
+            teamPromotedRook = Constants.pieceIDs.WHITE_PROMOTED_ROOK;
+            beginTeamRange = 15;
+            endTeamRange = 32;
+        }
+
+        for (byte[] move : kingPossibleMoves) {
+            if (move[0] > -1 && move[0] < 8 && move[1] > -1 && move[1] < 8) {
+                // if the move is inside the board
+                if (!((initialBoard.board[move[0]][move[1]] > beginTeamRange
+                        && initialBoard.board[move[0]][move[1]] < endTeamRange)
+                        || initialBoard.board[move[0]][move[1]] == teamPromotedRook)) {
+                    // if the piece is not a black piece
+                    newBoard = initialBoard.copy();
+                    newBoard.moveCount++;
+                    newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
+                    newBoard.setKingPos(color, move[0], move[1]);
+                    if (isNotUnderCheck(newBoard, color)) {
+                        boards.add(newBoard);
+                        newBoard.hasMoved[getHasMovedIndex(id)] = true;
+                        newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + move[0] + move[1]);
+                    }
+                }
+            }
+        }
+
+        // castling code
+        // castling left
+        if (!initialBoard.hasMoved[getHasMovedIndex(id)]
+                && !initialBoard.hasMoved[getHasMovedIndex(queensRook)]
+                && initialBoard.board[x - 1][y] == Constants.pieceIDs.EMPTY_CELL
+                && initialBoard.board[x - 2][y] == Constants.pieceIDs.EMPTY_CELL
+                && initialBoard.board[x - 3][y] == Constants.pieceIDs.EMPTY_CELL) {
+            // if no pieces are in the way and the king and castle have not moved
+
+            newBoard = initialBoard.copy();
+            if (isNotUnderCheck(newBoard, color)) {
+                // if the king isn't currently under check
+                newBoard.setKingPos(color, (byte) (x - 1), (byte) y);
+                newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
+                if (isNotUnderCheck(newBoard, color)) {
+                    // if the king doesn't pass through check
+                    newBoard.setKingPos(color, (byte) (x - 2), (byte) y);
+                    newBoard.board[x - 1][y] = Constants.pieceIDs.EMPTY_CELL;
+                    if (isNotUnderCheck(newBoard, color)) {
+                        // moves the castle to its new position, then clears its old position
+                        newBoard.board[x - 1][y] = newBoard.board[0][y];
+                        newBoard.board[0][y] = Constants.pieceIDs.EMPTY_CELL;
+                        newBoard.hasMoved[getHasMovedIndex(id)] = true;
+                        newBoard.hasMoved[getHasMovedIndex(queensRook)] = true;
+                        boards.add(newBoard);
+                        newBoard.setPreviousMove(Constants.moveTypes.CASTLE_LEFT + id + ".");
+                    }
+                }
+            }
+
+        }
+
+        // castle right
+        if (!initialBoard.hasMoved[getHasMovedIndex(id)]
+                && !initialBoard.hasMoved[getHasMovedIndex(kingsRook)]
+                && initialBoard.board[x + 1][y] == Constants.pieceIDs.EMPTY_CELL
+                && initialBoard.board[x + 2][y] == Constants.pieceIDs.EMPTY_CELL) {
+            // if no pieces are in the way and the king and castle have not moved
+
+            newBoard = initialBoard.copy();
+            if (isNotUnderCheck(newBoard, color)) {
+                // if the king isn't currently under check
+                newBoard.setKingPos(color, (byte) (x + 1), (byte) y);
+                newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
+                if (isNotUnderCheck(newBoard, color)) {
+                    // if the king doesn't pass through check
+                    newBoard.setKingPos(color, (byte) (x + 2), (byte) y);
+                    newBoard.board[x - 1][y] = Constants.pieceIDs.EMPTY_CELL;
+                    if (isNotUnderCheck(newBoard, color)) {
+                        // moves the castle to its new position, then clears its old position
+                        newBoard.board[x + 1][y] = newBoard.board[7][y];
+                        newBoard.board[0][y] = Constants.pieceIDs.EMPTY_CELL;
+                        newBoard.hasMoved[getHasMovedIndex(id)] = true;
+                        newBoard.hasMoved[getHasMovedIndex(kingsRook)] = true;
+                        boards.add(newBoard);
+                        newBoard.setPreviousMove(Constants.moveTypes.CASTLE_RIGHT + id + ".");
+                    }
+                }
+            }
 
         }
 
@@ -877,57 +1028,64 @@ public class Bot {
     }
 
     /**
-     * Method for generating the boards that come with knight movement. 
+     * Method for generating the boards that come with knight movement.
      * 
-     * @param boards ArrayList of BoardInfo objects that the method will add the newly generated boards to.
+     * @param boards       ArrayList of BoardInfo objects that the method will add
+     *                     the newly generated boards to.
      * @param initialBoard The initial board to generate from.
-     * @param x X location of the knight.
-     * @param y Y location of the knight. 
-     * @param color Indicates the color of the knight, true if black, false if not.
-     * @param id ID of the knight.
-     * @return An ArrayList of BoardInfo objects containing any newly generated boards.
+     * @param x            X location of the knight.
+     * @param y            Y location of the knight.
+     * @param color        Indicates the color of the knight, true if black, false
+     *                     if not.
+     * @param id           ID of the knight.
+     * @return An ArrayList of BoardInfo objects containing any newly generated
+     *         boards.
      */
     private ArrayList<BoardInfo> movesKnight(ArrayList<BoardInfo> boards, BoardInfo initialBoard, int x, int y,
             boolean color, byte id) {
         byte[][] possibleMoves = {
-            {(byte) (x+1), (byte) (y+2)},
-            {(byte) (x+1), (byte) (y-2)},
-            {(byte) (x-1), (byte) (y+2)},
-            {(byte) (x-1), (byte) (y-2)},
-            {(byte) (x+2), (byte) (y+1)},
-            {(byte) (x-2), (byte) (y+1)},
-            {(byte) (x+2), (byte) (y-1)},
-            {(byte) (x-2), (byte) (y-1)}
+                { (byte) (x + 1), (byte) (y + 2) },
+                { (byte) (x + 1), (byte) (y - 2) },
+                { (byte) (x - 1), (byte) (y + 2) },
+                { (byte) (x - 1), (byte) (y - 2) },
+                { (byte) (x + 2), (byte) (y + 1) },
+                { (byte) (x - 2), (byte) (y + 1) },
+                { (byte) (x + 2), (byte) (y - 1) },
+                { (byte) (x - 2), (byte) (y - 1) }
         };
 
-        if(color){
-            //for black
-            for(byte[] move : possibleMoves){
-                if(move[0] > -1 && move[0] < 8 && move[1] > -1 && move[1] < 8){
-                    if(!((initialBoard.board[move[0]][move[1]] > -1 && initialBoard.board[move[0]][move[1]] < 16 )|| initialBoard.board[move[0]][move[1]] == Constants.pieceIDs.BLACK_PROMOTED_ROOK)){
-                        //if the piece is not a black piece
+        if (color) {
+            // for black
+            for (byte[] move : possibleMoves) {
+                if (move[0] > -1 && move[0] < 8 && move[1] > -1 && move[1] < 8) {
+                    if (!((initialBoard.board[move[0]][move[1]] > -1 && initialBoard.board[move[0]][move[1]] < 16)
+                            || initialBoard.board[move[0]][move[1]] == Constants.pieceIDs.BLACK_PROMOTED_ROOK)) {
+                        // if the piece is not a black piece
                         BoardInfo newBoard = initialBoard.copy();
                         newBoard.moveCount++;
                         newBoard.board[move[0]][move[1]] = id;
                         newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
-                        if(isNotUnderCheck(newBoard, color)){
+                        if (isNotUnderCheck(newBoard, color)) {
                             boards.add(newBoard);
+                            newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + move[0] + move[1]);
                         }
                     }
                 }
             }
-        }else{
-            //for white
-            for(byte[] move : possibleMoves){
-                if(move[0] > -1 && move[0] < 8 && move[1] > -1 && move[1] < 8){
-                    if(!((initialBoard.board[move[0]][move[1]] > 15 && initialBoard.board[move[0]][move[1]] < 32 )|| initialBoard.board[move[0]][move[1]] == Constants.pieceIDs.WHITE_PROMOTED_ROOK)){
-                        //if the piece is not a white piece
+        } else {
+            // for white
+            for (byte[] move : possibleMoves) {
+                if (move[0] > -1 && move[0] < 8 && move[1] > -1 && move[1] < 8) {
+                    if (!((initialBoard.board[move[0]][move[1]] > 15 && initialBoard.board[move[0]][move[1]] < 32)
+                            || initialBoard.board[move[0]][move[1]] == Constants.pieceIDs.WHITE_PROMOTED_ROOK)) {
+                        // if the piece is not a white piece
                         BoardInfo newBoard = initialBoard.copy();
                         newBoard.moveCount++;
                         newBoard.board[move[0]][move[1]] = id;
                         newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
-                        if(isNotUnderCheck(newBoard, color)){
+                        if (isNotUnderCheck(newBoard, color)) {
                             boards.add(newBoard);
+                            newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + move[0] + move[1]);
                         }
                     }
                 }
@@ -980,6 +1138,12 @@ public class Bot {
 
     }
 
+    /**
+     * Class for BoardInteractions.
+     * 
+     * @author Selim Abdelwahab
+     * @version 1.0
+     */
     public class BoardInteractions {
         private String rawAIMoves;
         private Piece piece;

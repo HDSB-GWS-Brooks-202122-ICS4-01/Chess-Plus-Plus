@@ -56,7 +56,7 @@ public class Board {
          new HashMap<String, String>() };
    private byte winner;
 
-   private Bot bot = new Bot(App.getDiff(), true);
+   private Bot bot = new Bot(App.getDiff(), false);
 
    private final byte GAME_MODE;
 

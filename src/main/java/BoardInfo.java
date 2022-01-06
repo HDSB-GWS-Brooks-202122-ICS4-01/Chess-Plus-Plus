@@ -1,6 +1,12 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * Class for board data that is used by the A.I.
+ * 
+ * @author Akil Pathiranage
+ * @version 1.0
+ */
 public class BoardInfo {
     byte[][] board;
     int[] passant;
@@ -14,6 +20,13 @@ public class BoardInfo {
     byte blackKingX;
     byte blackKingY; 
 
+    /**
+     * Constructor for BoardInfo class.
+     * @param board Positions of everything on the board.
+     * @param passant An array of integers represnting the passant attribute for each pawn.
+     * @param hasMoved An array of booleans representing the hasMoved attributes for kings and rooks. 
+     * @param moveCount The current movecount on the board. 
+     */
     public BoardInfo(byte[][] board, int[] passant, boolean[] hasMoved, int moveCount){
 
         this.moveCount = moveCount;
@@ -41,7 +54,7 @@ public class BoardInfo {
      */
     public BoardInfo copy(){
         BoardInfo copy = new BoardInfo(deepCopy(board), Arrays.copyOf(passant, passant.length), Arrays.copyOf(hasMoved, hasMoved.length), moveCount);
-        copy.setKingPos(true, blackKingX, blackKingY);
+        copy.setKingPos(false, whiteKingX, whiteKingY);
         copy.setKingPos(true, blackKingX, blackKingY);
         return copy;
     }
@@ -62,6 +75,11 @@ public class BoardInfo {
 
     }
 
+    /**
+     * This method deep copies any two dimensional byte array, it is mainly meant to be used by the BoardInfo copy() method to create a deepcopy of the BoardInfo object. 
+     * @param original Original 2-d byte array to copy. 
+     * @return A new 2-d byte array containing all the same elements with no references to the original.
+     */
     public byte[][] deepCopy(byte[][] original){
         byte[][] newArray = new byte[original.length][original[0].length];
         for(int i = 0; i < original.length; i++){
@@ -71,13 +89,21 @@ public class BoardInfo {
 
     }
 
+    /**
+     * This method sets the king position attribute of the BoardInfo object, and also updates it's position on the board.
+     * @param black Color of the king, true if the king is black, false if not.
+     * @param x X location to put the king at.
+     * @param y Y location to put the king at. 
+     */
     public void setKingPos(boolean black, byte x, byte y){
         if(black){
             blackKingX = x;
             blackKingY = y;
+            board[x][y] = Constants.pieceIDs.BLACK_KING;
         } else {
             whiteKingX = x;
             whiteKingY = y;
+            board[x][y] = Constants.pieceIDs.WHITE_KING;
         }
     }
     
