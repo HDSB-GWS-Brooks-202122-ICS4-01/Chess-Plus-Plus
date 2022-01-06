@@ -69,28 +69,23 @@ public class Bot {
         boardInfo.setKingPos(false, App.GAME_PIECES[Constants.pieceIDs.WHITE_KING].gridX,
                 App.GAME_PIECES[Constants.pieceIDs.WHITE_KING].gridY);
 
-        return minimax(depth, true, boardInfo).previousMove;
-    }
-
-    /**
-     * Method for evaluating the value of the board. Evaluating a board means to
-     * apply a value for it,
-     * this is used in the minimax algorithm.
-     * 
-     * @param boardInfo The board to evaluate.
-     * @return an Integer represnting the score for this board.
-     */
-    private int evaluate(BoardInfo boardInfo) {
-        return 0;
+        BoardInfo[] boards = generateBoards(boardInfo, true);
+        if(boards.length ==0){
+            return Constants.moveTypes.NO_MOVES;
+        } else {
+            return boards[0].previousMove;
+        }
+        // return minimax(depth, true, boardInfo).previousMove;
     }
 
     /**
      * Minimax algorithm used for the A.I.
      * 
-     * @param depth
-     * @param max
-     * @param boardInfo
-     * @return
+     * @param depth     The depth to continue the recursion to.
+     * @param max       Variable for determining whether it is maximizing, or
+     *                  minimizing, true if maximizing, false if minimizing,
+     * @param boardInfo The board to generate from.
+     * @return The best board.
      */
     private BoardInfo minimax(int depth, boolean max, BoardInfo boardInfo) {
         if (depth == 0) {
@@ -98,21 +93,36 @@ public class Bot {
             return boardInfo;
         }
 
-        int lastEval = -1000;
+        // If it is trying to maximize, the initial eval is set to the lowest so that
+        // any eval that comes after is higher
+        // If it is trying to minimize, the intial eval is set to the highest so that
+        // any eval that comes after is lower
+        int lastEval;
+        if (max) {
+            lastEval = -1000;
+        } else {
+            lastEval = 1000;
+        }
         int thisEval;
         BoardInfo lastChild = null;
-        BoardInfo[] children = generateBoards(boardInfo);
+
+        // Generates boards that come after this board.
+        BoardInfo[] children = generateBoards(boardInfo, max);
+
         BoardInfo boardToEvaluate;
 
         for (BoardInfo child : children) {
+            // Sorts through the children to find the highest or lowest one, returns the
+            // highest/lowest.
             boardToEvaluate = minimax(depth - 1, !max, child);
-            thisEval = evaluate(boardToEvaluate);
+            thisEval = boardToEvaluate.evaluate();
             if ((max && thisEval > lastEval) || (!max && thisEval < lastEval)) {
                 lastEval = thisEval;
                 lastChild = boardToEvaluate;
             }
 
         }
+
         return lastChild;
 
     }
@@ -124,316 +134,517 @@ public class Bot {
      * @return An array of BoardInfo objects, representing all the possible moves
      *         generated from the original board.
      */
-    private BoardInfo[] generateBoards(BoardInfo boardInfo) {
+    private BoardInfo[] generateBoards(BoardInfo boardInfo, boolean color) {
+        //TODO Akil finish this
+        //TODO Fix diagonal move generation
         ArrayList<BoardInfo> generatedBoards = new ArrayList<BoardInfo>();
+        System.out.println("Color to generate for: " + ((color)? "black" : "white"));
+        
         for (int x = 0; x < 8; x++) {
             for (int y = 0; y < 8; y++) {
                 byte id = boardInfo.board[x][y];
-                if (id == Constants.pieceIDs.EMPTY_CELL) {
-                    continue;
-                } else if (id == Constants.pieceIDs.BLACK_KINGS_ROOK
-                        || id == Constants.pieceIDs.BLACK_QUEENS_ROOK
-                        || id == Constants.pieceIDs.WHITE_QUEENS_ROOK
-                        || id == Constants.pieceIDs.WHITE_KINGS_ROOK) {
+                if((id/16==Constants.pieceIDs.BLACK) == color){
+                    //if the piece is  the color it is generating for.
+        
+                    if(id == Constants.pieceIDs.BLACK_KINGS_ROOK || id == Constants.pieceIDs.WHITE_KINGS_ROOK || id == Constants.pieceIDs.BLACK_QUEENS_ROOK || id == Constants.pieceIDs.WHITE_QUEENS_ROOK){
+                        generatedBoards = movesRook(generatedBoards, boardInfo, x, y, color, id);
+                        System.out.println("Boards generated for rook" + id + "moving: " + generatedBoards.size());
+                        for(int i = 0; i < generatedBoards.size(); i++){
+                            System.out.println(generatedBoards.get(i).previousMove);
+                        }
+                    }
 
-                    generatedBoards = movesLeft(generatedBoards, boardInfo, x, y,
-                            (id / 2 == Constants.pieceIDs.BLACK), id);
-                    generatedBoards = movesRight(generatedBoards, boardInfo, x, y,
-                            (id / 2 == Constants.pieceIDs.BLACK), id);
-                    generatedBoards = movesUp(generatedBoards, boardInfo, x, y,
-                            (id / 2 == Constants.pieceIDs.BLACK), id);
-                    generatedBoards = movesDown(generatedBoards, boardInfo, x, y,
-                            (id / 2 == Constants.pieceIDs.BLACK), id);
-                    System.out.println("Moves generated after looking at black castle: " + generatedBoards.size());
-
-                } else if (id == Constants.pieceIDs.BLACK_KINGS_KNIGHT
-                        || id == Constants.pieceIDs.BLACK_QUEENS_KNIGHT
-                        || id == Constants.pieceIDs.WHITE_KINGS_KNIGHT
-                        || id == Constants.pieceIDs.WHITE_QUEENS_KNIGHT) {
-
-                } else if (id == Constants.pieceIDs.BLACK_QUEEN
-                        || id == Constants.pieceIDs.WHITE_QUEEN) {
-                    generatedBoards = movesLeft(generatedBoards, boardInfo, x, y,
-                            (id / 2 == Constants.pieceIDs.BLACK), id);
-                    generatedBoards = movesRight(generatedBoards, boardInfo, x, y,
-                            (id / 2 == Constants.pieceIDs.BLACK), id);
-                    generatedBoards = movesUp(generatedBoards, boardInfo, x, y,
-                            (id / 2 == Constants.pieceIDs.BLACK), id);
-                    generatedBoards = movesDown(generatedBoards, boardInfo, x, y,
-                            (id / 2 == Constants.pieceIDs.BLACK), id);
-                    generatedBoards = movesUpRight(generatedBoards, boardInfo, x, y,
-                            (id / 2 == Constants.pieceIDs.BLACK), id);
-                    generatedBoards = movesUpLeft(generatedBoards, boardInfo, x, y,
-                            (id / 2 == Constants.pieceIDs.BLACK), id);
-                    generatedBoards = movesDownRight(generatedBoards, boardInfo, x, y,
-                            (id / 2 == Constants.pieceIDs.BLACK), id);
-                    generatedBoards = movesDownLeft(generatedBoards, boardInfo, x, y,
-                            (id / 2 == Constants.pieceIDs.BLACK), id);
-                    System.out.println("Moves generated after looking at queen: " + generatedBoards.size());
-
-                } else if (id == Constants.pieceIDs.BLACK_KINGS_BISHOP
-                        || id == Constants.pieceIDs.BLACK_QUEENS_BISHOP
-                        || id == Constants.pieceIDs.WHITE_KINGS_BISHOP
-                        || id == Constants.pieceIDs.WHITE_QUEENS_BISHOP) {
-
-                    generatedBoards = movesUpRight(generatedBoards, boardInfo, x, y,
-                            (id / 2 == Constants.pieceIDs.BLACK), id);
-                    generatedBoards = movesUpLeft(generatedBoards, boardInfo, x, y,
-                            (id / 2 == Constants.pieceIDs.BLACK), id);
-                    generatedBoards = movesDownRight(generatedBoards, boardInfo, x, y,
-                            (id / 2 == Constants.pieceIDs.BLACK), id);
-                    generatedBoards = movesDownLeft(generatedBoards, boardInfo, x, y,
-                            (id / 2 == Constants.pieceIDs.BLACK), id);
-                    System.out.println("Moves generated after looking at bishop: " + generatedBoards.size());
-
-                } else if (id == Constants.pieceIDs.BLACK_KING || id == Constants.pieceIDs.WHITE_KING) {
-
-                } else if ((id > 7 && id < 16) || (id > 23 && id < 32)) {
+                } else {
 
                 }
-
+                
             }
 
         }
+        BoardInfo[] generatedBoardsArray = generatedBoards.toArray(new BoardInfo[generatedBoards.size()]);
 
-        return (BoardInfo[]) generatedBoards.toArray();
+        return generatedBoardsArray;
     }
 
     /**
      * Method for determining if the king is under check.
      * 
-     * @param boardInfo BoardInfo object containing the board data. 
-     * @param color Color of the piece, true means black, false means white. 
+     * @param boardInfo BoardInfo object containing the board data.
+     * @param color     Color of the piece, true means black, false means white.
      * 
      * @return true if the king isn't under check, false if it is.
      */
     boolean isNotUnderCheck(BoardInfo boardInfo, boolean color) {
-        // if the color it is checking is black.
+        int x;
+        int y;
+        byte queen;
+        byte queensRook;
+        byte kingsRook;
+        byte promotedRook;
+        byte queensBishop;
+        byte kingsBishop;
+        byte kingsKnight;
+        byte queensKnight;
+        byte beginPawnRange;
+        byte endPawnRange;
+        byte pawnDirection;
         if (color) {
-            int x = boardInfo.blackKingX;
-            int y = boardInfo.blackKingY;
-            byte[][] boardPositions = boardInfo.board;
-            boolean up = true, down = true, left = true, right = true, upRight = true, downRight =true, upLeft = true, downLeft = true;
+            x = boardInfo.blackKingX;
+            y = boardInfo.blackKingY;
+            queen = Constants.pieceIDs.WHITE_QUEEN;
+            queensRook = Constants.pieceIDs.WHITE_QUEENS_ROOK;
+            kingsRook = Constants.pieceIDs.WHITE_KINGS_ROOK;
+            promotedRook = Constants.pieceIDs.WHITE_PROMOTED_ROOK;
+            queensBishop = Constants.pieceIDs.WHITE_QUEENS_BISHOP;
+            kingsBishop = Constants.pieceIDs.WHITE_KINGS_BISHOP;
+            kingsKnight = Constants.pieceIDs.WHITE_KINGS_KNIGHT;
+            queensKnight = Constants.pieceIDs.WHITE_QUEENS_KNIGHT;
 
-            // iterator for going up
-            int u = y - 1;
+            // range for other teams pawns
+            beginPawnRange = 23;
+            endPawnRange = 32;
+            pawnDirection = 1;
 
-            // iterator for going down
-            int d = y + 1;
-
-            // iterator for going to the right
-            int r = x + 1;
-
-            // iterator for going to the left
-            int l = x - 1;
-
-            while (left || right || up || down || upRight || upLeft || downRight || downLeft) {
-                // left check
-                if (l > -1  && left) {
-                    if (boardPositions[l][y] == Constants.pieceIDs.WHITE_QUEEN
-                            || boardPositions[l][y] == Constants.pieceIDs.WHITE_KINGS_ROOK
-                            || boardPositions[l][y] == Constants.pieceIDs.WHITE_QUEENS_ROOK) {
-                        return false;
-                    } else if (boardPositions[l][y] != Constants.pieceIDs.EMPTY_CELL) {
-                        left = false;
-                    }
-                }
-
-                // right check
-                if (r < 8 && right) {
-                    if (boardPositions[r][y] == Constants.pieceIDs.WHITE_QUEEN
-                            || boardPositions[r][y] == Constants.pieceIDs.WHITE_KINGS_ROOK
-                            || boardPositions[r][y] == Constants.pieceIDs.WHITE_QUEENS_ROOK) {
-                        return false;
-                    } else if (boardPositions[r][y] != Constants.pieceIDs.EMPTY_CELL) {
-                        right = false;
-                    }
-                }
-
-                // down check
-                if (d < 8 && down) {
-                    if (boardPositions[x][d] == Constants.pieceIDs.WHITE_QUEEN
-                            || boardPositions[x][d] == Constants.pieceIDs.WHITE_KINGS_ROOK
-                            || boardPositions[x][d] == Constants.pieceIDs.WHITE_QUEENS_ROOK) {
-                        return false;
-                    } else if (boardPositions[x][d] != Constants.pieceIDs.EMPTY_CELL) {
-                        down = false;
-                    }
-                }
-
-                // up check
-                if (u > -1 && up) {
-                    if (boardPositions[x][u] == Constants.pieceIDs.WHITE_QUEEN
-                            || boardPositions[x][u] == Constants.pieceIDs.WHITE_KINGS_ROOK
-                            || boardPositions[x][u] == Constants.pieceIDs.WHITE_QUEENS_ROOK) {
-                        return false;
-                    } else if (boardPositions[x][u] != Constants.pieceIDs.EMPTY_CELL) {
-                        up = false;
-                    }
-                }
-
-                // upright check
-                if (r < 8 && u > -1 && upRight) {
-                    if (boardPositions[r][u] == Constants.pieceIDs.WHITE_QUEEN
-                            || boardPositions[r][u] == Constants.pieceIDs.WHITE_QUEENS_BISHOP
-                            || boardPositions[r][u] == Constants.pieceIDs.WHITE_KINGS_BISHOP) {
-                        return false;
-                    } else if (boardPositions[r][u] != Constants.pieceIDs.EMPTY_CELL){
-                        upRight = false;
-                    }
-                }
-
-                //upLeft
-                if (l > -1 && u > -1 && upLeft) {
-                    if (boardPositions[l][u] == Constants.pieceIDs.WHITE_QUEEN
-                            || boardPositions[l][u] == Constants.pieceIDs.WHITE_QUEENS_BISHOP
-                            || boardPositions[l][u] == Constants.pieceIDs.WHITE_KINGS_BISHOP) {
-                        return false;
-                    } else if (boardPositions[l][u] != Constants.pieceIDs.EMPTY_CELL){
-                        upLeft = false;
-                    }
-                }
-
-                //downRight
-                if (r < 8 && d < 8 && downRight) {
-                    if (boardPositions[r][d] == Constants.pieceIDs.WHITE_QUEEN
-                            || boardPositions[r][d] == Constants.pieceIDs.WHITE_QUEENS_BISHOP
-                            || boardPositions[r][d] == Constants.pieceIDs.WHITE_KINGS_BISHOP) {
-                        return false;
-                    } else if (boardPositions[r][d] != Constants.pieceIDs.EMPTY_CELL){
-                        downRight = false;
-                    }
-                }
-
-                //downLeft
-                if (l >-1  && d < 8 && downLeft) {
-                    if (boardPositions[l][d] == Constants.pieceIDs.WHITE_QUEEN
-                            || boardPositions[l][d] == Constants.pieceIDs.WHITE_QUEENS_BISHOP
-                            || boardPositions[l][d] == Constants.pieceIDs.WHITE_KINGS_BISHOP) {
-                        return false;
-                    } else if (boardPositions[l][d] != Constants.pieceIDs.EMPTY_CELL){
-                        downLeft = false;
-                    }
-                }
-                d++;
-                l--;
-                r++;
-                u--;
-            }
         } else {
-            int x = boardInfo.whiteKingX;
-            int y = boardInfo.whiteKingY;
-            byte[][] boardPositions = boardInfo.board;
-            boolean up = true, down = true, left = true, right = true, upRight = true, downRight =true, upLeft = true, downLeft = true;
+            x = boardInfo.whiteKingX;
+            y = boardInfo.whiteKingY;
+            queen = Constants.pieceIDs.BLACK_QUEEN;
+            queensRook = Constants.pieceIDs.BLACK_QUEENS_ROOK;
+            kingsRook = Constants.pieceIDs.BLACK_KINGS_ROOK;
+            promotedRook = Constants.pieceIDs.BLACK_PROMOTED_ROOK;
+            queensBishop = Constants.pieceIDs.BLACK_QUEENS_BISHOP;
+            kingsBishop = Constants.pieceIDs.BLACK_KINGS_BISHOP;
+            kingsKnight = Constants.pieceIDs.BLACK_KINGS_KNIGHT;
+            queensKnight = Constants.pieceIDs.BLACK_QUEENS_KNIGHT;
 
-            // iterator for going up
-            int u = y - 1;
-
-            // iterator for going down
-            int d = y + 1;
-
-            // iterator for going to the right
-            int r = x + 1;
-
-            // iterator for going to the left
-            int l = x - 1;
-
-            while (left || right || up || down || upRight || upLeft || downRight || downLeft) {
-                // left check
-                if (l > -1  && left) {
-                    if (boardPositions[l][y] == Constants.pieceIDs.BLACK_QUEEN
-                            || boardPositions[l][y] == Constants.pieceIDs.BLACK_KINGS_ROOK
-                            || boardPositions[l][y] == Constants.pieceIDs.BLACK_QUEENS_ROOK) {
-                        return false;
-                    } else if (boardPositions[l][y] != Constants.pieceIDs.EMPTY_CELL) {
-                        left = false;
-                    }
-                }
-
-                // right check
-                if (r < 8 && right) {
-                    if (boardPositions[r][y] == Constants.pieceIDs.BLACK_QUEEN
-                            || boardPositions[r][y] == Constants.pieceIDs.BLACK_KINGS_ROOK
-                            || boardPositions[r][y] == Constants.pieceIDs.BLACK_QUEENS_ROOK) {
-                        return false;
-                    } else if (boardPositions[r][y] != Constants.pieceIDs.EMPTY_CELL) {
-                        right = false;
-                    }
-                }
-
-                // down check
-                if (d < 8 && down) {
-                    if (boardPositions[x][d] == Constants.pieceIDs.BLACK_QUEEN
-                            || boardPositions[x][d] == Constants.pieceIDs.BLACK_KINGS_ROOK
-                            || boardPositions[x][d] == Constants.pieceIDs.BLACK_QUEENS_ROOK) {
-                        return false;
-                    } else if (boardPositions[x][d] != Constants.pieceIDs.EMPTY_CELL) {
-                        down = false;
-                    }
-                }
-
-                // up check
-                if (u > -1 && up) {
-                    if (boardPositions[x][u] == Constants.pieceIDs.BLACK_QUEEN
-                            || boardPositions[x][u] == Constants.pieceIDs.BLACK_KINGS_ROOK
-                            || boardPositions[x][u] == Constants.pieceIDs.BLACK_QUEENS_ROOK) {
-                        return false;
-                    } else if (boardPositions[x][u] != Constants.pieceIDs.EMPTY_CELL) {
-                        up = false;
-                    }
-                }
-
-                // upright check
-                if (r < 8 && u > -1 && upRight) {
-                    if (boardPositions[r][u] == Constants.pieceIDs.BLACK_QUEEN
-                            || boardPositions[r][u] == Constants.pieceIDs.BLACK_QUEENS_BISHOP
-                            || boardPositions[r][u] == Constants.pieceIDs.BLACK_KINGS_BISHOP) {
-                        return false;
-                    } else if (boardPositions[r][u] != Constants.pieceIDs.EMPTY_CELL){
-                        upRight = false;
-                    }
-                }
-
-                //upLeft
-                if (l > -1 && u > -1 && upLeft) {
-                    if (boardPositions[l][u] == Constants.pieceIDs.BLACK_QUEEN
-                            || boardPositions[l][u] == Constants.pieceIDs.BLACK_QUEENS_BISHOP
-                            || boardPositions[l][u] == Constants.pieceIDs.BLACK_KINGS_BISHOP) {
-                        return false;
-                    } else if (boardPositions[l][u] != Constants.pieceIDs.EMPTY_CELL){
-                        upLeft = false;
-                    }
-                }
-
-                //downRight
-                if (r < 8 && d < 8 && downRight) {
-                    if (boardPositions[r][d] == Constants.pieceIDs.BLACK_QUEEN
-                            || boardPositions[r][d] == Constants.pieceIDs.BLACK_QUEENS_BISHOP
-                            || boardPositions[r][d] == Constants.pieceIDs.BLACK_KINGS_BISHOP) {
-                        return false;
-                    } else if (boardPositions[r][d] != Constants.pieceIDs.EMPTY_CELL){
-                        downRight = false;
-                    }
-                }
-
-                //downLeft
-                if (l >-1  && d < 8 && downLeft) {
-                    if (boardPositions[l][d] == Constants.pieceIDs.BLACK_QUEEN
-                            || boardPositions[l][d] == Constants.pieceIDs.BLACK_QUEENS_BISHOP
-                            || boardPositions[l][d] == Constants.pieceIDs.BLACK_KINGS_BISHOP) {
-                        return false;
-                    } else if (boardPositions[l][d] != Constants.pieceIDs.EMPTY_CELL){
-                        downLeft = false;
-                    }
-                }
-                d++;
-                l--;
-                r++;
-                u--;
-            }
+            // range for other teams pawns
+            beginPawnRange = 7;
+            endPawnRange = 16;
+            pawnDirection = -1;
 
         }
+
+        byte[][] boardPositions = boardInfo.board;
+        boolean up = true, down = true, left = true, right = true, upRight = true, downRight = true, upLeft = true,
+                downLeft = true;
+
+        // iterator for going up
+        int u = y - 1;
+
+        // iterator for going down
+        int d = y + 1;
+
+        // iterator for going to the right
+        int r = x + 1;
+
+        // iterator for going to the left
+        int l = x - 1;
+
+        while (left || right || up || down || upRight || upLeft || downRight || downLeft) {
+            // left check
+            if (l > -1 && left) {
+                if (boardPositions[l][y] == queen
+                        || boardPositions[l][y] == kingsRook
+                        || boardPositions[l][y] == queensRook
+                        || boardPositions[l][y] == promotedRook) {
+                    System.out.println("check from left");
+                    return false;
+                } else if (boardPositions[l][y] != Constants.pieceIDs.EMPTY_CELL) {
+                    left = false;
+                }
+            }
+
+            // right check
+            if (r < 8 && right) {
+                if (boardPositions[r][y] == queen
+                        || boardPositions[r][y] == kingsRook
+                        || boardPositions[r][y] == queensRook
+                        || boardPositions[r][y] == promotedRook) {
+                    System.out.println("check from right");
+                    return false;
+                } else if (boardPositions[r][y] != Constants.pieceIDs.EMPTY_CELL) {
+                    right = false;
+                }
+            }
+
+            // down check
+            if (d < 8 && down) {
+                if (boardPositions[x][d] == queen
+                        || boardPositions[x][d] == kingsRook
+                        || boardPositions[x][d] == queensRook
+                        || boardPositions[x][d] == promotedRook) {
+                    System.out.println("check from down");
+                    return false;
+                } else if (boardPositions[x][d] != Constants.pieceIDs.EMPTY_CELL) {
+                    down = false;
+                }
+            }
+
+            // up check
+            if (u > -1 && up) {
+                if (boardPositions[x][u] == queen
+                        || boardPositions[x][u] == kingsRook
+                        || boardPositions[x][u] == queensRook
+                        || boardPositions[x][u] == promotedRook) {
+                    System.out.println("check from up");
+                    return false;
+                } else if (boardPositions[x][u] != Constants.pieceIDs.EMPTY_CELL) {
+                    up = false;
+                }
+            }
+
+            // upright check
+            if (r < 8 && u > -1 && upRight) {
+                if (boardPositions[r][u] == queen
+                        || boardPositions[r][u] == queensBishop
+                        || boardPositions[r][u] == kingsBishop) {
+                    System.out.println("check from upRight");
+                    return false;
+                } else if (boardPositions[r][u] != Constants.pieceIDs.EMPTY_CELL) {
+                    upRight = false;
+                }
+            }
+
+            // upLeft
+            if (l > -1 && u > -1 && upLeft) {
+                if (boardPositions[l][u] == queen
+                        || boardPositions[l][u] == queensBishop
+                        || boardPositions[l][u] == kingsBishop) {
+                    System.out.println("check from upLeft");
+                    return false;
+                } else if (boardPositions[l][u] != Constants.pieceIDs.EMPTY_CELL) {
+                    upLeft = false;
+                }
+            }
+
+            // downRight
+            if (r < 8 && d < 8 && downRight) {
+                if (boardPositions[r][d] == queen
+                        || boardPositions[r][d] == queensBishop
+                        || boardPositions[r][d] == kingsBishop) {
+                    System.out.println("check from downRight");
+                    return false;
+                } else if (boardPositions[r][d] != Constants.pieceIDs.EMPTY_CELL) {
+                    downRight = false;
+                }
+            }
+
+            // downLeft
+            if (l > -1 && d < 8 && downLeft) {
+                if (boardPositions[l][d] == queen
+                        || boardPositions[l][d] == queensBishop
+                        || boardPositions[l][d] == kingsBishop) {
+                    System.out.println("check from downleft");
+                    return false;
+                } else if (boardPositions[l][d] != Constants.pieceIDs.EMPTY_CELL) {
+                    downLeft = false;
+                }
+            }
+            if(d > 7){
+                down = false;
+                downRight = false;
+                downLeft = false;
+            }
+            if(r > 7){
+                right = false;
+                downRight = false;
+                upRight = false;
+            }
+            if(l < 0){
+                downLeft = false;
+                upLeft = false;
+                left= false;
+            }
+            if(u < 0){
+                upRight = false;
+                up = false;
+                upLeft = false;
+            }
+            d++;
+            l--;
+            r++;
+            u--;
+        }
+
+        // knight check
+        byte[][] knightPositions = {
+                { (byte) (x + 1), (byte) (y + 2) },
+                { (byte) (x + 1), (byte) (y - 2) },
+                { (byte) (x - 1), (byte) (y + 2) },
+                { (byte) (x - 1), (byte) (y - 2) },
+                { (byte) (x - 2), (byte) (y + 1) },
+                { (byte) (x + 2), (byte) (y + 1) },
+                { (byte) (x - 2), (byte) (y - 1) },
+                { (byte) (x + 2), (byte) (y - 1) },
+        };
+
+        for (byte[] position : knightPositions) {
+            if (position[0] > -1 && position[0] < 8 && position[1] > -1 && position[1] < 8) {
+                if (boardPositions[position[0]][position[1]] == kingsKnight
+                        || boardPositions[position[0]][position[1]] == queensKnight) {
+                            System.out.println("check from knight");
+                    return false;
+                }
+            }
+        }
+
+        // pawnCheck
+        // enemy pawn to the right
+        if (x + 1 < 8 && (y + pawnDirection > -1 && y + pawnDirection < 8)) {
+            if (boardPositions[x + 1][y + pawnDirection] > beginPawnRange
+                    && boardPositions[x + 1][y + pawnDirection] < endPawnRange) {
+                System.out.println("check from pawn");
+                return false;
+            }
+        }
+        // enemy pawn to the left
+        if (x - 1 > -1 && (y + pawnDirection > -1 && y + pawnDirection < 8)) {
+            if (boardPositions[x - 1][y + pawnDirection] > beginPawnRange
+                    && boardPositions[x - 1][y + pawnDirection] < endPawnRange) {
+                System.out.println("check from pawn");
+                return false;
+            }
+        }
+
+        // king check
+        if (Math.abs(boardInfo.blackKingX - boardInfo.whiteKingX) < 2
+                && Math.abs(boardInfo.blackKingY - boardInfo.whiteKingY) < 2) {
+            System.out.println("check from king");
+            System.out.println("Color: " + color);
+            System.out.println("BlackKing coords: " + boardInfo.blackKingX + "," + boardInfo.blackKingY);
+            System.out.println("WhiteKing coords: " + boardInfo.whiteKingX + "," + boardInfo.whiteKingY);
+            return false;
+        }
+
+        System.out.println("No piece in check");
         return true;
+    }
+
+    private ArrayList<BoardInfo> movesRook(ArrayList<BoardInfo> boards, BoardInfo initialBoard, int x, int y,
+            boolean color, byte id) {
+        byte teamRook;
+        byte beginTeamRange;
+        byte endTeamRange;
+        BoardInfo newBoard;
+
+        if (color) {
+            teamRook = Constants.pieceIDs.BLACK_PROMOTED_ROOK;
+            beginTeamRange = -1;
+            endTeamRange = 16;
+        } else {
+            teamRook = Constants.pieceIDs.WHITE_PROMOTED_ROOK;
+            beginTeamRange = 15;
+            endTeamRange = 32;
+        }
+
+        boolean up = true, down = true, left = true, right = true;
+        int u = y - 1;
+        int d = y + 1;
+        int l = x - 1;
+        int r = x + 1;
+
+
+        while (up || down || left || right) {
+
+            // up check
+            if (u > -1 && up) {
+                // if there is a teammate piece at this location.
+                if ((initialBoard.board[x][u] > beginTeamRange && initialBoard.board[x][u] < endTeamRange)
+                        || initialBoard.board[x][u] == teamRook) {
+                    up = false;
+                } else if (initialBoard.board[x][u] != Constants.pieceIDs.EMPTY_CELL) {
+                    // if there is an enemy piece at this location.
+                    newBoard = initialBoard.copy();
+                    //adds the deadpieces to the boardInfo object.
+                    //moves this piece to there.
+                    newBoard.deadPieces.add(newBoard.board[x][u]);
+                    newBoard.board[x][u] = id;
+                    newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
+
+                    //sets the string for the previous move
+                    newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + x + u);
+                    //if the move doesn't place the king in check, it adds it to the list. 
+                    if(isNotUnderCheck(newBoard, color)){
+                        if (id == Constants.pieceIDs.BLACK_KINGS_ROOK || id == Constants.pieceIDs.BLACK_QUEENS_ROOK
+                            || id == Constants.pieceIDs.WHITE_KINGS_ROOK
+                            || id == Constants.pieceIDs.WHITE_QUEENS_ROOK) {
+                            newBoard.hasMoved[getHasMovedIndex(id)] = true;
+                        }
+                        boards.add(newBoard);
+                        up = false;
+                    }
+                } else {
+                    newBoard = initialBoard.copy();
+            
+                    //moves piece there
+                    newBoard.board[x][u] = id;
+                    newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
+                    newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + x + u);
+                    if(isNotUnderCheck(newBoard, color)){
+                        if (id == Constants.pieceIDs.BLACK_KINGS_ROOK || id == Constants.pieceIDs.BLACK_QUEENS_ROOK
+                                || id == Constants.pieceIDs.WHITE_KINGS_ROOK
+                                || id == Constants.pieceIDs.WHITE_QUEENS_ROOK) {
+                            newBoard.hasMoved[getHasMovedIndex(id)] = true;
+                        }
+                        boards.add(newBoard);
+                    }
+                }
+            }
+
+            // down check
+            if (d < 8 && down) {
+                if ((initialBoard.board[x][d] > beginTeamRange && initialBoard.board[x][d] < endTeamRange)
+                        || initialBoard.board[x][d] == teamRook) {
+                    down = false;
+                } else if (initialBoard.board[x][d] != Constants.pieceIDs.EMPTY_CELL) {
+                    // if there is an enemy piece at this location.
+                    newBoard = initialBoard.copy();
+                    //adds the deadpieces to the boardInfo object.
+                    //moves this piece to there.
+                    newBoard.deadPieces.add(newBoard.board[x][d]);
+                    newBoard.board[x][d] = id;
+                    newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
+
+                    //sets the string for the previous move
+                    newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + x + d);
+                    //if the move doesn't place the king in check, it adds it to the list. 
+                    if(isNotUnderCheck(newBoard, color)){
+                        if (id == Constants.pieceIDs.BLACK_KINGS_ROOK || id == Constants.pieceIDs.BLACK_QUEENS_ROOK
+                            || id == Constants.pieceIDs.WHITE_KINGS_ROOK
+                            || id == Constants.pieceIDs.WHITE_QUEENS_ROOK) {
+                            newBoard.hasMoved[getHasMovedIndex(id)] = true;
+                        }
+                        boards.add(newBoard);
+                        down = false;
+                    }
+                } else {
+                    newBoard = initialBoard.copy();
+            
+                    //moves piece there
+                    newBoard.board[x][d] = id;
+                    newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
+                    newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + x + d);
+                    if(isNotUnderCheck(newBoard, color)){
+                        if (id == Constants.pieceIDs.BLACK_KINGS_ROOK || id == Constants.pieceIDs.BLACK_QUEENS_ROOK
+                                || id == Constants.pieceIDs.WHITE_KINGS_ROOK
+                                || id == Constants.pieceIDs.WHITE_QUEENS_ROOK) {
+                            newBoard.hasMoved[getHasMovedIndex(id)] = true;
+                        }
+                        boards.add(newBoard);
+                    }
+                }
+            }
+
+            // left check
+            if (l > -1 && left) {
+                // if there is a teammate piece at this location.
+                if ((initialBoard.board[l][y] > beginTeamRange && initialBoard.board[l][y] < endTeamRange)
+                        || initialBoard.board[l][y] == teamRook) {
+                    left = false;
+                } else if (initialBoard.board[l][y] != Constants.pieceIDs.EMPTY_CELL) {
+                    // if there is an enemy piece at this location.
+                    newBoard = initialBoard.copy();
+                    //adds the deadpieces to the boardInfo object.
+                    //moves this piece to there.
+                    newBoard.deadPieces.add(newBoard.board[l][y]);
+                    newBoard.board[l][y] = id;
+                    newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
+
+                    //sets the string for the previous move
+                    newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + l + y);
+                    //if the move doesn't place the king in check, it adds it to the list. 
+                    if(isNotUnderCheck(newBoard, color)){
+                        if (id == Constants.pieceIDs.BLACK_KINGS_ROOK || id == Constants.pieceIDs.BLACK_QUEENS_ROOK
+                            || id == Constants.pieceIDs.WHITE_KINGS_ROOK
+                            || id == Constants.pieceIDs.WHITE_QUEENS_ROOK) {
+                            newBoard.hasMoved[getHasMovedIndex(id)] = true;
+                        }
+                        boards.add(newBoard);
+                        left = false;
+                    }
+                } else {
+                    newBoard = initialBoard.copy();
+            
+                    //moves piece there
+                    newBoard.board[l][y] = id;
+                    newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
+                    newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + l + y);
+                    if(isNotUnderCheck(newBoard, color)){
+                        if (id == Constants.pieceIDs.BLACK_KINGS_ROOK || id == Constants.pieceIDs.BLACK_QUEENS_ROOK
+                                || id == Constants.pieceIDs.WHITE_KINGS_ROOK
+                                || id == Constants.pieceIDs.WHITE_QUEENS_ROOK) {
+                            newBoard.hasMoved[getHasMovedIndex(id)] = true;
+                        }
+                        boards.add(newBoard);
+                    }
+                }
+            }
+
+            // right check
+            if (r < 8 && right) {
+                // if there is a teammate piece at this location.
+                if ((initialBoard.board[r][y] > beginTeamRange && initialBoard.board[r][y] < endTeamRange)
+                        || initialBoard.board[r][y] == teamRook) {
+                    right = false;
+                } else if (initialBoard.board[r][y] != Constants.pieceIDs.EMPTY_CELL) {
+                    // if there is an enemy piece at this location.
+                    newBoard = initialBoard.copy();
+                    //adds the deadpieces to the boardInfo object.
+                    //moves this piece to there.
+                    newBoard.deadPieces.add(newBoard.board[r][y]);
+                    newBoard.board[r][y] = id;
+                    newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
+
+                    //sets the string for the previous move
+                    newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + r + y);
+                    //if the move doesn't place the king in check, it adds it to the list. 
+                    if(isNotUnderCheck(newBoard, color)){
+                        if (id == Constants.pieceIDs.BLACK_KINGS_ROOK || id == Constants.pieceIDs.BLACK_QUEENS_ROOK
+                            || id == Constants.pieceIDs.WHITE_KINGS_ROOK
+                            || id == Constants.pieceIDs.WHITE_QUEENS_ROOK) {
+                            newBoard.hasMoved[getHasMovedIndex(id)] = true;
+                        }
+                        boards.add(newBoard);
+                        right = false;
+                    }
+                } else {
+                    newBoard = initialBoard.copy();
+            
+                    //moves piece there
+                    newBoard.board[r][y] = id;
+                    newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
+                    newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + r + y);
+                    if(isNotUnderCheck(newBoard, color)){
+                        if (id == Constants.pieceIDs.BLACK_KINGS_ROOK || id == Constants.pieceIDs.BLACK_QUEENS_ROOK
+                                || id == Constants.pieceIDs.WHITE_KINGS_ROOK
+                                || id == Constants.pieceIDs.WHITE_QUEENS_ROOK) {
+                            newBoard.hasMoved[getHasMovedIndex(id)] = true;
+                        }
+                        boards.add(newBoard);
+                    }
+                }
+            }
+
+
+            if(d > 7){
+                down = false;
+            }
+            if(r > 7){
+                right = false;
+            }
+            if(l < 0){
+                left= false;
+            }
+            if(u < 0){
+                up = false;
+            }
+            u--;
+            l--;
+            r++;
+            d++;
+        }
+
+        return boards;
     }
 
     private ArrayList<BoardInfo> movesPawn(ArrayList<BoardInfo> boards, BoardInfo initialBoard, int x, int y,
@@ -481,7 +692,8 @@ public class Bot {
         if (color) {
             for (int i = x - 1; i > -1; i--) {
                 for (int j = y - 1; j > -1; j--) {
-                    if (initialBoard.board[i][j] > -1 && initialBoard.board[i][j] < 16) {
+                    if ((initialBoard.board[i][j] > -1 && initialBoard.board[i][j] < 16)
+                            || initialBoard.board[i][j] == Constants.pieceIDs.BLACK_PROMOTED_ROOK) {
                         break;
                     } else {
                         BoardInfo newBoard = initialBoard.copy();
@@ -489,13 +701,17 @@ public class Bot {
                         if (initialBoard.board[i][j] != Constants.pieceIDs.EMPTY_CELL) {
                             newBoard.deadPieces.add(newBoard.board[i][j]);
                             newBoard.board[i][j] = id;
-                            newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + i + j);
-                            boards.add(newBoard);
+                            if (isNotUnderCheck(newBoard, color)) {
+                                newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + i + j);
+                                boards.add(newBoard);
+                            }
                             break;
                         }
                         newBoard.board[i][j] = id;
-                        newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + i + j);
-                        boards.add(newBoard);
+                        if (isNotUnderCheck(newBoard, color)) {
+                            newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "." + i + j);
+                            boards.add(newBoard);
+                        }
                     }
                 }
             }
@@ -503,7 +719,8 @@ public class Bot {
         } else {
             for (int i = x - 1; i > -1; i--) {
                 for (int j = y - 1; j > -1; j--) {
-                    if (initialBoard.board[i][j] > 15 && initialBoard.board[i][j] < 32) {
+                    if ((initialBoard.board[i][j] > 15 && initialBoard.board[i][j] < 32)
+                            || initialBoard.board[i][j] == Constants.pieceIDs.WHITE_PROMOTED_ROOK) {
                         break;
                     } else {
                         BoardInfo newBoard = initialBoard.copy();
@@ -550,7 +767,8 @@ public class Bot {
         if (color) {
             for (int i = x + 1; i < 8; i++) {
                 for (int j = y + 1; j < 8; j++) {
-                    if (initialBoard.board[i][j] > -1 && initialBoard.board[i][j] < 16) {
+                    if ((initialBoard.board[i][j] > -1 && initialBoard.board[i][j] < 16)
+                            || initialBoard.board[i][j] == Constants.pieceIDs.BLACK_PROMOTED_ROOK) {
                         break;
                     } else {
                         BoardInfo newBoard = initialBoard.copy();
@@ -572,7 +790,8 @@ public class Bot {
         } else {
             for (int i = x + 1; i < 8; i++) {
                 for (int j = y + 1; j < 8; j++) {
-                    if (initialBoard.board[i][j] > 15 && initialBoard.board[i][j] < 32) {
+                    if ((initialBoard.board[i][j] > 15 && initialBoard.board[i][j] < 32)
+                            || initialBoard.board[i][j] == Constants.pieceIDs.WHITE_PROMOTED_ROOK) {
                         break;
                     } else {
                         BoardInfo newBoard = initialBoard.copy();
@@ -619,7 +838,8 @@ public class Bot {
         if (color) {
             for (int i = x - 1; i > -1; i--) {
                 for (int j = y - 1; j > -1; j--) {
-                    if (initialBoard.board[i][j] > -1 && initialBoard.board[i][j] < 16) {
+                    if ((initialBoard.board[i][j] > -1 && initialBoard.board[i][j] < 16)
+                            || initialBoard.board[i][j] == Constants.pieceIDs.BLACK_PROMOTED_ROOK) {
                         break;
                     } else {
                         BoardInfo newBoard = initialBoard.copy();
@@ -641,7 +861,8 @@ public class Bot {
         } else {
             for (int i = x - 1; i > -1; i--) {
                 for (int j = y - 1; j > -1; j--) {
-                    if (initialBoard.board[i][j] > 15 && initialBoard.board[i][j] < 32) {
+                    if ((initialBoard.board[i][j] > 15 && initialBoard.board[i][j] < 32)
+                            || initialBoard.board[i][j] == Constants.pieceIDs.WHITE_PROMOTED_ROOK) {
                         break;
                     } else {
                         BoardInfo newBoard = initialBoard.copy();
@@ -688,7 +909,8 @@ public class Bot {
         if (color) {
             for (int i = x + 1; i < 8; i++) {
                 for (int j = y - 1; j > -1; j--) {
-                    if (initialBoard.board[i][j] > -1 && initialBoard.board[i][j] < 16) {
+                    if ((initialBoard.board[i][j] > -1 && initialBoard.board[i][j] < 16)
+                            || initialBoard.board[i][j] == Constants.pieceIDs.BLACK_PROMOTED_ROOK) {
                         break;
                     } else {
                         BoardInfo newBoard = initialBoard.copy();
@@ -710,7 +932,8 @@ public class Bot {
         } else {
             for (int i = x + 1; i < 8; i++) {
                 for (int j = y - 1; j > -1; j--) {
-                    if (initialBoard.board[i][j] > 15 && initialBoard.board[i][j] < 32) {
+                    if ((initialBoard.board[i][j] > 15 && initialBoard.board[i][j] < 32)
+                            || initialBoard.board[i][j] == Constants.pieceIDs.WHITE_PROMOTED_ROOK) {
                         break;
                     } else {
                         BoardInfo newBoard = initialBoard.copy();
@@ -757,7 +980,8 @@ public class Bot {
         // if the color of the piece is black
         if (color) {
             for (int i = x - 1; i > -1; i--) {
-                if (initialBoard.board[i][y] > -1 && initialBoard.board[i][y] < 16) {
+                if ((initialBoard.board[i][y] > -1 && initialBoard.board[i][y] < 16)
+                        || initialBoard.board[i][y] == Constants.pieceIDs.BLACK_PROMOTED_ROOK) {
                     break;
                 } else {
                     BoardInfo newBoard = initialBoard.copy();
@@ -782,7 +1006,8 @@ public class Bot {
             }
         } else {
             for (int i = x - 1; i > -1; i--) {
-                if (initialBoard.board[i][y] > 15 && initialBoard.board[i][y] < 32) {
+                if ((initialBoard.board[i][y] > 15 && initialBoard.board[i][y] < 32)
+                        || initialBoard.board[i][y] == Constants.pieceIDs.WHITE_PROMOTED_ROOK) {
                     break;
                 } else {
                     BoardInfo newBoard = initialBoard.copy();
@@ -831,7 +1056,8 @@ public class Bot {
         // if the color of the piece is black
         if (color) {
             for (int i = x + 1; i < 8; i++) {
-                if (initialBoard.board[i][y] > -1 && initialBoard.board[i][y] < 16) {
+                if ((initialBoard.board[i][y] > -1 && initialBoard.board[i][y] < 16)
+                        || initialBoard.board[i][y] == Constants.pieceIDs.BLACK_PROMOTED_ROOK) {
                     break;
                 } else {
                     BoardInfo newBoard = initialBoard.copy();
@@ -856,7 +1082,8 @@ public class Bot {
             }
         } else {
             for (int i = x + 1; i < 8; i++) {
-                if (initialBoard.board[i][y] > 15 && initialBoard.board[i][y] < 32) {
+                if ((initialBoard.board[i][y] > 15 && initialBoard.board[i][y] < 32)
+                        || initialBoard.board[i][y] == Constants.pieceIDs.WHITE_PROMOTED_ROOK) {
                     break;
                 } else {
                     BoardInfo newBoard = initialBoard.copy();
@@ -907,7 +1134,8 @@ public class Bot {
         // if the color of the piece is black
         if (color) {
             for (int i = y - 1; i > -1; i--) {
-                if (initialBoard.board[x][i] > -1 && initialBoard.board[x][i] < 16) {
+                if ((initialBoard.board[x][i] > -1 && initialBoard.board[x][i] < 16)
+                        || initialBoard.board[i][y] == Constants.pieceIDs.BLACK_PROMOTED_ROOK) {
                     break;
                 } else {
                     BoardInfo newBoard = initialBoard.copy();
@@ -932,7 +1160,8 @@ public class Bot {
             }
         } else {
             for (int i = y - 1; i > -1; i--) {
-                if (initialBoard.board[x][i] > 15 && initialBoard.board[x][i] < 32) {
+                if ((initialBoard.board[x][i] > 15 && initialBoard.board[x][i] < 32)
+                        || initialBoard.board[i][y] == Constants.pieceIDs.WHITE_PROMOTED_ROOK) {
                     break;
                 } else {
                     BoardInfo newBoard = initialBoard.copy();
@@ -984,7 +1213,8 @@ public class Bot {
         // if the color of the piece is black
         if (color) {
             for (int i = y + 1; i < 8; i++) {
-                if (initialBoard.board[x][i] > -1 && initialBoard.board[x][i] < 16) {
+                if ((initialBoard.board[x][i] > -1 && initialBoard.board[x][i] < 16)
+                        || initialBoard.board[i][y] == Constants.pieceIDs.BLACK_PROMOTED_ROOK) {
                     break;
                 } else {
                     BoardInfo newBoard = initialBoard.copy();
@@ -1009,7 +1239,8 @@ public class Bot {
             }
         } else {
             for (int i = y + 1; i < 8; i++) {
-                if (initialBoard.board[x][i] > 15 && initialBoard.board[x][i] < 32) {
+                if ((initialBoard.board[x][i] > 15 && initialBoard.board[x][i] < 32)
+                        || initialBoard.board[i][y] == Constants.pieceIDs.WHITE_PROMOTED_ROOK) {
                     break;
                 } else {
                     BoardInfo newBoard = initialBoard.copy();
@@ -1038,12 +1269,28 @@ public class Bot {
         return boards;
     }
 
+    /**
+     * Method for getting the index for a pawn's passant value. This is the index
+     * for the int[] passant array attribute in any BoardInfo object.
+     * 
+     * @param id The id of the pawn.
+     * @return The indexe where the passant value is stored at.
+     */
     private byte getPassantIndex(byte id) {
-        byte index = (id / 2 == 1) ? (byte) (id % 8) : (byte) (id % 8 + 8);
+        // if the pawn is black, the index will be from 0-7, if the pawn is white the
+        // index is from 8-15
+        byte index = (id / 16 == Constants.pieceIDs.BLACK) ? (byte) (id - 8) : (byte) (id - 24 + 8);
         System.out.println("Pawn index for id: " + id + ", is " + index);
         return index;
     }
 
+    /**
+     * Method for getting the index for a castles hasMoved variable. This is the
+     * index for the boolean[] hasMoved array in any BoardInfo object.
+     * 
+     * @param id The id of the castle.
+     * @return The index where the hasMoved for that castle is stored at.
+     */
     private byte getHasMovedIndex(byte id) {
         switch (id) {
             case Constants.pieceIDs.BLACK_KINGS_ROOK:

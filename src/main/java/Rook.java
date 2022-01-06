@@ -18,7 +18,13 @@ public class Rook extends Piece {
     public Rook(Byte id) {
         this.id = id;
         setType();
-        this.color = (byte) (id / 16);
+        if(this.id == Constants.pieceIDs.BLACK_PROMOTED_ROOK){
+            this.color = 0;
+        }else if(this.id == Constants.pieceIDs.WHITE_PROMOTED_ROOK){
+            this.color = 1;
+        }else {
+            this.color = (byte) (id / 16);
+        }
         this.sprite = new ImageView(App.getSpritesheet());
         if (this.color == 0) {
             // if the colour is black put a black pawn

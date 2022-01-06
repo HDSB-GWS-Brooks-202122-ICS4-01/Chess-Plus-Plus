@@ -39,7 +39,8 @@ public abstract class Piece {
                || id == Constants.pieceIDs.WHITE_KINGS_KNIGHT || id == Constants.pieceIDs.WHITE_QUEENS_KNIGHT) {
             this.pieceType = Constants.pieceType.KNIGHT;
          } else if (id == Constants.pieceIDs.BLACK_KINGS_ROOK || id == Constants.pieceIDs.BLACK_QUEENS_ROOK
-               || id == Constants.pieceIDs.WHITE_KINGS_ROOK || id == Constants.pieceIDs.WHITE_QUEENS_ROOK) {
+               || id == Constants.pieceIDs.WHITE_KINGS_ROOK || id == Constants.pieceIDs.WHITE_QUEENS_ROOK
+               || id == Constants.pieceIDs.BLACK_PROMOTED_ROOK || id == Constants.pieceIDs.WHITE_PROMOTED_ROOK) {
             this.pieceType = Constants.pieceType.ROOK;
          } else {
             this.pieceType = Constants.pieceType.PAWN;
@@ -249,7 +250,8 @@ public abstract class Piece {
                 if (color == Constants.pieceIDs.BLACK) {
                     if (pieceAtSquare == Constants.pieceIDs.WHITE_KINGS_ROOK
                             || pieceAtSquare == Constants.pieceIDs.WHITE_QUEENS_ROOK
-                            || pieceAtSquare == Constants.pieceIDs.WHITE_QUEEN) {
+                            || pieceAtSquare == Constants.pieceIDs.WHITE_QUEEN
+                            || pieceAtSquare == Constants.pieceIDs.WHITE_PROMOTED_ROOK) {
                         return true;
                     } else {
                         return false;
@@ -257,7 +259,8 @@ public abstract class Piece {
                 } else {
                     if (pieceAtSquare == Constants.pieceIDs.BLACK_KINGS_ROOK
                             || pieceAtSquare == Constants.pieceIDs.BLACK_QUEENS_ROOK
-                            || pieceAtSquare == Constants.pieceIDs.BLACK_QUEEN) {
+                            || pieceAtSquare == Constants.pieceIDs.BLACK_QUEEN
+                            || pieceAtSquare == Constants.pieceIDs.BLACK_PROMOTED_ROOK) {
                         return true;
                     } else {
                         return false;
@@ -289,7 +292,8 @@ public abstract class Piece {
                 if (color == Constants.pieceIDs.BLACK) {
                     if (pieceAtSquare == Constants.pieceIDs.WHITE_KINGS_ROOK
                             || pieceAtSquare == Constants.pieceIDs.WHITE_QUEENS_ROOK
-                            || pieceAtSquare == Constants.pieceIDs.WHITE_QUEEN) {
+                            || pieceAtSquare == Constants.pieceIDs.WHITE_QUEEN
+                            || pieceAtSquare == Constants.pieceIDs.WHITE_PROMOTED_ROOK) {
                         return true;
                     } else {
                         return false;
@@ -297,7 +301,8 @@ public abstract class Piece {
                 } else {
                     if (pieceAtSquare == Constants.pieceIDs.BLACK_KINGS_ROOK
                             || pieceAtSquare == Constants.pieceIDs.BLACK_QUEENS_ROOK
-                            || pieceAtSquare == Constants.pieceIDs.BLACK_QUEEN) {
+                            || pieceAtSquare == Constants.pieceIDs.BLACK_QUEEN
+                            || pieceAtSquare == Constants.pieceIDs.BLACK_PROMOTED_ROOK) {
                         return true;
                     } else {
                         return false;
@@ -328,7 +333,8 @@ public abstract class Piece {
                 if (color == Constants.pieceIDs.BLACK) {
                     if (pieceAtSquare == Constants.pieceIDs.WHITE_KINGS_ROOK
                             || pieceAtSquare == Constants.pieceIDs.WHITE_QUEENS_ROOK
-                            || pieceAtSquare == Constants.pieceIDs.WHITE_QUEEN) {
+                            || pieceAtSquare == Constants.pieceIDs.WHITE_QUEEN
+                            || pieceAtSquare == Constants.pieceIDs.WHITE_PROMOTED_ROOK) {
                         return true;
                     } else {
                         return false;
@@ -336,7 +342,8 @@ public abstract class Piece {
                 } else {
                     if (pieceAtSquare == Constants.pieceIDs.BLACK_KINGS_ROOK
                             || pieceAtSquare == Constants.pieceIDs.BLACK_QUEENS_ROOK
-                            || pieceAtSquare == Constants.pieceIDs.BLACK_QUEEN) {
+                            || pieceAtSquare == Constants.pieceIDs.BLACK_QUEEN
+                            || pieceAtSquare == Constants.pieceIDs.BLACK_PROMOTED_ROOK) {
                         return true;
                     } else {
                         return false;
@@ -368,7 +375,8 @@ public abstract class Piece {
                 if (color == Constants.pieceIDs.BLACK) {
                     if (pieceAtSquare == Constants.pieceIDs.WHITE_KINGS_ROOK
                             || pieceAtSquare == Constants.pieceIDs.WHITE_QUEENS_ROOK
-                            || pieceAtSquare == Constants.pieceIDs.WHITE_QUEEN) {
+                            || pieceAtSquare == Constants.pieceIDs.WHITE_QUEEN
+                            || pieceAtSquare == Constants.pieceIDs.WHITE_PROMOTED_ROOK) {
                         return true;
                     } else {
                         return false;
@@ -376,7 +384,8 @@ public abstract class Piece {
                 } else {
                     if (pieceAtSquare == Constants.pieceIDs.BLACK_KINGS_ROOK
                             || pieceAtSquare == Constants.pieceIDs.BLACK_QUEENS_ROOK
-                            || pieceAtSquare == Constants.pieceIDs.BLACK_QUEEN) {
+                            || pieceAtSquare == Constants.pieceIDs.BLACK_QUEEN
+                            || pieceAtSquare == Constants.pieceIDs.BLACK_PROMOTED_ROOK) {
                         return true;
                     } else {
                         return false;

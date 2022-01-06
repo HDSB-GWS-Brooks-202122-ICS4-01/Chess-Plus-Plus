@@ -41,6 +41,11 @@ public class Constants {
                 public static final byte WHITE_PAWN_FIVE = 29;
                 public static final byte WHITE_PAWN_SIX = 30;
                 public static final byte WHITE_PAWN_SEVEN = 31;
+
+                //Any promoted rooks will not fall into a general colour check, they must be checked for individually.
+                //They will not return their color wheny you divide by 16, for example BLACK_PROMOTED_ROOK/16 == BLACK will return false. 
+                public static final byte BLACK_PROMOTED_ROOK = 32;
+                public static final byte WHITE_PROMOTED_ROOK = 33;
         }
 
         public static class pieceType {
@@ -59,6 +64,7 @@ public class Constants {
                 public static final String PASSANT_LEFT = "e";
                 public static final String PASSANT_RIGHT = "E";
                 public static final String PROMOTION = "P";
+                public static final String NO_MOVES = "I";
         }
 
         public static final class boardData {

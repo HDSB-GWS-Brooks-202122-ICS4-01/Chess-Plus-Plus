@@ -21,14 +21,33 @@ public class BoardInfo {
         this.hasMoved = hasMoved;
         this.deadPieces = deadPieces;
     }
+    
+    
+    
+    /**
+     * Method for evaluating the value of the board. Evaluating a board means to
+     * apply a value for it,
+     * this is used in the minimax algorithm.
+     * 
+     * @return an Integer represnting the score for this board.
+     */
+    public int evaluate() {
+        return 0;
+    }
 
     /**
      * Method for deep copying a BoardInfo object. 
      * @return A new BoardInfo object that is a deep copy of the original. 
      */
     public BoardInfo copy(){
-        return new BoardInfo(deepCopy(board), Arrays.copyOf(passant, passant.length), Arrays.copyOf(hasMoved, hasMoved.length), new ArrayList<Byte>(deadPieces));
+        BoardInfo copy = new BoardInfo(deepCopy(board), Arrays.copyOf(passant, passant.length), Arrays.copyOf(hasMoved, hasMoved.length), new ArrayList<Byte>(deadPieces));
+        copy.setKingPos(true, blackKingX, blackKingY);
+        copy.setKingPos(true, blackKingX, blackKingY);
+        return copy;
     }
+
+
+
 
     /**
      * Sets the previous move string. This string is used to determine which move led to a move to create the board.
