@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,8 +50,7 @@ public class Board {
 
    private byte turn = Constants.pieceIDs.WHITE;
 
-   private final PlayerTimer TIMER_WHITE;
-   private final PlayerTimer TIMER_BLACK;
+   private final PlayerTimer[] TIMERS = new PlayerTimer[2];
 
    private final Map[] STATS = new Map[] { new HashMap<String, Integer>(), new HashMap<String, Integer>(),
          new HashMap<String, String>() };
@@ -69,11 +69,6 @@ public class Board {
     * @param gm         The game mode; Ai, pass n play
     */
    public Board(GameController game, GridPane[] cells, byte gm) {
-      for (byte x = 0; x < 8; x++) {
-         for (byte y = 0; y < 8; y++) {
-            GRID[x][y] = Constants.boardData.DEFAULT_GAME_SETUP[x][y];
-         }
-      }
       GAME = game;
       gp_CHESS_BOARD = cells[0];
       gp_DEAD_BLACK_CELLS = cells[1];
@@ -106,17 +101,18 @@ public class Board {
       }
       System.out.println(gameTime);
 
-      TIMER_BLACK = new PlayerTimer(blackLabel, gameTime, false);
-      TIMER_WHITE = new PlayerTimer(whiteLabel, gameTime, true);
+      TIMERS[Constants.pieceIDs.WHITE] = new PlayerTimer(whiteLabel, gameTime, true);
+      TIMERS[Constants.pieceIDs.BLACK] = new PlayerTimer(blackLabel, gameTime, false);
 
       setupBoard();
-      /*
-       * try {
-       * parseTranscript();
-       * } catch (IOException e) {
-       * e.printStackTrace();
-       * }
-       */
+
+      if (GAME_MODE == Constants.boardData.MODE_RESUME_GAME) {
+         try {
+            parseTranscript();
+         } catch (IOException e) {
+            e.printStackTrace();
+         }
+      }
    }
 
    /**
@@ -125,6 +121,12 @@ public class Board {
     * correct starting locations, it will also initialize all the array lists.
     */
    private void setupBoard() {
+      for (byte x = 0; x < 8; x++) {
+         for (byte y = 0; y < 8; y++) {
+            GRID[x][y] = Constants.boardData.DEFAULT_GAME_SETUP[x][y];
+         }
+      }
+
       // Loop through chess board nodes to find find stackpanes.
       App.MOVE_COUNT = 1;
       for (Node node : gp_CHESS_BOARD.getChildren()) {
@@ -163,7 +165,9 @@ public class Board {
          // Add event handler for when the mouse is clicked.
          setDefaultMouseClicked(sp, (byte) x, (byte) y);
 
+         sp.getChildren().clear();
          CELLS[x][y] = sp;
+
       }
 
       for (byte x = 0; x < GRID.length; x++) {
@@ -201,11 +205,11 @@ public class Board {
 
       App.GAME_PIECES = GAME_PIECES.clone();
 
-      STATS[Constants.pieceIDs.WHITE].put("remaining_time", (int) TIMER_WHITE.getTimeMillis());
+      STATS[Constants.pieceIDs.WHITE].put("remaining_time", (int) TIMERS[Constants.pieceIDs.WHITE].getTimeMillis());
       STATS[Constants.pieceIDs.WHITE].put("total_moves", 0);
       STATS[Constants.pieceIDs.WHITE].put("pieces_killed", 0);
 
-      STATS[Constants.pieceIDs.BLACK].put("remaining_time", (int) TIMER_BLACK.getTimeMillis());
+      STATS[Constants.pieceIDs.BLACK].put("remaining_time", (int) TIMERS[Constants.pieceIDs.BLACK].getTimeMillis());
       STATS[Constants.pieceIDs.BLACK].put("total_moves", 0);
       STATS[Constants.pieceIDs.BLACK].put("pieces_killed", 0);
    }
@@ -219,21 +223,36 @@ public class Board {
     */
    private void parseTranscript() throws IOException {
       final String REG = "((?=[A-Z])|(?<=[A-Z]))|((?=[a-z])|(?<=[a-z]))";
-      File tsFile = new File("src\\main\\resources\\data\\tstest.txt");
 
-      FileReader fileReader = new FileReader(tsFile);
+      FileReader fileReader = new FileReader(new File(Constants.boardData.PATH_TO_SAVED_GAME));
+
       try (Scanner r = new Scanner(fileReader)) {
          String ts;
-         App.MOVE_COUNT = 1;
 
          while (r.hasNextLine()) {
             ts = r.nextLine();
 
-            if (ts.contains("TW")) {
-               TIMER_WHITE.setTime(Long.parseLong(ts.substring(2, ts.length())));
-            } else if (ts.contains("TB")) {
-               TIMER_BLACK.setTime(Long.parseLong(ts.substring(2, ts.length())));
+            if (ts.contains("TW")) { // White timer
+               TIMERS[Constants.pieceIDs.WHITE].setTime(Long.parseLong(ts.substring(2, ts.length())));
+            } else if (ts.contains("TB")) { // Black timer
+               TIMERS[Constants.pieceIDs.BLACK].setTime(Long.parseLong(ts.substring(2, ts.length())));
+            } else if (ts.contains("PP")) { // Pawn promotion
+               MATCH_TRANSCRIPT.add(ts);
+
+               System.out.println(ts);
+               ts = ts.substring(2, ts.length());
+               System.out.println(ts);
+
+               String[] ids = ts.split("-");
+               System.out.println("ID 0: " + ids[0]);
+               System.out.println("ID 1: " + ids[1]);
+
+               Piece from = getPieceOnGrid(Byte.parseByte(ids[0]));
+
+               promotePawn(from, ids[1], true);
             } else {
+               MATCH_TRANSCRIPT.add(ts);
+               App.MOVE_COUNT++;
 
                String[] data = ts.split(REG);
                System.out.println(Arrays.toString(data));
@@ -250,14 +269,17 @@ public class Board {
 
                if (x > 0 && x < 8 && y > 0 && y < 8) {
                   App.MOVE_COUNT++;
-                  movePiece(piece, piece.getGridX(), piece.getGridY(), x, y);
+                  movePiece(piece, piece.getGridX(), piece.getGridY(), x, y, true);
                   System.out.println(203902903);
                }
             }
          }
-      } catch (NumberFormatException e) {
-         // TODO Auto-generated catch block
+      } catch (Exception e) {
          e.printStackTrace();
+
+         setupBoard();
+         LIVE_PIECES.clear();
+         DEAD_PIECES.clear();
       }
    }
 
@@ -265,25 +287,7 @@ public class Board {
     * This method is called when the match concludes.
     */
    private void gameover() throws IOException {
-      TIMER_BLACK.pauseTimer();
-      TIMER_WHITE.pauseTimer();
-
-      MATCH_TRANSCRIPT.add("TW" + TIMER_WHITE.getTimeMillis());
-      MATCH_TRANSCRIPT.add("TB" + TIMER_BLACK.getTimeMillis());
-
-      String ms = MATCH_TRANSCRIPT.toString();
-
-      ms = ms.replace("[", "");
-      ms = ms.replace("]", "");
-      ms = ms.replaceAll(",", "\n");
-      ms = ms.replaceAll(" ", "");
-
-      App.setTranscript(ms);
-
-      STATS[Constants.pieceIDs.WHITE].replace("remaining_time", (int) TIMER_WHITE.getTimeMillis());
-      STATS[Constants.pieceIDs.BLACK].replace("remaining_time", (int) TIMER_BLACK.getTimeMillis());
-
-      App.setMatchStats(STATS);
+      App.setMatchStats(solidifyTranscript());
 
       GAME.gameOver(winner);
    }
@@ -449,17 +453,15 @@ public class Board {
 
       STATS[turn].replace("total_moves", (int) STATS[turn].get("total_moves") + 1);
 
-      if (turn == Constants.pieceIDs.WHITE) {
-         TIMER_WHITE.pauseTimer();
-         TIMER_BLACK.playTimer();
+      TIMERS[turn].pauseTimer();
 
+      if (turn == Constants.pieceIDs.WHITE) {
          turn = Constants.pieceIDs.BLACK;
       } else {
-         TIMER_BLACK.pauseTimer();
-         TIMER_WHITE.playTimer();
-
          turn = Constants.pieceIDs.WHITE;
       }
+
+      TIMERS[turn].playTimer();
 
       for (Piece p : LIVE_PIECES) {
          if (p.getColor() != turn)
@@ -484,7 +486,6 @@ public class Board {
          playAi(bi.getMovedPiece(), bi.getMove());
       }
    }
-
 
    private void playAi(Piece piece, byte[] move) {
    }
@@ -635,7 +636,7 @@ public class Board {
     * @param toX   Final board x value.
     * @param toY   final board y value.
     */
-   private void movePiece(Piece piece, byte fromX, byte fromY, byte toX, byte toY) {
+   private void movePiece(Piece piece, byte fromX, byte fromY, byte toX, byte toY, boolean parsingTranscript) {
       StackPane from = CELLS[fromX][fromY];
       from.getChildren().clear();
 
@@ -679,9 +680,9 @@ public class Board {
       // System.out.println("\n-------------------------------\n");
       // System.out.println(WHITE_TRANSCRIPT.toString());
 
-      if (piece.getType() == Constants.pieceType.PAWN && (piece.getGridY() == 0 || piece.getGridY() == 7)) {
+      if (piece.getType() == Constants.pieceType.PAWN && (piece.getGridY() == 0 || piece.getGridY() == 7) && !parsingTranscript) {
          try {
-            GAME.displayWhitePawnPromotion(piece);
+            GAME.displayPawnPromotion(piece, turn);
          } catch (IOException e) {
          }
       }
@@ -755,7 +756,7 @@ public class Board {
          public void handle(MouseEvent me) {
             // When clicked move the piece.
             piece.hasMoved = true;
-            movePiece(piece, piece.getGridX(), piece.getGridY(), x, y);
+            movePiece(piece, piece.getGridX(), piece.getGridY(), x, y, false);
             nextTurn();
          }
       });
@@ -779,26 +780,26 @@ public class Board {
             // When clicked move the piece.
             piece.hasMoved = true;
             if (left) {
-               movePiece(piece, piece.getGridX(), piece.getGridY(), (byte) (piece.getGridX() - 2), piece.getGridY());
+               movePiece(piece, piece.getGridX(), piece.getGridY(), (byte) (piece.getGridX() - 2), piece.getGridY(), false);
                if (color == Constants.pieceIDs.BLACK) {
                   Piece rook = GAME_PIECES[Constants.pieceIDs.BLACK_QUEENS_ROOK];
                   rook.hasMoved = true;
-                  movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX() + 1), piece.getGridY());
+                  movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX() + 1), piece.getGridY(), false);
                } else {
                   Piece rook = GAME_PIECES[Constants.pieceIDs.WHITE_QUEENS_ROOK];
                   rook.hasMoved = true;
-                  movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX() + 1), piece.getGridY());
+                  movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX() + 1), piece.getGridY(), false);
                }
             } else {
-               movePiece(piece, piece.getGridX(), piece.getGridY(), (byte) (piece.getGridX() + 2), piece.getGridY());
+               movePiece(piece, piece.getGridX(), piece.getGridY(), (byte) (piece.getGridX() + 2), piece.getGridY(), false);
                if (color == Constants.pieceIDs.BLACK) {
                   Piece rook = GAME_PIECES[Constants.pieceIDs.BLACK_KINGS_ROOK];
                   rook.hasMoved = true;
-                  movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX() - 1), piece.getGridY());
+                  movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX() - 1), piece.getGridY(), false);
                } else {
                   Piece rook = GAME_PIECES[Constants.pieceIDs.WHITE_KINGS_ROOK];
                   rook.hasMoved = true;
-                  movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX() - 1), piece.getGridY());
+                  movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX() - 1), piece.getGridY(), false);
                }
             }
             nextTurn();
@@ -827,22 +828,22 @@ public class Board {
                if (enemyPawn.getGridX() < primaryPawn.getGridX()) {
                   // pawn is to the left
                   movePiece(primaryPawn, primaryPawn.gridX, primaryPawn.gridY, (byte) (primaryPawn.gridX - 1),
-                        (byte) (primaryPawn.gridY + 1));
+                        (byte) (primaryPawn.gridY + 1), false);
 
                } else {
                   // pawn is to the right
                   movePiece(primaryPawn, primaryPawn.gridX, primaryPawn.gridY, (byte) (primaryPawn.gridX + 1),
-                        (byte) (primaryPawn.gridY + 1));
+                        (byte) (primaryPawn.gridY + 1), false);
                }
             } else {
                if (enemyPawn.getGridX() < primaryPawn.getGridX()) {
                   // pawn to the left
                   movePiece(primaryPawn, primaryPawn.gridX, primaryPawn.gridY, (byte) (primaryPawn.gridX - 1),
-                        (byte) (primaryPawn.gridY - 1));
+                        (byte) (primaryPawn.gridY - 1), false);
                } else {
                   // pawn is to the right
                   movePiece(primaryPawn, primaryPawn.gridX, primaryPawn.gridY, (byte) (primaryPawn.gridX + 1),
-                        (byte) (primaryPawn.gridY - 1));
+                        (byte) (primaryPawn.gridY - 1), false);
                }
 
             }
@@ -871,7 +872,7 @@ public class Board {
     * @param piece The pawn piece to be promoted
     * @param type  The type of piece to replace it.
     */
-   public void promotePawn(Piece piece, String type) {
+   public void promotePawn(Piece piece, String type, boolean parsingTranscript) {
       byte x = piece.getGridX();
       byte y = piece.getGridY();
 
@@ -936,7 +937,9 @@ public class Board {
          newPiece = new Rook(id);
       }
 
-      movePiece(newPiece, x, y, x, y);
+      MATCH_TRANSCRIPT.add("PP" + piece.getId() + "-" + type);
+
+      movePiece(newPiece, x, y, x, y, parsingTranscript);
       LIVE_PIECES.set(LIVE_PIECES.indexOf(piece), newPiece);
    }
 
@@ -949,5 +952,45 @@ public class Board {
             System.out.println(Arrays.toString(bi.getMove()));
             break;
       }
+   }
+
+   public void pauseGame() {
+      TIMERS[turn].pauseTimer();
+   }
+
+   public void resumeGame() {
+      TIMERS[turn].playTimer();
+   }
+
+   public void saveGame() throws IOException {
+      solidifyTranscript();
+
+      FileWriter myWriter = new FileWriter(Constants.boardData.PATH_TO_SAVED_GAME);
+      myWriter.write(App.getTranscript());
+      myWriter.close();
+
+      GAME.transitionToHome();
+   }
+
+   private Map[] solidifyTranscript() {
+      TIMERS[Constants.pieceIDs.WHITE].pauseTimer();
+      TIMERS[Constants.pieceIDs.BLACK].pauseTimer();
+
+      MATCH_TRANSCRIPT.add("TW" + TIMERS[Constants.pieceIDs.WHITE].getTimeMillis());
+      MATCH_TRANSCRIPT.add("TB" + TIMERS[Constants.pieceIDs.BLACK].getTimeMillis());
+
+      String ms = MATCH_TRANSCRIPT.toString();
+
+      ms = ms.replace("[", "");
+      ms = ms.replace("]", "");
+      ms = ms.replaceAll(",", "\n");
+      ms = ms.replaceAll(" ", "");
+
+      App.setTranscript(ms);
+
+      STATS[Constants.pieceIDs.WHITE].replace("remaining_time", (int) TIMERS[Constants.pieceIDs.WHITE].getTimeMillis());
+      STATS[Constants.pieceIDs.BLACK].replace("remaining_time", (int) TIMERS[Constants.pieceIDs.BLACK].getTimeMillis());
+
+      return STATS;
    }
 }

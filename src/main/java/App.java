@@ -54,7 +54,7 @@ public class App extends Application {
     public void start(Stage st) throws IOException {
         scene = new Scene(loadFXML("startScreen"));
         stage = st;
-        
+
         stage.setScene(scene);
         stage.show();
         stage.setOnCloseRequest(new EventHandler<WindowEvent>() {

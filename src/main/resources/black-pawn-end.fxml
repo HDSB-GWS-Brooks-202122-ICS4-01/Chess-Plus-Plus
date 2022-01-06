@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.geometry.Rectangle2D?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.Image?>
@@ -13,7 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="850.0" prefWidth="1250.0" style="-fx-background-color: rgba(0, 0, 0, 0.8);" stylesheets="@board.css" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+<StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="850.0" prefWidth="1250.0" style="-fx-background-color: rgba(9, 0, 0, 0.8);" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <VBox prefHeight="200.0" prefWidth="100.0">
          <children>
@@ -21,12 +22,12 @@
             <HBox prefHeight="100.0" prefWidth="200.0">
                <children>
                   <Pane HBox.hgrow="ALWAYS" />
-                  <VBox style="-fx-background-color: #EADECE;">
+                  <VBox style="-fx-background-color: #606060;">
                      <children>
                         <HBox prefHeight="100.0" prefWidth="200.0">
                            <children>
                               <Pane HBox.hgrow="ALWAYS" />
-                              <Label text="Select which game piece to bring">
+                              <Label text="Select which game piece to bring" textFill="WHITE">
                                  <font>
                                     <Font name="System Bold Italic" size="25.0" />
                                  </font>
@@ -35,15 +36,15 @@
                            </children>
                         </HBox>
                         <GridPane fx:id="gp_wPieces" styleClass="gp_wPieces">
-                          <columnConstraints>
-                            <ColumnConstraints fillWidth="false" hgrow="NEVER" />
-                            <ColumnConstraints hgrow="NEVER" />
+                           <columnConstraints>
+                              <ColumnConstraints fillWidth="false" hgrow="NEVER" />
                               <ColumnConstraints hgrow="NEVER" />
                               <ColumnConstraints hgrow="NEVER" />
-                          </columnConstraints>
-                          <rowConstraints>
-                            <RowConstraints vgrow="NEVER" />
-                          </rowConstraints>
+                              <ColumnConstraints hgrow="NEVER" />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints vgrow="NEVER" />
+                           </rowConstraints>
                            <children>
                               <StackPane id="queen" minHeight="100.0" minWidth="100.0" prefHeight="100.0" prefWidth="100.0">
                                  <children>
@@ -52,7 +53,7 @@
                                           <Image url="@assets/chess_spritesheet.png" />
                                        </image>
                                        <viewport>
-                                          <Rectangle2D height="200.0" minX="200.0" width="200.0" />
+                                          <Rectangle2D height="200.0" minX="200.0" minY="200.0" width="200.0" />
                                        </viewport>
                                     </ImageView>
                                  </children>
@@ -64,7 +65,7 @@
                                           <Image url="@assets/chess_spritesheet.png" />
                                        </image>
                                        <viewport>
-                                          <Rectangle2D height="200.0" minX="400.0" width="200.0" />
+                                          <Rectangle2D height="200.0" minX="400.0" minY="200.0" width="200.0" />
                                        </viewport>
                                     </ImageView>
                                  </children>
@@ -76,8 +77,11 @@
                                           <Image url="@assets/chess_spritesheet.png" />
                                        </image>
                                        <viewport>
-                                          <Rectangle2D height="200.0" minX="600.0" width="200.0" />
+                                          <Rectangle2D height="200.0" minX="600.0" minY="200.0" width="200.0" />
                                        </viewport>
+                                       <StackPane.margin>
+                                          <Insets />
+                                       </StackPane.margin>
                                     </ImageView>
                                  </children>
                               </StackPane>
@@ -88,7 +92,7 @@
                                           <Image url="@assets/chess_spritesheet.png" />
                                        </image>
                                        <viewport>
-                                          <Rectangle2D height="200.0" minX="800.0" width="200.0" />
+                                          <Rectangle2D height="200.0" minX="800.0" minY="200.0" width="200.0" />
                                        </viewport>
                                     </ImageView>
                                  </children>

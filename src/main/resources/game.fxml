@@ -2,11 +2,8 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Cursor?>
-<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.effect.InnerShadow?>
-<?import javafx.scene.effect.Light.Spot?>
-<?import javafx.scene.effect.Lighting?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
@@ -24,13 +21,22 @@
          <children>
             <StackPane fx:id="sp_container" styleClass="root" stylesheets="@board.css">
                <children>
-                  <HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="850.0" prefWidth="1250.0">
+                  <HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="850.0" prefWidth="1250.0" StackPane.alignment="TOP_CENTER">
                      <children>
                         <VBox HBox.hgrow="ALWAYS">
                            <children>
                               <HBox>
                                  <children>
-                                    <Pane HBox.hgrow="ALWAYS" />
+                                    <Pane HBox.hgrow="ALWAYS">
+                                       <children>
+                                          <Rectangle fx:id="rect_pauseLeft" fill="WHITE" height="50.0" layoutX="10.0" stroke="BLACK" strokeType="INSIDE" width="10.0" />
+                                          <Rectangle fx:id="rect_pauseRight" fill="WHITE" height="50.0" layoutX="40.0" stroke="BLACK" strokeType="INSIDE" width="10.0" />
+                                          <Rectangle fx:id="rect_pauseHitBox" accessibleRole="BUTTON" fill="#ffffff00" height="50.0" layoutX="10.0" onMouseClicked="#pauseGame" stroke="BLACK" strokeType="INSIDE" width="40.0">
+                                             <cursor>
+                                                <Cursor fx:constant="HAND" />
+                                             </cursor>
+                                          </Rectangle>
+                                       </children></Pane>
                                     <Label fx:id="lbl_bTimer" text="10:00" textFill="WHITE">
                                        <font>
                                           <Font name="Arial Black" size="30.0" />
@@ -270,7 +276,7 @@
                         </VBox>
                      </children>
                   </HBox>
-                  <VBox fx:id="vb_gameover" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: rgba(0, 0, 0, 0.5);" visible="false">
+                  <VBox fx:id="vb_gameover" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: rgba(0, 0, 0, 0.5);" visible="false" StackPane.alignment="TOP_CENTER">
                      <children>
                         <Pane prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
                         <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="-Infinity">
@@ -289,30 +295,7 @@
                   </VBox>
                </children>
             </StackPane>
-            <Pane fx:id="pn_dev" maxHeight="1.7976931348623157E308" prefHeight="100.0" style="-fx-background-color: #621B00;">
-               <children>
-                  <Rectangle arcHeight="50.0" arcWidth="50.0" fill="#1f93ff00" height="50.0" layoutX="50.0" layoutY="25.0" stroke="BLACK" strokeType="OUTSIDE" strokeWidth="5.0" width="170.0">
-                     <effect>
-                        <Lighting bumpInput="$null" diffuseConstant="0.0" specularConstant="1.0" specularExponent="5.0" surfaceScale="1.0">
-                           <light>
-                              <Light.Spot pointsAtX="10.0" pointsAtY="10.0" />
-                           </light>
-                        </Lighting>
-                     </effect>
-                     <cursor>
-                        <Cursor fx:constant="DEFAULT" />
-                     </cursor>
-                  </Rectangle>
-                  <Button layoutX="50.0" layoutY="25.0" mnemonicParsing="false" onAction="#devGetAiMoves" prefHeight="50.0" prefWidth="170.0" style="-fx-background-color: #007593; -fx-background-radius: 30;" text="Get AI Moves" textFill="WHITE">
-                     <font>
-                        <Font name="Bell MT Bold" size="22.0" />
-                     </font>
-                     <cursor>
-                        <Cursor fx:constant="HAND" />
-                     </cursor>
-                  </Button>
-               </children>
-            </Pane>
+            <Pane fx:id="pn_dev" maxHeight="1.7976931348623157E308" prefHeight="100.0" style="-fx-background-color: black;" />
          </children>
       </VBox>
    </children>

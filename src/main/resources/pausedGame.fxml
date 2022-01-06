@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="850.0" prefWidth="1250.0" style="-fx-background-color: rgba(0, 0, 0, 0.8);" stylesheets="@board.css" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox>
+         <children>
+            <Pane VBox.vgrow="ALWAYS" />
+            <HBox>
+               <children>
+                  <Pane HBox.hgrow="ALWAYS" />
+                  <VBox style="-fx-background-color: #DFDFDF;">
+                     <children>
+                        <HBox>
+                           <children>
+                              <Pane HBox.hgrow="ALWAYS" />
+                              <Label text="The Game Has Been Paused">
+                                 <font>
+                                    <Font name="System Bold Italic" size="25.0" />
+                                 </font>
+                              </Label>
+                              <Pane HBox.hgrow="ALWAYS" />
+                           </children>
+                        </HBox>
+                        <GridPane fx:id="gp_wPieces" styleClass="gp_wPieces">
+                           <columnConstraints>
+                              <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                              <RowConstraints vgrow="NEVER" />
+                              <RowConstraints />
+                              <RowConstraints />
+                           </rowConstraints>
+                           <children>
+                              <Button id="btn_resumeGame" minHeight="40.0" minWidth="200.0" mnemonicParsing="false" text="Resume Game" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS">
+                                 <GridPane.margin>
+                                    <Insets bottom="10.0" top="10.0" />
+                                 </GridPane.margin>
+                                 <font>
+                                    <Font name="System Bold" size="18.0" />
+                                 </font>
+                                 <cursor>
+                                    <Cursor fx:constant="HAND" />
+                                 </cursor>
+                              </Button>
+                              <Button id="btn_saveAndQuit" minHeight="40.0" minWidth="200.0" mnemonicParsing="false" text="Save &amp; Quit" GridPane.rowIndex="2">
+                                 <GridPane.margin>
+                                    <Insets bottom="10.0" top="10.0" />
+                                 </GridPane.margin>
+                                 <font>
+                                    <Font name="System Bold" size="18.0" />
+                                 </font>
+                                 <cursor>
+                                    <Cursor fx:constant="HAND" />
+                                 </cursor>
+                              </Button>
+                              <Button id="btn_home" minHeight="40.0" minWidth="200.0" mnemonicParsing="false" text="Home" GridPane.rowIndex="3">
+                                 <font>
+                                    <Font name="System Bold" size="18.0" />
+                                 </font>
+                                 <cursor>
+                                    <Cursor fx:constant="HAND" />
+                                 </cursor>
+                                 <GridPane.margin>
+                                    <Insets bottom="10.0" top="10.0" />
+                                 </GridPane.margin>
+                              </Button>
+                           </children>
+                        </GridPane>
+                     </children>
+                     <padding>
+                        <Insets left="50.0" right="50.0" />
+                     </padding>
+                  </VBox>
+                  <Pane HBox.hgrow="ALWAYS" />
+               </children>
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+            </HBox>
+            <Pane prefWidth="1178.0" VBox.vgrow="ALWAYS" />
+         </children>
+      </VBox>
+   </children>
+</StackPane>

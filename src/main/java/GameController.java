@@ -14,6 +14,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
@@ -84,8 +85,8 @@ public class GameController {
     * @param piece Piece that needs to be promoted
     * @throws IOException May throw an exception if the fxml is not found.
     */
-   public void displayWhitePawnPromotion(Piece piece) throws IOException {
-      Parent nextScene = App.loadFXML("white-pawn-end");
+   public void displayPawnPromotion(Piece piece, byte type) throws IOException {
+      Parent nextScene = App.loadFXML((type == Constants.pieceIDs.WHITE) ? "white-pawn-end" : "black-pawn-end");
       sp_root.getChildren().add(nextScene);
       nextScene.translateYProperty().set(sp_root.getScene().getHeight());
 
@@ -120,7 +121,7 @@ public class GameController {
                public void handle(MouseEvent me) {
                   String type = ((StackPane) n).getId();
 
-                  board.promotePawn(piece, type);
+                  board.promotePawn(piece, type, false);
 
                   Timeline timeline = new Timeline(
                         new KeyFrame(javafx.util.Duration.seconds(1),
@@ -149,6 +150,7 @@ public class GameController {
     * @throws IOException May throw an exception if the fxml is not found.
     */
    public void gameOver(byte winner) throws IOException {
+      App.getStage().setHeight(App.getStage().getMinHeight());
       App.setWinner(winner);
 
       vb_gameover.translateYProperty().set(sp_root.getScene().getHeight());
@@ -188,5 +190,101 @@ public class GameController {
    private void devGetAiMoves() {
       System.out.println(true);
       board.devRequest(Constants.Dev.GET_AI_MOVES);
+   }
+
+   @FXML
+   private void pauseGame() throws IOException {
+      board.pauseGame();
+
+      Parent nextScene = App.loadFXML("pausedGame");
+      sp_root.getChildren().add(nextScene);
+      nextScene.scaleXProperty().set(0);
+      nextScene.scaleYProperty().set(0);
+      nextScene.opacityProperty().set(0);
+      nextScene.applyCss();
+
+      // Create a timeline
+      Timeline inAni = new Timeline(
+            new KeyFrame(javafx.util.Duration.seconds(1),
+                  new KeyValue(nextScene.scaleXProperty(), 1, Interpolator.EASE_BOTH)),
+            new KeyFrame(javafx.util.Duration.seconds(1),
+                  new KeyValue(nextScene.scaleYProperty(), 1, Interpolator.EASE_BOTH)),
+            new KeyFrame(javafx.util.Duration.seconds(1),
+                  new KeyValue(nextScene.opacityProperty(), 1, Interpolator.EASE_BOTH)));
+
+      Timeline outAni = new Timeline(
+            new KeyFrame(javafx.util.Duration.seconds(1),
+                  new KeyValue(nextScene.scaleXProperty(), 0, Interpolator.EASE_BOTH)),
+            new KeyFrame(javafx.util.Duration.seconds(1),
+                  new KeyValue(nextScene.scaleYProperty(), 0, Interpolator.EASE_BOTH)),
+            new KeyFrame(javafx.util.Duration.seconds(1),
+                  new KeyValue(nextScene.opacityProperty(), 0, Interpolator.EASE_BOTH)));
+
+      inAni.play();
+      inAni.setOnFinished(inAniF -> {
+         Button btn_resumeGame = (Button) nextScene.lookup("#btn_resumeGame");
+
+         btn_resumeGame.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            public void handle(MouseEvent me) {
+               outAni.play();
+               outAni.setOnFinished(outAniF -> {
+                  board.resumeGame();
+                  sp_root.getChildren().remove(nextScene);
+               });
+            }
+         });
+
+         Button btn_saveAndQuit = (Button) nextScene.lookup("#btn_saveAndQuit");
+
+         btn_saveAndQuit.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            public void handle(MouseEvent me) {
+               try {
+                  board.saveGame();
+               } catch (IOException e) {
+
+               }
+            }
+         });
+
+         Button btn_home = (Button) nextScene.lookup("#btn_home");
+
+         btn_home.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            public void handle(MouseEvent me) {
+               try {
+                  transitionToHome();
+               } catch (IOException e) {
+                  // TODO Auto-generated catch block
+                  e.printStackTrace();
+               }
+            }
+         });
+      });
+   }
+
+   public void transitionToHome() throws IOException {
+      App.getStage().setHeight(App.getStage().getMinHeight());
+
+      Parent homeScene = App.loadFXML("startScreen");
+
+      sp_root.getChildren().add(homeScene);
+      homeScene.translateXProperty().set(sp_root.getScene().getWidth());
+      homeScene.translateYProperty().set(sp_root.getScene().getHeight());
+
+      Timeline timeline = new Timeline(
+            new KeyFrame(javafx.util.Duration.seconds(1),
+                  new KeyValue(homeScene.translateXProperty(), 0, Interpolator.EASE_BOTH)),
+            new KeyFrame(javafx.util.Duration.seconds(1),
+                  new KeyValue(homeScene.translateYProperty(), 0, Interpolator.EASE_BOTH)));
+      // Play ani
+      timeline.play();
+
+      timeline.setOnFinished(f1 -> {
+         sp_root.getChildren().remove(homeScene);
+
+         try {
+            App.setRoot("startScreen");
+         } catch (IOException e) {
+         }
+      });
    }
 }

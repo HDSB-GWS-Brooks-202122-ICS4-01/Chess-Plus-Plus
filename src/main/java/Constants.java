@@ -1,5 +1,7 @@
 public class Constants {
-
+        public static final class Screen {
+                public static final int WIDTH = 1250, HEIGHT = 850;
+        }
         public static final class pieceIDs {
                 public static final byte EMPTY_CELL = -1;
 
@@ -62,6 +64,7 @@ public class Constants {
         public static final class boardData {
                 public static final byte MODE_PASS_N_PLAY = 0;
                 public static final byte MODE_AI = 1;
+                public static final byte MODE_RESUME_GAME = 2;
 
                 public static final byte[][] DEFAULT_GAME_SETUP = {
                                 { pieceIDs.BLACK_QUEENS_ROOK, pieceIDs.BLACK_PAWN_ZERO, pieceIDs.EMPTY_CELL,
@@ -142,6 +145,8 @@ public class Constants {
                                 { 7, 6 },
 
                 };
+
+                public static final String PATH_TO_SAVED_GAME = "src\\main\\resources\\data\\transcripts\\savedGame.txt";
         }
 
         public static final class SpriteSheetDimensions {
