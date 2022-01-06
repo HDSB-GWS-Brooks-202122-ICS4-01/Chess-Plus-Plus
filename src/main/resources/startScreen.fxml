@@ -104,7 +104,7 @@
                         <Font name="System Bold" size="36.0" />
                      </font>
                   </Label>
-                  <Button fx:id="btn_signOut" layoutX="850.0" layoutY="60.0" mnemonicParsing="false" onAction="#signOut" prefHeight="81.0" prefWidth="250.0" text="Sign Out" textFill="WHITE">
+                  <Button fx:id="btn_signOut" layoutX="825.0" layoutY="109.0" mnemonicParsing="false" onAction="#signOut" prefHeight="81.0" prefWidth="300.0" text="Sign Out" textFill="WHITE">
                      <font>
                         <Font name="System Bold" size="38.0" />
                      </font>
@@ -130,6 +130,14 @@
                         <Font name="System Bold Italic" size="26.0" />
                      </font>
                   </Label>
+                  <Button fx:id="btn_playOnline" layoutX="825.0" layoutY="9.0" mnemonicParsing="false" onAction="#matchmake" prefHeight="80.0" prefWidth="300.0" text="Play Online" textFill="WHITE">
+                     <font>
+                        <Font name="System Bold" size="38.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
                </children>
             </Pane>
          </children>

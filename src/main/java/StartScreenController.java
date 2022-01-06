@@ -1,10 +1,16 @@
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.ObjectInputFilter.Config;
 import java.util.Properties;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
 import com.google.firebase.cloud.StorageClient;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import javafx.animation.FadeTransition;
 import javafx.animation.Interpolator;
@@ -53,7 +59,7 @@ public class StartScreenController {
     @FXML
     Button resumeButton;
     @FXML
-    Button btn_signIn, btn_register, btn_signOut;
+    Button btn_signIn, btn_register, btn_signOut, btn_playOnline;
 
     @FXML
     ImageView imgv_avatar;
@@ -65,7 +71,7 @@ public class StartScreenController {
     public void initialize() throws IOException, FirebaseAuthException {
 
         Region[] elements = { playButton, resumeButton, settingsButton, aiButton, btn_signIn, btn_register,
-                btn_signOut };
+                btn_signOut, btn_playOnline };
 
         for (Region element : elements) {
             element.setOpacity(0);
@@ -148,7 +154,7 @@ public class StartScreenController {
 
         tt.setOnFinished(e -> {
             Region[] elements = { playButton, settingsButton, resumeButton, aiButton, btn_signIn, btn_register,
-                    btn_signOut };
+                    btn_signOut, btn_playOnline };
 
             for (Region element : elements) {
                 element.setDisable(false);
@@ -195,6 +201,51 @@ public class StartScreenController {
     public void switchToResume() {
         App.setGameMode(Constants.boardData.MODE_RESUME_GAME);
         transition("game");
+    }
+
+    @FXML
+    public void matchmake() {
+        DatabaseReference ref = FirebaseDatabase.getInstance()
+                .getReference("servers");
+
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            byte turn;
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                boolean foundServer = false;
+
+                if (dataSnapshot.getChildrenCount() == 1) {
+                    DatabaseReference newRef = ref.push();
+
+                    newRef.child("connected1").setValueAsync(config.getProperty("UID"));
+                    newRef.child("connected2").setValueAsync("null");
+                    newRef.child("matchBegun").setValueAsync("false");
+                    newRef.child("turn").setValueAsync(0);
+                    turn = 0;
+                }
+
+                for (DataSnapshot server : dataSnapshot.getChildren()) {
+                    boolean matchBegun = Boolean.parseBoolean((String)server.child("matchBegun").getValue());
+
+                    if (matchBegun)
+                        continue;
+
+                    String connected2 = (String)server.child("connected2").getValue();
+
+                    if (connected2.equalsIgnoreCase("null")) {
+                        DatabaseReference serverRef = server.getRef();
+                        
+                        serverRef.push().child("connected2").setValueAsync(config.getProperty("UID"));
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+            }
+        });
+
+        
     }
 
     /**

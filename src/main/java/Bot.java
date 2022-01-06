@@ -1321,7 +1321,7 @@ public class Bot {
         private boolean moveMade = false;
 
         public BoardInteractions parseAiMove(String move) {
-            System.out.println(move);
+            System.out.println("Move: " + move);
             rawAIMoves = move;
             moveMade = true;
 

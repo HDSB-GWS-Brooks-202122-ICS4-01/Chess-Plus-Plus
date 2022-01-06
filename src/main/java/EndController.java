@@ -60,6 +60,9 @@ public class EndController {
    Label lbl_b_rt, lbl_b_tm, lbl_b_pk, lbl_w_rt, lbl_w_pk, lbl_w_tm;
 
    @FXML
+   /**
+    * This method acts as the constructor and will initialize the scene.
+    */
    public void initialize() {
       SUBMIT_BUTTONS = new Button[] { btn_replay, btn_matchmake, btn_home, btn_downloadTranscript };
 
@@ -126,6 +129,10 @@ public class EndController {
    }
 
    @FXML
+   /**
+    * Will return to the game screen and restart the match.
+    * @throws IOException  Will throw an error if the fxml file is not found.
+    */
    private void replayMatch() throws IOException {
       Parent gameScene = App.loadFXML("game");
 
@@ -151,6 +158,10 @@ public class EndController {
    }
 
    @FXML
+   /**
+    * This method transitions the scene to home
+    * @throws IOException  Will throw an error if the fxml file is not found.
+    */
    private void goToHome() throws IOException {
       Parent gameScene = App.loadFXML("startScreen");
 
@@ -176,6 +187,9 @@ public class EndController {
    }
 
    @FXML
+   /**
+    * This method will save the match transcript as a txt file to a folder.
+    */
    private void downloadGameTranscript() {
       if (savedMatchTranscript) {
          lbl_output.setText("Game transcript already saved.");
@@ -186,10 +200,9 @@ public class EndController {
       try {
          File folder = new File("src\\main\\resources\\data\\transcripts\\");
 
+         // Generate name for new trancript
          String name = "GAME_" + folder.listFiles().length + "_TRANSCRIPT.txt";
 
-         // File newFile = new File("src\\main\\resources\\data\\" +
-         // tf_storyName.getText() + ".txt");
          File newFile = new File("src\\main\\resources\\data\\transcripts\\" + name);
 
          if (newFile.createNewFile()) { // File created
