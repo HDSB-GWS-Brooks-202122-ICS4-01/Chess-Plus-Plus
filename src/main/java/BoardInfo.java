@@ -5,8 +5,8 @@ public class BoardInfo {
     byte[][] board;
     int[] passant;
     boolean[] hasMoved;
-    ArrayList<Byte> deadPieces;
     String previousMove;
+    int moveCount;
 
     byte whiteKingX;
     byte whiteKingY;
@@ -14,12 +14,12 @@ public class BoardInfo {
     byte blackKingX;
     byte blackKingY; 
 
-    public BoardInfo(byte[][] board, int[] passant, boolean[] hasMoved, ArrayList<Byte> deadPieces){
+    public BoardInfo(byte[][] board, int[] passant, boolean[] hasMoved, int moveCount){
 
+        this.moveCount = moveCount;
         this.board = board;
         this.passant = passant;
         this.hasMoved = hasMoved;
-        this.deadPieces = deadPieces;
     }
     
     
@@ -40,7 +40,7 @@ public class BoardInfo {
      * @return A new BoardInfo object that is a deep copy of the original. 
      */
     public BoardInfo copy(){
-        BoardInfo copy = new BoardInfo(deepCopy(board), Arrays.copyOf(passant, passant.length), Arrays.copyOf(hasMoved, hasMoved.length), new ArrayList<Byte>(deadPieces));
+        BoardInfo copy = new BoardInfo(deepCopy(board), Arrays.copyOf(passant, passant.length), Arrays.copyOf(hasMoved, hasMoved.length), moveCount);
         copy.setKingPos(true, blackKingX, blackKingY);
         copy.setKingPos(true, blackKingX, blackKingY);
         return copy;
