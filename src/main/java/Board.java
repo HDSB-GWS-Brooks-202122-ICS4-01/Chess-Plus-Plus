@@ -938,7 +938,6 @@ public class Board {
       switch (request) {
          case Constants.Dev.GET_AI_MOVES:
             Bot.BoardInteractions bi = bot.BI.parseAiMove(bot.getMove(GRID, DEAD_PIECES));
-
             System.out.println(Arrays.toString(bi.getMove()));
             break;
       }

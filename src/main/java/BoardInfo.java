@@ -40,7 +40,10 @@ public class BoardInfo {
      * @return A new BoardInfo object that is a deep copy of the original. 
      */
     public BoardInfo copy(){
-        return new BoardInfo(deepCopy(board), Arrays.copyOf(passant, passant.length), Arrays.copyOf(hasMoved, hasMoved.length), new ArrayList<Byte>(deadPieces));
+        BoardInfo copy = new BoardInfo(deepCopy(board), Arrays.copyOf(passant, passant.length), Arrays.copyOf(hasMoved, hasMoved.length), new ArrayList<Byte>(deadPieces));
+        copy.setKingPos(true, blackKingX, blackKingY);
+        copy.setKingPos(true, blackKingX, blackKingY);
+        return copy;
     }
 
 

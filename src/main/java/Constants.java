@@ -62,6 +62,7 @@ public class Constants {
                 public static final String PASSANT_LEFT = "e";
                 public static final String PASSANT_RIGHT = "E";
                 public static final String PROMOTION = "P";
+                public static final String NO_MOVES = "I";
         }
 
         public static final class boardData {
