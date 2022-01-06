@@ -188,7 +188,6 @@ public class GameController {
 
    @FXML
    private void devGetAiMoves() {
-      System.out.println(true);
       board.devRequest(Constants.Dev.GET_AI_MOVES);
    }
 

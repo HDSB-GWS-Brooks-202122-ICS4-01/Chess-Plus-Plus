@@ -2,8 +2,12 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.effect.InnerShadow?>
+<?import javafx.scene.effect.Light.Distant?>
+<?import javafx.scene.effect.Lighting?>
+<?import javafx.scene.effect.Shadow?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
@@ -254,6 +258,9 @@
                                        <HBox.margin>
                                           <Insets left="10.0" />
                                        </HBox.margin>
+                                       <padding>
+                                          <Insets right="10.0" />
+                                       </padding>
                                     </VBox>
                                  </children>
                               </HBox>
@@ -295,7 +302,29 @@
                   </VBox>
                </children>
             </StackPane>
-            <Pane fx:id="pn_dev" maxHeight="1.7976931348623157E308" prefHeight="100.0" style="-fx-background-color: black;" />
+            <Pane fx:id="pn_dev" maxHeight="1.7976931348623157E308" prefHeight="100.0" style="-fx-background-color: black;">
+               <children>
+                  <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#96ccff00" height="50.0" layoutX="50.0" layoutY="25.0" stroke="#808080" strokeWidth="10.0" width="200.0">
+                     <effect>
+                        <Lighting diffuseConstant="2.0" specularConstant="0.35" specularExponent="0.0" surfaceScale="10.0">
+                           <bumpInput>
+                              <Shadow radius="4.75" width="0.0" />
+                           </bumpInput>
+                           <light>
+                              <Light.Distant azimuth="360.0" elevation="40.81" />
+                           </light>
+                        </Lighting>
+                     </effect>
+                  </Rectangle>
+                  <Button layoutX="50.0" layoutY="25.0" minHeight="50.0" minWidth="200.0" mnemonicParsing="false" onAction="#devGetAiMoves" style="-fx-border-color: transparent; -fx-background-color: #007593; -fx-background-radius: 5;" text="Get Ai Moves" textFill="WHITE">
+                     <font>
+                        <Font name="Algerian" size="25.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+               </children></Pane>
          </children>
       </VBox>
    </children>
