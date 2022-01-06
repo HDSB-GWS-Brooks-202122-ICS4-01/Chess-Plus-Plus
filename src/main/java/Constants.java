@@ -46,6 +46,7 @@ public class Constants {
                 //They will not return their color wheny you divide by 16, for example BLACK_PROMOTED_ROOK/16 == BLACK will return false. 
                 public static final byte BLACK_PROMOTED_ROOK = 32;
                 public static final byte WHITE_PROMOTED_ROOK = 33;
+
         }
 
         public static class pieceType {

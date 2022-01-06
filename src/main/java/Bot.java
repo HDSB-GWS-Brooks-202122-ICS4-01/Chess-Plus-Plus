@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 
+
 public class Bot {
     public final BoardInteractions BI = new BoardInteractions();
     final int depth;
@@ -139,7 +140,8 @@ public class Bot {
                 byte id = boardInfo.board[x][y];
                 if ((id / 16 == Constants.pieceIDs.BLACK) == color
                         || (color && id == Constants.pieceIDs.BLACK_PROMOTED_ROOK)
-                        || (!color && id == Constants.pieceIDs.WHITE_PROMOTED_ROOK)) {
+                        || (!color && id == Constants.pieceIDs.WHITE_PROMOTED_ROOK)
+                                && id != Constants.pieceIDs.EMPTY_CELL) {
                     // if the piece is the color it is generating for.
 
                     if (id == Constants.pieceIDs.BLACK_KINGS_ROOK || id == Constants.pieceIDs.WHITE_KINGS_ROOK
@@ -187,8 +189,13 @@ public class Bot {
                             System.out.println(generatedBoards.get(i).previousMove);
                         }
                     } else if (id == Constants.pieceIDs.BLACK_KING || id == Constants.pieceIDs.WHITE_KING) {
+                        // if the piece it is generating for is a king
                         generatedBoards = movesKing(generatedBoards, boardInfo, x, y, color, id);
                         System.out.println("Boards generated for king " + id + ": " + generatedBoards.size());
+                    } else {
+                        // if the piece it is generating for is a pawn
+                        generatedBoards = movesPawn(generatedBoards, boardInfo, x, y, color, id);
+                        System.out.println("Boards generated for pawn " + id + ": " + generatedBoards.size());
                     }
 
                 }
@@ -891,7 +898,229 @@ public class Bot {
 
     private ArrayList<BoardInfo> movesPawn(ArrayList<BoardInfo> boards, BoardInfo initialBoard, int x, int y,
             boolean color, byte id) {
+
+        // TODO finish this method
+
+        byte pawnDirection;
+        byte enemyBeginRange;
+        byte enemyEndRange;
+        byte pawnFinalRank;
+
+        // pawn ranges are for enemy pawns
+        byte startPawnRange;
+        byte endPawnRange;
+
+        byte enemyPromotedRook;
+        byte[] promotions = new byte[4];
+        BoardInfo newBoard;
+        if (color) {
+            pawnDirection = 1;
+            enemyBeginRange = 15;
+            enemyEndRange = 32;
+            enemyPromotedRook = Constants.pieceIDs.WHITE_PROMOTED_ROOK;
+            promotions[0] = Constants.pieceIDs.BLACK_QUEEN;
+            promotions[1] = Constants.pieceIDs.BLACK_PROMOTED_ROOK;
+            promotions[2] = Constants.pieceIDs.BLACK_QUEENS_BISHOP;
+            promotions[3] = Constants.pieceIDs.BLACK_QUEENS_KNIGHT;
+            startPawnRange = 23;
+            endPawnRange = 32;
+            pawnFinalRank = 7;
+
+        } else {
+            pawnDirection = -1;
+            startPawnRange = 7;
+            endPawnRange = 16;
+            enemyBeginRange = -1;
+            enemyEndRange = 16;
+            enemyPromotedRook = Constants.pieceIDs.BLACK_PROMOTED_ROOK;
+            promotions[0] = Constants.pieceIDs.WHITE_QUEEN;
+            promotions[1] = Constants.pieceIDs.WHITE_PROMOTED_ROOK;
+            promotions[2] = Constants.pieceIDs.WHITE_QUEENS_BISHOP;
+            promotions[3] = Constants.pieceIDs.WHITE_QUEENS_KNIGHT;
+            pawnFinalRank = 0;
+        }
+
+        // if the y is in the board
+        if (y + pawnDirection * 1 > -1 && y + pawnDirection * 1 < 8) {
+            if (x - 1 > -1) {
+                // if it can attack left
+                if ((initialBoard.board[x - 1][y + pawnDirection * 1] > enemyBeginRange
+                        && initialBoard.board[x - 1][y + pawnDirection * 1] < enemyEndRange)
+                        || initialBoard.board[x - 1][y + pawnDirection * 1] == enemyPromotedRook) {
+                    // if piece in the square is an enemy piece.
+
+
+                    //if this move is a promotion move
+                    if((y+pawnDirection*1) == pawnFinalRank){
+                        for (byte promotion : promotions) {
+                            newBoard = initialBoard.copy();
+                            newBoard.moveCount++;
+                            newBoard.board[x-1][y + pawnDirection * 1] = promotion;
+                            newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
+                            if (isNotUnderCheck(newBoard, color)) {
+                                boards.add(newBoard);
+                                newBoard.setPreviousMove(Constants.moveTypes.PROMOTION + id + "f" + x + "" + y + "." + (x-1)
+                                        + "" + (y + pawnDirection * 1) + "." + promotion);
+                            }
+                        }
+                    } else {
+                        newBoard = initialBoard.copy();
+                        newBoard.moveCount++;
+                        newBoard.board[x - 1][y + pawnDirection * 1] = id;
+                        newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
+                        if (isNotUnderCheck(newBoard, color)) {
+                            boards.add(newBoard);
+                            newBoard.setPreviousMove(
+                            Constants.moveTypes.REGULAR + id + "." + (x - 1) + "" + (y + pawnDirection * 1));
+                        }
+                    }
+                }
+
+                // passant left
+                if (initialBoard.board[x - 1][y] > startPawnRange && initialBoard.board[x - 1][y] < endPawnRange
+                        && initialBoard.passant[getPassantIndex(initialBoard.board[x - 1][y])] == initialBoard.moveCount
+                                - 1) {
+                                    newBoard = initialBoard.copy();
+                                    newBoard.moveCount++;
+                                    //clears the postion of the pawn attacking and the piece that it attacks
+                                    newBoard.board[x-1][y] = Constants.pieceIDs.EMPTY_CELL;
+                                    newBoard.board[x-1][y+1*pawnDirection] = id;
+                                    newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
+                                    if(isNotUnderCheck(newBoard, color)){
+                                        boards.add(newBoard);
+                                        newBoard.setPreviousMove(Constants.moveTypes.PASSANT_LEFT + id + "f" + x+ ""+ y + "." + (x-1) + "" + (y+1*pawnDirection));
+                                    }
+
+                }
+            }
+
+            if (x + 1 < 8) {
+                // if it can attack right
+                if ((initialBoard.board[x + 1][y + pawnDirection * 1] > enemyBeginRange
+                        && initialBoard.board[x + 1][y + pawnDirection * 1] < enemyEndRange)
+                        || initialBoard.board[x + 1][y + pawnDirection * 1] == enemyPromotedRook) {
+
+                    // if piece in the square is an enemy piece.
+                    
+
+                    //if the move is a promotion move
+                    if((y+pawnDirection*1) == pawnFinalRank){
+                        for (byte promotion : promotions) {
+                            newBoard = initialBoard.copy();
+                            newBoard.moveCount++;
+                            newBoard.board[x+1][y + pawnDirection * 1] = promotion;
+                            newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
+                            if (isNotUnderCheck(newBoard, color)) {
+                                boards.add(newBoard);
+                                newBoard.setPreviousMove(Constants.moveTypes.PROMOTION + id + "f" + x + "" + y + "." + (x+1)
+                                        + "" + (y + pawnDirection * 1) + "." + promotion);
+                            }
+                        }
+                    } else {
+                        newBoard = initialBoard.copy();
+                        newBoard.moveCount++;
+                        newBoard.board[x + 1][y + pawnDirection * 1] = id;
+                        newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
+                        if (isNotUnderCheck(newBoard, color)) {
+                            boards.add(newBoard);
+                            newBoard.setPreviousMove(
+                            Constants.moveTypes.REGULAR + id + "." + (x + 1) + "" + (y + pawnDirection * 1));
+                        }
+                    }
+
+                }
+
+                // passant right
+                if (initialBoard.board[x + 1][y] > startPawnRange && initialBoard.board[x + 1][y] < endPawnRange
+                        && initialBoard.passant[getPassantIndex(initialBoard.board[x + 1][y])] == initialBoard.moveCount
+                                - 1) {
+                                    newBoard = initialBoard.copy();
+                                    newBoard.moveCount++;
+                                    //clears the postion of the pawn attacking and the piece that it attacks
+                                    newBoard.board[x+1][y] = Constants.pieceIDs.EMPTY_CELL;
+                                    newBoard.board[x+1][y+1*pawnDirection] = id;
+                                    newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
+                                    if(isNotUnderCheck(newBoard, color)){
+                                        boards.add(newBoard);
+                                        newBoard.setPreviousMove(Constants.moveTypes.PASSANT_RIGHT + id + "f" + x+ ""+ y + "." + (x+1) + "" + (y+1*pawnDirection));
+                                    }
+
+                }
+
+            }
+
+            if (initialBoard.board[x][y + pawnDirection * 1] == Constants.pieceIDs.EMPTY_CELL) {
+                // it can move forward
+
+                //pawn promotion
+                if (y+pawnDirection*1 == pawnFinalRank) {
+                    for (byte promotion : promotions) {
+                        newBoard = initialBoard.copy();
+                        newBoard.moveCount++;
+                        newBoard.board[x][y + pawnDirection * 1] = promotion;
+                        newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
+                        if (isNotUnderCheck(newBoard, color)) {
+                            boards.add(newBoard);
+                            newBoard.setPreviousMove(Constants.moveTypes.PROMOTION + id + "f" + x + "" + y + "." + x
+                                    + "" + (y + pawnDirection * 1) + "." + promotion);
+                        }
+                    }
+                } else {
+                    newBoard = initialBoard.copy();
+                    newBoard.moveCount++;
+                    newBoard.board[x][y + pawnDirection * 1] = id;
+                    newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
+                    if (isNotUnderCheck(newBoard, color)) {
+                        boards.add(newBoard);
+                        newBoard.setPreviousMove(Constants.moveTypes.REGULAR + id + "f" + x + "" + y + "." + x + ""
+                        + (y + pawnDirection * 1));
+                    }
+                }
+            }
+        }
+
+        // double forward move.
+        if (((y == 6 && !color) || (y == 1 && color))
+                && initialBoard.board[x][y + 1 * pawnDirection] == Constants.pieceIDs.EMPTY_CELL
+                && initialBoard.board[x][y + 2 * pawnDirection] == Constants.pieceIDs.EMPTY_CELL) {
+
+            newBoard = initialBoard.copy();
+            newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
+            newBoard.board[x][y + 2 * pawnDirection] = id;
+            newBoard.passant[getPassantIndex(id)] = newBoard.moveCount;
+            newBoard.moveCount++;
+            if (isNotUnderCheck(newBoard, color)) {
+                boards.add(newBoard);
+                newBoard.setPreviousMove(
+                        Constants.moveTypes.REGULAR + id + "f" + x + "" + y + "." + x + "" + (y + 2 * pawnDirection));
+            }
+        }
+
+        // passant attack
         return boards;
+    }
+
+    private BoardInfo promotionCheck(BoardInfo initialBoard, int x, int y, byte id){
+        byte pawnEndY;
+        byte[] promotions = new byte[4];
+        BoardInfo newBoard;
+        if((id/16 == Constants.pieceIDs.BLACK)){
+            pawnEndY = 7;
+            promotions[0] = Constants.pieceIDs.BLACK_QUEEN;
+            promotions[1] = Constants.pieceIDs.BLACK_QUEENS_BISHOP;
+            promotions[2] = Constants.pieceIDs.BLACK_QUEENS_KNIGHT;
+            promotions[3] = Constants.pieceIDs.BLACK_PROMOTED_ROOK;
+        } else {
+            pawnEndY = 0;
+            promotions[0] = Constants.pieceIDs.WHITE_QUEEN;
+            promotions[1] = Constants.pieceIDs.WHITE_QUEENS_BISHOP;
+            promotions[2] = Constants.pieceIDs.WHITE_QUEENS_KNIGHT;
+            promotions[3] = Constants.pieceIDs.WHITE_PROMOTED_ROOK;
+        }
+        if(y == pawnEndY){
+            
+        }
+        return null;
     }
 
     /**
