@@ -72,6 +72,7 @@ public class Constants {
                 public static final byte MODE_PASS_N_PLAY = 0;
                 public static final byte MODE_AI = 1;
                 public static final byte MODE_RESUME_GAME = 2;
+                public static final byte MODE_ONLINE = 3;
 
                 public static final byte[][] DEFAULT_GAME_SETUP = {
                                 { pieceIDs.BLACK_QUEENS_ROOK, pieceIDs.BLACK_PAWN_ZERO, pieceIDs.EMPTY_CELL,

@@ -9,8 +9,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -26,7 +31,7 @@ import javafx.scene.layout.StackPane;
  * @author Selim Abdelwahab
  * @version 1.0
  */
-public class Board {
+public class OnlineBoard {
    Properties config = new Properties();
 
    private static final ArrayList<String> MATCH_TRANSCRIPT = new ArrayList<String>();
@@ -50,18 +55,17 @@ public class Board {
    private StackPane sp_selected;
    private final ArrayList<StackPane> POSSIBLE_MOVES = new ArrayList<StackPane>();
 
-   private byte turn = Constants.pieceIDs.WHITE;
-
    private final PlayerTimer[] TIMERS = new PlayerTimer[2];
 
    private final Map[] STATS = new Map[] { new HashMap<String, Integer>(), new HashMap<String, Integer>(),
          new HashMap<String, String>() };
    private byte winner;
 
-   private final Bot bot = new Bot(App.getDiff(), false);
    private final DatabaseReference SERVER_REF;
 
-   private final byte GAME_MODE;
+   private boolean isTurn = false;
+
+   private String pushMove;
 
    /**
     * Constructor for the Board class
@@ -69,14 +73,12 @@ public class Board {
     * @param game       Reference to the GameController class.
     * @param chessBoard GridPane element containing the rows, and columns of
     *                   StackPane.
-    * @param gm         The game mode; Ai, pass n play
     */
-   public Board(GameController game, GridPane[] cells, byte gm) {
+   public OnlineBoard(GameController game, GridPane[] cells) {
       GAME = game;
       gp_CHESS_BOARD = cells[0];
       gp_DEAD_BLACK_CELLS = cells[1];
       gp_DEAD_WHITE_CELLS = cells[2];
-      GAME_MODE = gm;
 
       int gameTime = 600000;
       Label blackLabel = GAME.getTimeReference(Constants.pieceIDs.BLACK);
@@ -109,15 +111,82 @@ public class Board {
 
       setupBoard();
 
-      if (GAME_MODE == Constants.boardData.MODE_RESUME_GAME) {
+      SERVER_REF = App.getServerReference();
+      SERVER_REF.addListenerForSingleValueEvent(new ValueEventListener() {
+         @Override
+         public void onDataChange(DataSnapshot dataSnapshot) {
+            isTurn = Boolean.parseBoolean(
+                  (String) dataSnapshot.child("USER " + config.getProperty("UID")).child("turn").getValue());
+         }
+
+         @Override
+         public void onCancelled(DatabaseError error) {
+         }
+
+      });
+
+      SERVER_REF.child("move").addValueEventListener(new ValueEventListener() {
+         @Override
+         public void onCancelled(DatabaseError error) {
+            // TODO Auto-generated method stub
+
+         }
+
+         @Override
+         public void onDataChange(DataSnapshot snapshot) {
+            // TODO Auto-generated method stub
+            String value = (String) snapshot.getValue();
+            System.out.println("Move Value: " + value);
+
+            if (value.equals(pushMove)) {
+               isTurn = false;
+               return;
+            }
+
+            Platform.runLater(new Runnable() {
+
+               @Override
+               public void run() {
+                  // TODO Auto-generated method stub
+                  parseOpponentMove(value);
+                  isTurn = true;
+               }
+            });
+
+         }
+
+      });
+   }
+
+   protected void parseOpponentMove(String value) {
+      final String REG = "((?=[A-Z])|(?<=[A-Z]))|((?=[a-z])|(?<=[a-z]))";
+
+      MATCH_TRANSCRIPT.add(value);
+
+      String[] data = value.split(REG);
+
+      System.out.println("Value " + value);
+      System.out.println(Arrays.toString(data));
+
+      Piece piece = getPieceOnGrid(Byte.parseByte(data[0].trim()));
+
+      if (piece == null)
+         return;
+
+      byte x = getBoardX(data[1]);
+      byte y = getBoardY(data[2]);
+
+      System.out.println("(" + x + ", " + y + ")");
+
+      if (x > 0 && x < 8 && y > 0 && y < 8) {
+         App.MOVE_COUNT++;
+
          try {
-            parseTranscript();
-         } catch (IOException e) {
+            movePiece(piece, piece.getGridX(), piece.getGridY(), x, y, true);
+         } catch (Exception e) {
             e.printStackTrace();
          }
       }
-
-      SERVER_REF = App.getServerReference();
    }
 
    /**
@@ -155,14 +224,8 @@ public class Board {
                }
 
                // Checks to see if interaction is allowed
-               if (GAME_MODE == Constants.boardData.MODE_PASS_N_PLAY) {
-                  if ((getAllowInteract(sp, x, y) || isPossibleMove))
-                     highlightMouseCellHover(true, sp);
-               } else if (GAME_MODE == Constants.boardData.MODE_AI && turn == Constants.pieceIDs.WHITE) {
-                  if (getAllowInteract(sp, x, y) || isPossibleMove) {
-                     highlightMouseCellHover(true, sp);
-                  }
-               }
+               if ((getAllowInteract(sp, x, y) || isPossibleMove))
+                  highlightMouseCellHover(true, sp);
             }
          });
 
@@ -226,75 +289,6 @@ public class Board {
    }
 
    /**
-    * This method will read a text file containing data as to the moves that have
-    * been played.
-    * It will then renact each move until the entire file is parsed.
-    * 
-    * @throws IOException May throw an exception if the file location is not found.
-    */
-   private void parseTranscript() throws IOException {
-      final String REG = "((?=[A-Z])|(?<=[A-Z]))|((?=[a-z])|(?<=[a-z]))";
-
-      FileReader fileReader = new FileReader(new File(Constants.boardData.PATH_TO_SAVED_GAME));
-
-      try (Scanner r = new Scanner(fileReader)) {
-         String ts;
-
-         while (r.hasNextLine()) {
-            ts = r.nextLine();
-
-            if (ts.contains("TW")) { // White timer
-               TIMERS[Constants.pieceIDs.WHITE].setTime(Long.parseLong(ts.substring(2, ts.length())));
-            } else if (ts.contains("TB")) { // Black timer
-               TIMERS[Constants.pieceIDs.BLACK].setTime(Long.parseLong(ts.substring(2, ts.length())));
-            } else if (ts.contains("PP")) { // Pawn promotion
-               MATCH_TRANSCRIPT.add(ts);
-
-               System.out.println(ts);
-               ts = ts.substring(2, ts.length());
-               System.out.println(ts);
-
-               String[] ids = ts.split("-");
-               System.out.println("ID 0: " + ids[0]);
-               System.out.println("ID 1: " + ids[1]);
-
-               Piece from = getPieceOnGrid(Byte.parseByte(ids[0]));
-
-               promotePawn(from, ids[1], true);
-            } else {
-               MATCH_TRANSCRIPT.add(ts);
-               App.MOVE_COUNT++;
-
-               String[] data = ts.split(REG);
-               System.out.println(Arrays.toString(data));
-
-               Piece piece = getPieceOnGrid(Byte.parseByte(data[0].trim()));
-
-               if (piece == null)
-                  continue;
-
-               byte x = getBoardX(data[1]);
-               byte y = getBoardY(data[2]);
-
-               System.out.println("(" + x + ", " + y + ")");
-
-               if (x > 0 && x < 8 && y > 0 && y < 8) {
-                  App.MOVE_COUNT++;
-                  movePiece(piece, piece.getGridX(), piece.getGridY(), x, y, true);
-                  System.out.println(203902903);
-               }
-            }
-         }
-      } catch (Exception e) {
-         e.printStackTrace();
-
-         setupBoard();
-         LIVE_PIECES.clear();
-         DEAD_PIECES.clear();
-      }
-   }
-
-   /**
     * This method is called when the match concludes.
     */
    private void gameover() throws IOException {
@@ -347,7 +341,7 @@ public class Board {
          for (Piece livePiece : LIVE_PIECES) {
             // Check to see if the coordinates match.
             if (livePiece.getGridX() == x && livePiece.getGridY() == y) {
-               return livePiece.getColor() == turn;
+               return isTurn && livePiece.getColor() == Constants.pieceIDs.WHITE;
             }
          }
 
@@ -414,10 +408,10 @@ public class Board {
    /**
     * This method will which player's turn it is.
     * 
-    * @return int
+    * @return byet
     */
-   public int getTurn() {
-      return turn;
+   public byte getTurn() {
+      return (isTurn) ? Constants.pieceIDs.WHITE : Constants.pieceIDs.BLACK;
    }
 
    /**
@@ -461,22 +455,16 @@ public class Board {
 
       sp_selected = null;
       boolean inCheck = true;
-      winner = turn;
+      winner = getTurn();
 
-      STATS[turn].replace("total_moves", (int) STATS[turn].get("total_moves") + 1);
+      STATS[getTurn()].replace("total_moves", (int) STATS[getTurn()].get("total_moves") + 1);
 
-      TIMERS[turn].pauseTimer();
+      TIMERS[getTurn()].pauseTimer();
 
-      if (turn == Constants.pieceIDs.WHITE) {
-         turn = Constants.pieceIDs.BLACK;
-      } else {
-         turn = Constants.pieceIDs.WHITE;
-      }
-
-      TIMERS[turn].playTimer();
+      TIMERS[getTurn()].playTimer();
 
       for (Piece p : LIVE_PIECES) {
-         if (p.getColor() != turn)
+         if (p.getColor() != getTurn())
             continue;
 
          if (p.getPossibleMoves(GRID).length > 0)
@@ -491,15 +479,10 @@ public class Board {
          }
       }
 
-      System.out.println("Next turn: " + turn);
+      SERVER_REF.child("move").setValueAsync(pushMove);
+      isTurn = false;
 
-      if (GAME_MODE == Constants.boardData.MODE_AI) {
-         Bot.BoardInteractions bi = bot.BI.parseAiMove(bot.getMove(GRID, DEAD_PIECES));
-         playAi(bi.getMovedPiece(), bi.getMove());
-      }
-   }
-
-   private void playAi(Piece piece, byte[] move) {
+      System.out.println("Next turn: " + getTurn());
    }
 
    /**
@@ -665,12 +648,13 @@ public class Board {
             LIVE_PIECES.remove(p);
             DEAD_PIECES.add(p);
 
-            STATS[turn].replace("pieces_killed", (int) STATS[turn].get("pieces_killed") + 1);
+            STATS[getTurn()].replace("pieces_killed", (int) STATS[getTurn()].get("pieces_killed") + 1);
 
             displayDeadPiece(p);
             break;
          }
       }
+
       to.getChildren().clear();
       to.getChildren().add(piece.getSprite());
 
@@ -679,23 +663,18 @@ public class Board {
       GRID[fromX][fromY] = Constants.pieceIDs.EMPTY_CELL;
       GRID[toX][toY] = piece.getId();
 
-      String moveTranscript = piece.getId() + Constants.boardData.X_ID[toX] + Constants.boardData.Y_ID[toY];
+      if (!parsingTranscript) {
+         String moveTranscript = piece.getId() + Constants.boardData.X_ID[toX] + Constants.boardData.Y_ID[toY];
+         pushMove = ((byte) (piece.getId() - 16)) + Constants.boardData.X_ID[toX] + Constants.boardData.Y_ID[toY];
 
-      // if (piece.getColor() == Constants.pieceIDs.BLACK)
-      // BLACK_TRANSCRIPT.add(moveTranscript);
-      // else
-      // WHITE_TRANSCRIPT.add(moveTranscript);
+         MATCH_TRANSCRIPT.add(moveTranscript);
 
-      MATCH_TRANSCRIPT.add(moveTranscript);
-
-      // System.out.println(BLACK_TRANSCRIPT.toString());
-      // System.out.println("\n-------------------------------\n");
-      // System.out.println(WHITE_TRANSCRIPT.toString());
+      }
 
       if (piece.getType() == Constants.pieceType.PAWN && (piece.getGridY() == 0 || piece.getGridY() == 7)
             && !parsingTranscript) {
          try {
-            GAME.displayPawnPromotion(piece, turn);
+            GAME.displayPawnPromotion(piece, getTurn());
          } catch (IOException e) {
          }
       }
@@ -952,34 +931,6 @@ public class Board {
 
       movePiece(newPiece, x, y, x, y, parsingTranscript);
       LIVE_PIECES.set(LIVE_PIECES.indexOf(piece), newPiece);
-   }
-
-   public void devRequest(byte request) {
-      System.out.println(1);
-      switch (request) {
-         case Constants.Dev.GET_AI_MOVES:
-            Bot.BoardInteractions bi = bot.BI.parseAiMove(bot.getMove(GRID, DEAD_PIECES));
-            System.out.println(Arrays.toString(bi.getMove()));
-            break;
-      }
-   }
-
-   public void pauseGame() {
-      TIMERS[turn].pauseTimer();
-   }
-
-   public void resumeGame() {
-      TIMERS[turn].playTimer();
-   }
-
-   public void saveGame() throws IOException {
-      solidifyTranscript();
-
-      FileWriter myWriter = new FileWriter(Constants.boardData.PATH_TO_SAVED_GAME);
-      myWriter.write(App.getTranscript());
-      myWriter.close();
-
-      GAME.transitionToHome();
    }
 
    private Map[] solidifyTranscript() {

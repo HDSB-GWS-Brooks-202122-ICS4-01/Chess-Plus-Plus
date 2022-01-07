@@ -26,6 +26,7 @@ import com.google.firebase.FirebaseOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
+import com.google.firebase.database.DatabaseReference;
 
 /**
  * JavaFX Ap
@@ -49,6 +50,8 @@ public class App extends Application {
 
     private static String aiDiff = config.getProperty("aidiff");
     private static byte gameMode;
+
+    private static DatabaseReference serverReference;
 
     @Override
     public void start(Stage st) throws IOException {
@@ -192,5 +195,13 @@ public class App extends Application {
 
     public static Stage getStage() {
         return stage;
+    }
+
+    public static void setServerReference(DatabaseReference serverRef) {
+        serverReference = serverRef;
+    }
+
+    public static DatabaseReference getServerReference() {
+        return serverReference;
     }
 }
