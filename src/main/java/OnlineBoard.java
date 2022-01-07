@@ -64,6 +64,7 @@ public class OnlineBoard {
    private final DatabaseReference SERVER_REF;
 
    private boolean isTurn = false;
+   private byte color;
 
    private String pushMove;
 
@@ -117,6 +118,9 @@ public class OnlineBoard {
          public void onDataChange(DataSnapshot dataSnapshot) {
             isTurn = Boolean.parseBoolean(
                   (String) dataSnapshot.child("USER " + config.getProperty("UID")).child("turn").getValue());
+
+            color = Byte.parseByte(
+                  (String) dataSnapshot.child("USER " + config.getProperty("UID")).child("color").getValue());
          }
 
          @Override
@@ -344,7 +348,7 @@ public class OnlineBoard {
          for (Piece livePiece : LIVE_PIECES) {
             // Check to see if the coordinates match.
             if (livePiece.getGridX() == x && livePiece.getGridY() == y) {
-               return isTurn && livePiece.getColor() == Constants.pieceIDs.WHITE;
+               return isTurn && livePiece.getColor() == color;
             }
          }
 
@@ -635,7 +639,6 @@ public class OnlineBoard {
     * @param toY   final board y value.
     */
    private void movePiece(Piece piece, byte fromX, byte fromY, byte toX, byte toY, boolean parsingTranscript) {
-      System.out.println(true);
       StackPane from = CELLS[fromX][fromY];
       from.getChildren().clear();
 
@@ -669,8 +672,7 @@ public class OnlineBoard {
 
       if (!parsingTranscript) {
          String moveTranscript = piece.getId() + Constants.boardData.X_ID[toX] + Constants.boardData.Y_ID[toY];
-         pushMove = ((byte) (piece.getId() - 16)) + Constants.boardData.X_ID[toX] + Constants.boardData.Y_ID[toY];
-
+         pushMove = moveTranscript;
          MATCH_TRANSCRIPT.add(moveTranscript);
 
       }

@@ -220,6 +220,7 @@ public class StartScreenController {
                     DatabaseReference user1 = newRef.child("USER " + config.getProperty("UID"));
                     user1.child("turn").setValueAsync("true");
                     user1.child("timer").setValueAsync(600000);
+                    user1.child("color").setValueAsync(Constants.pieceIDs.WHITE);
 
                     newRef.child("matchBegun").setValueAsync(false);
                     newRef.child("move").setValueAsync("");
@@ -277,6 +278,7 @@ public class StartScreenController {
 
                     user2.child("turn").setValueAsync("false");
                     user2.child("timer").setValueAsync(600000);
+                    user2.child("color").setValueAsync(Constants.pieceIDs.BLACK);
 
                     App.setServerReference(server.getRef());
                     App.setGameMode(Constants.boardData.MODE_ONLINE);
