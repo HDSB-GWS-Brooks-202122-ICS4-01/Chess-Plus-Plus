@@ -147,7 +147,6 @@ public class OnlineBoard {
 
                @Override
                public void run() {
-                  // TODO Auto-generated method stub
                   parseOpponentMove(value);
                   isTurn = true;
                }
@@ -159,33 +158,37 @@ public class OnlineBoard {
    }
 
    protected void parseOpponentMove(String value) {
-      final String REG = "((?=[A-Z])|(?<=[A-Z]))|((?=[a-z])|(?<=[a-z]))";
+      try {
+         final String REG = "((?=[A-Z])|(?<=[A-Z]))|((?=[a-z])|(?<=[a-z]))";
 
-      MATCH_TRANSCRIPT.add(value);
+         MATCH_TRANSCRIPT.add(value);
 
-      String[] data = value.split(REG);
+         String[] data = value.split(REG);
 
-      System.out.println("Value " + value);
-      System.out.println(Arrays.toString(data));
+         System.out.println("Value " + value);
+         System.out.println(Arrays.toString(data));
 
-      Piece piece = getPieceOnGrid(Byte.parseByte(data[0].trim()));
+         Piece piece = getPieceOnGrid(Byte.parseByte(data[0].trim()));
 
-      if (piece == null)
-         return;
+         if (piece == null)
+            return;
 
-      byte x = getBoardX(data[1]);
-      byte y = getBoardY(data[2]);
+         System.out.println(piece);
 
-      System.out.println("(" + x + ", " + y + ")");
+         byte x = getBoardX(data[1]);
+         byte y = getBoardY(data[2]);
 
-      if (x > 0 && x < 8 && y > 0 && y < 8) {
-         App.MOVE_COUNT++;
+         System.out.println("(" + x + ", " + y + ")");
 
-         try {
+         if (x >= 0 && x < 8 && y >= 0 && y < 8) {
+
             movePiece(piece, piece.getGridX(), piece.getGridY(), x, y, true);
-         } catch (Exception e) {
-            e.printStackTrace();
+
+            App.MOVE_COUNT++;
+
          }
+      } catch (Exception err) {
+         err.printStackTrace();
       }
    }
 
@@ -632,6 +635,7 @@ public class OnlineBoard {
     * @param toY   final board y value.
     */
    private void movePiece(Piece piece, byte fromX, byte fromY, byte toX, byte toY, boolean parsingTranscript) {
+      System.out.println(true);
       StackPane from = CELLS[fromX][fromY];
       from.getChildren().clear();
 
