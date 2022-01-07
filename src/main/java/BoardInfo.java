@@ -46,6 +46,7 @@ public class BoardInfo {
      */
     public BoardInfo copy(){
         BoardInfo copy = new BoardInfo(App.deepCopy(board), Arrays.copyOf(passant, passant.length), Arrays.copyOf(hasMoved, hasMoved.length), moveCount);
+        copy.previousMove = this.previousMove;
         copy.setKingPos(false, whiteKingX, whiteKingY);
         copy.setKingPos(true, blackKingX, blackKingY);
         return copy;

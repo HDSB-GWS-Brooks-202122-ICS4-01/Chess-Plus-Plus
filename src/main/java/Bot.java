@@ -30,7 +30,7 @@ public class Bot {
                 depth = 4;
                 break;
         }
-        this.depth = 6;
+        this.depth = 4;
         this.black = black;
     }
 
@@ -114,8 +114,10 @@ public class Bot {
             // Sorts through the children to find the highest or lowest one, returns the
             // highest/lowest.
                 boardToEvaluate = minimax(depth - 1, !max, child);
-                if (boardToEvaluate.evaluate > lastEval) {
-                    
+                thisEval = evaluate(boardToEvaluate);
+                if (thisEval > lastEval) {
+                    lastEval = thisEval;
+                    lastChild = boardToEvaluate;
                 }
             }
         } else {
@@ -130,7 +132,8 @@ public class Bot {
                 boardToEvaluate = minimax(depth - 1, !max, child);
                 thisEval = evaluate(boardToEvaluate);
                 if (thisEval < lastEval) {
-                    
+                    lastEval = thisEval;
+                    lastChild = boardToEvaluate;
                 }
             }
         }

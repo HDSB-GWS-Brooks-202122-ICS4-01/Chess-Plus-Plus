@@ -209,7 +209,8 @@ public class App extends Application {
             newArray[i] = Arrays.copyOf(original[i], original[i].length);
         }
         return newArray;
-
+    }
+    
     public static void setServerReference(DatabaseReference serverRef) {
         serverReference = serverRef;
     }
