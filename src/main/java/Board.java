@@ -543,44 +543,33 @@ public class Board {
          byte pawnRight = (pawn.gridX + 1 < 8) ? GRID[piece.gridX + 1][piece.gridY] : -1;
 
          if ((pawnLeft > 7 && pawnLeft < 16) || (pawnLeft > 23 && pawnLeft < 32)) {
-            if (pawn.getColor() == Constants.pieceIDs.BLACK) {
-               if (pawnLeft > 23 && pawnLeft < 32
-                     && ((Pawn) GAME_PIECES[pawnLeft]).getPassant() == App.MOVE_COUNT - 1 && pawn.gridY + 1 < 8) {
-                  StackPane s_leftPawn = CELLS[pawn.gridX - 1][pawn.gridY + 1];
-                  s_leftPawn.getStyleClass().add("cell-enemy");
-                  setPassantMoveMouseClicked(s_leftPawn, pawn, (Pawn) GAME_PIECES[pawnLeft]);
-                  POSSIBLE_MOVES.add(s_leftPawn);
-               }
-            } else {
-               if (pawnLeft > 7 && pawnLeft < 16
-                     && ((Pawn) GAME_PIECES[pawnLeft]).getPassant() == App.MOVE_COUNT - 1 && pawn.gridY - 1 > -1) {
-                  StackPane s_leftPawn = CELLS[pawn.gridX - 1][pawn.gridY - 1];
-                  s_leftPawn.getStyleClass().add("cell-enemy");
-                  setPassantMoveMouseClicked(s_leftPawn, pawn, (Pawn) GAME_PIECES[pawnLeft]);
-                  POSSIBLE_MOVES.add(s_leftPawn);
-               }
+            if (pawn.getColor() == Constants.pieceIDs.BLACK && pawn.canPassantLeft(pawnLeft, GRID)) {
+               StackPane s_leftPawn = CELLS[pawn.gridX - 1][pawn.gridY + 1];
+               s_leftPawn.getStyleClass().add("cell-enemy");
+               setPassantMoveMouseClicked(s_leftPawn, pawn, (Pawn) GAME_PIECES[pawnLeft]);
+               POSSIBLE_MOVES.add(s_leftPawn);
+               
+            } else if(pawn.getColor() == Constants.pieceIDs.WHITE && pawn.canPassantLeft(pawnLeft, GRID)){
+               StackPane s_leftPawn = CELLS[pawn.gridX - 1][pawn.gridY - 1];
+               s_leftPawn.getStyleClass().add("cell-enemy");
+               setPassantMoveMouseClicked(s_leftPawn, pawn, (Pawn) GAME_PIECES[pawnLeft]);
+               POSSIBLE_MOVES.add(s_leftPawn);
 
             }
             System.out.println("piece to the left is a pawn");
          }
 
          if ((pawnRight > 7 && pawnRight < 16) || (pawnRight > 23 && pawnRight < 32)) {
-            if (pawn.getColor() == Constants.pieceIDs.BLACK) {
-               if (pawnRight > 23 && pawnRight < 32
-                     && ((Pawn) GAME_PIECES[pawnRight]).getPassant() == App.MOVE_COUNT - 1 && pawn.gridY + 1 < 8) {
-                  StackPane s_rightPawn = CELLS[pawn.gridX + 1][pawn.gridY + 1];
-                  s_rightPawn.getStyleClass().add("cell-enemy");
-                  setPassantMoveMouseClicked(s_rightPawn, pawn, (Pawn) GAME_PIECES[pawnRight]);
-                  POSSIBLE_MOVES.add(s_rightPawn);
-               }
-            } else {
-               if (pawnRight > 7 && pawnRight < 16
-                     && ((Pawn) GAME_PIECES[pawnRight]).getPassant() == App.MOVE_COUNT - 1 && pawn.gridY - 1 < 8) {
-                  StackPane s_rightPawn = CELLS[pawn.gridX + 1][pawn.gridY - 1];
-                  s_rightPawn.getStyleClass().add("cell-enemy");
-                  setPassantMoveMouseClicked(s_rightPawn, pawn, (Pawn) GAME_PIECES[pawnRight]);
-                  POSSIBLE_MOVES.add(s_rightPawn);
-               }
+            if (pawn.getColor() == Constants.pieceIDs.BLACK && pawn.canPassantLeft(pawnLeft, GRID)) {
+               StackPane s_rightPawn = CELLS[pawn.gridX + 1][pawn.gridY + 1];
+               s_rightPawn.getStyleClass().add("cell-enemy");
+               setPassantMoveMouseClicked(s_rightPawn, pawn, (Pawn) GAME_PIECES[pawnRight]);
+               POSSIBLE_MOVES.add(s_rightPawn);
+            } else if( pawn.getColor() == Constants.pieceIDs.WHITE && pawn.canPassantLeft(pawnLeft, GRID)){
+               StackPane s_rightPawn = CELLS[pawn.gridX + 1][pawn.gridY - 1];
+               s_rightPawn.getStyleClass().add("cell-enemy");
+               setPassantMoveMouseClicked(s_rightPawn, pawn, (Pawn) GAME_PIECES[pawnRight]);
+               POSSIBLE_MOVES.add(s_rightPawn);
 
             }
             System.out.println("piece to the right is a pawn");

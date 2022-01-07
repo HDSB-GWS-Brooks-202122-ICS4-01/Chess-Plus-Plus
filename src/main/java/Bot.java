@@ -1,9 +1,12 @@
 import java.util.ArrayList;
+import java.util.Arrays;
+
+import javax.naming.InitialContext;
 
 
 public class Bot {
     public final BoardInteractions BI = new BoardInteractions();
-    final int depth;
+    int depth;
     final boolean black;
 
     /**
@@ -15,18 +18,19 @@ public class Bot {
     public Bot(String diff, boolean black) {
         switch (diff) {
             case "easy":
-                depth = 3;
+                depth = 4;
                 break;
             case "medium":
-                depth = 5;
+                depth = 6;
                 break;
             case "hard":
-                depth = 7;
+                depth = 8;
                 break;
             default:
-                depth = 3;
+                depth = 4;
                 break;
         }
+        this.depth = 6;
         this.black = black;
     }
 
@@ -65,13 +69,12 @@ public class Bot {
         boardInfo.setKingPos(false, App.GAME_PIECES[Constants.pieceIDs.WHITE_KING].gridX,
                 App.GAME_PIECES[Constants.pieceIDs.WHITE_KING].gridY);
 
-        BoardInfo[] boards = generateBoards(boardInfo, black);
-        if (boards.length == 0) {
-            return Constants.moveTypes.NO_MOVES;
-        } else {
-            return boards[0].previousMove;
-        }
-        // return minimax(depth, true, boardInfo).previousMove;
+        BoardInfo[] boards = generateBoards(boardInfo, true);
+        //for(BoardInfo board : boards){
+            //System.out.println(board.previousMove);
+        //}
+
+        return minimax(depth, black, boardInfo).previousMove;
     }
 
     /**
@@ -84,8 +87,11 @@ public class Bot {
      * @return The best board.
      */
     private BoardInfo minimax(int depth, boolean max, BoardInfo boardInfo) {
+        BoardInfo lastChild = null;
+        BoardInfo boardToEvaluate;
         if (depth == 0) {
             // end case for recursions, at this point the board has generated the
+            boardInfo.evaluate = evaluate(boardInfo);
             return boardInfo;
         }
 
@@ -93,34 +99,82 @@ public class Bot {
         // any eval that comes after is higher
         // If it is trying to minimize, the intial eval is set to the highest so that
         // any eval that comes after is lower
+
+
         int lastEval;
-        if (max) {
-            lastEval = -1000;
-        } else {
-            lastEval = 1000;
-        }
         int thisEval;
-        BoardInfo lastChild = null;
 
-        // Generates boards that come after this board.
-        BoardInfo[] children = generateBoards(boardInfo, max);
+        if(max){
+            lastEval = -1000;
+            // Generates boards that come after this board.
+            BoardInfo[] children = generateBoards(boardInfo, max);
+            //System.out.println("Children" + Arrays.toString(children));
 
-        BoardInfo boardToEvaluate;
-
-        for (BoardInfo child : children) {
+            for (BoardInfo child : children) {
             // Sorts through the children to find the highest or lowest one, returns the
             // highest/lowest.
-            boardToEvaluate = minimax(depth - 1, !max, child);
-            thisEval = boardToEvaluate.evaluate();
-            if ((max && thisEval > lastEval) || (!max && thisEval < lastEval)) {
-                lastEval = thisEval;
-                lastChild = boardToEvaluate;
+                boardToEvaluate = minimax(depth - 1, !max, child);
+                if (boardToEvaluate.evaluate > lastEval) {
+                    
+                }
             }
+        } else {
+            lastEval = +1000;
+            // Generates boards that come after this board.
+            BoardInfo[] children = generateBoards(boardInfo, max);
 
+            for (BoardInfo child : children) {
+            // Sorts through the children to find the highest or lowest one, returns the
+            // highest/lowest.
+
+                boardToEvaluate = minimax(depth - 1, !max, child);
+                thisEval = evaluate(boardToEvaluate);
+                if (thisEval < lastEval) {
+                    
+                }
+            }
         }
 
-        return lastChild;
 
+        return boardInfo;
+        
+    }
+
+    /**
+     * Method for evaluating the value of the board. Evaluating a board means to
+     * apply a value for it,
+     * this is used in the minimax algorithm.
+     * 
+     * @return an Integer represnting the score for this board.
+     */
+    public int evaluate(BoardInfo boardInfo) {
+        //black is maximizing colors
+        int score = 0; 
+
+        if(!isNotUnderCheck(boardInfo, true)){
+            score += 100;
+        } else if(!isNotUnderCheck(boardInfo, false)){
+            score -= 100;
+        }
+
+        for(int x = 0; x < 8; x++){
+            for(int y = 0; y < 8; y++){
+                byte id = boardInfo.board[x][y];
+                boolean color = ((id/16 == Constants.pieceIDs.BLACK) || id == Constants.pieceIDs.BLACK_PROMOTED_ROOK);
+                if(id == Constants.pieceIDs.EMPTY_CELL){
+                    continue;
+                }
+                if(color){
+                    score++;
+                } else {
+                    score--;
+                }
+
+            
+            }
+        }
+
+        return 0;
     }
 
     /**
@@ -133,14 +187,15 @@ public class Bot {
     private BoardInfo[] generateBoards(BoardInfo boardInfo, boolean color) {
         // TODO Akil finish this
         ArrayList<BoardInfo> generatedBoards = new ArrayList<BoardInfo>();
-        System.out.println("Color to generate for: " + ((color) ? "black" : "white"));
+        //System.out.println("Color to generate for: " + ((color) ? "black" : "white"));
 
         for (int x = 0; x < 8; x++) {
             for (int y = 0; y < 8; y++) {
                 byte id = boardInfo.board[x][y];
-                if ((id / 16 == Constants.pieceIDs.BLACK) == color
+                if ((
+                        ((id / 16 == Constants.pieceIDs.BLACK) == color)
                         || (color && id == Constants.pieceIDs.BLACK_PROMOTED_ROOK)
-                        || (!color && id == Constants.pieceIDs.WHITE_PROMOTED_ROOK)
+                        || (!color && id == Constants.pieceIDs.WHITE_PROMOTED_ROOK))
                                 && id != Constants.pieceIDs.EMPTY_CELL) {
                     // if the piece is the color it is generating for.
 
@@ -153,10 +208,7 @@ public class Bot {
                         // if the piece it is generating for is a rook
 
                         generatedBoards = movesRook(generatedBoards, boardInfo, x, y, color, id);
-                        System.out.println("Boards generated for rook " + id + ": " + generatedBoards.size());
-                        for (int i = 0; i < generatedBoards.size(); i++) {
-                            System.out.println(generatedBoards.get(i).previousMove);
-                        }
+                        //System.out.println("Boards generated for rook " + id + ": " + generatedBoards.size());
                     } else if (id == Constants.pieceIDs.BLACK_KINGS_BISHOP
                             || id == Constants.pieceIDs.BLACK_QUEENS_BISHOP
                             || id == Constants.pieceIDs.WHITE_QUEENS_BISHOP
@@ -165,37 +217,28 @@ public class Bot {
                         // if the piece it is generating for is a bishop
 
                         generatedBoards = movesBishop(generatedBoards, boardInfo, x, y, color, id);
-                        System.out.println("Boards generated for bishop " + id + ": " + generatedBoards.size());
-                        for (int i = 0; i < generatedBoards.size(); i++) {
-                            System.out.println(generatedBoards.get(i).previousMove);
-                        }
+                        //System.out.println("Boards generated for bishop " + id + ": " + generatedBoards.size());
 
                     } else if (id == Constants.pieceIDs.BLACK_QUEEN || id == Constants.pieceIDs.WHITE_QUEEN) {
                         // if the piece it is generating for is a queen
                         generatedBoards = movesRook(generatedBoards, boardInfo, x, y, color, id);
                         generatedBoards = movesBishop(generatedBoards, boardInfo, x, y, color, id);
-                        System.out.println("Boards generated for queen " + id + ": " + generatedBoards.size());
-                        for (int i = 0; i < generatedBoards.size(); i++) {
-                            System.out.println(generatedBoards.get(i).previousMove);
-                        }
+                        //System.out.println("Boards generated for queen " + id + ": " + generatedBoards.size());
                     } else if (id == Constants.pieceIDs.BLACK_KINGS_KNIGHT
                             || id == Constants.pieceIDs.BLACK_QUEENS_KNIGHT
                             || id == Constants.pieceIDs.WHITE_QUEENS_KNIGHT
                             || id == Constants.pieceIDs.WHITE_KINGS_KNIGHT) {
                         // if the piece it is generating for is a knight
                         generatedBoards = movesKnight(generatedBoards, boardInfo, x, y, color, id);
-                        System.out.println("Boards generated for kngiht " + id + ": " + generatedBoards.size());
-                        for (int i = 0; i < generatedBoards.size(); i++) {
-                            System.out.println(generatedBoards.get(i).previousMove);
-                        }
+                        //System.out.println("Boards generated for kngiht " + id + ": " + generatedBoards.size());
                     } else if (id == Constants.pieceIDs.BLACK_KING || id == Constants.pieceIDs.WHITE_KING) {
                         // if the piece it is generating for is a king
                         generatedBoards = movesKing(generatedBoards, boardInfo, x, y, color, id);
-                        System.out.println("Boards generated for king " + id + ": " + generatedBoards.size());
+                        //System.out.println("Boards generated for king " + id + ": " + generatedBoards.size());
                     } else {
                         // if the piece it is generating for is a pawn
                         generatedBoards = movesPawn(generatedBoards, boardInfo, x, y, color, id);
-                        System.out.println("Boards generated for pawn " + id + ": " + generatedBoards.size());
+                        //System.out.println("Boards generated for pawn " + id + ": " + generatedBoards.size());
                     }
 
                 }
@@ -899,8 +942,6 @@ public class Bot {
     private ArrayList<BoardInfo> movesPawn(ArrayList<BoardInfo> boards, BoardInfo initialBoard, int x, int y,
             boolean color, byte id) {
 
-        // TODO finish this method
-
         byte pawnDirection;
         byte enemyBeginRange;
         byte enemyEndRange;
@@ -1195,6 +1236,7 @@ public class Bot {
         // castling left
         if (!initialBoard.hasMoved[getHasMovedIndex(id)]
                 && !initialBoard.hasMoved[getHasMovedIndex(queensRook)]
+                && initialBoard.board[x-4][y] == queensRook
                 && initialBoard.board[x - 1][y] == Constants.pieceIDs.EMPTY_CELL
                 && initialBoard.board[x - 2][y] == Constants.pieceIDs.EMPTY_CELL
                 && initialBoard.board[x - 3][y] == Constants.pieceIDs.EMPTY_CELL) {
@@ -1213,10 +1255,12 @@ public class Bot {
                         // moves the castle to its new position, then clears its old position
                         newBoard.board[x - 1][y] = newBoard.board[0][y];
                         newBoard.board[0][y] = Constants.pieceIDs.EMPTY_CELL;
-                        newBoard.hasMoved[getHasMovedIndex(id)] = true;
-                        newBoard.hasMoved[getHasMovedIndex(queensRook)] = true;
-                        boards.add(newBoard);
-                        newBoard.setPreviousMove(Constants.moveTypes.CASTLE_LEFT + id + ".");
+                        if(isNotUnderCheck(newBoard, color)){
+                            newBoard.hasMoved[getHasMovedIndex(id)] = true;
+                            newBoard.hasMoved[getHasMovedIndex(queensRook)] = true;
+                            boards.add(newBoard);
+                            newBoard.setPreviousMove(Constants.moveTypes.CASTLE_LEFT + id + ".");
+                        }
                     }
                 }
             }
@@ -1226,6 +1270,7 @@ public class Bot {
         // castle right
         if (!initialBoard.hasMoved[getHasMovedIndex(id)]
                 && !initialBoard.hasMoved[getHasMovedIndex(kingsRook)]
+                && initialBoard.board[x + 3][y] == kingsRook
                 && initialBoard.board[x + 1][y] == Constants.pieceIDs.EMPTY_CELL
                 && initialBoard.board[x + 2][y] == Constants.pieceIDs.EMPTY_CELL) {
             // if no pieces are in the way and the king and castle have not moved
@@ -1243,10 +1288,12 @@ public class Bot {
                         // moves the castle to its new position, then clears its old position
                         newBoard.board[x + 1][y] = newBoard.board[7][y];
                         newBoard.board[0][y] = Constants.pieceIDs.EMPTY_CELL;
-                        newBoard.hasMoved[getHasMovedIndex(id)] = true;
-                        newBoard.hasMoved[getHasMovedIndex(kingsRook)] = true;
-                        boards.add(newBoard);
-                        newBoard.setPreviousMove(Constants.moveTypes.CASTLE_RIGHT + id + ".");
+                        if(isNotUnderCheck(newBoard, color)){
+                            newBoard.hasMoved[getHasMovedIndex(id)] = true;
+                            newBoard.hasMoved[getHasMovedIndex(kingsRook)] = true;
+                            boards.add(newBoard);
+                            newBoard.setPreviousMove(Constants.moveTypes.CASTLE_RIGHT + id + ".");
+                        }
                     }
                 }
             }
@@ -1330,11 +1377,17 @@ public class Bot {
      * @param id The id of the pawn.
      * @return The indexe where the passant value is stored at.
      */
-    private byte getPassantIndex(byte id) {
+    private int getPassantIndex(byte id) {
         // if the pawn is black, the index will be from 0-7, if the pawn is white the
         // index is from 8-15
+        /*
+        if(id < 16){
+            return (id-8);
+        } else {S
+            return (id-24)+8;
+        }*/
         byte index = (id / 16 == Constants.pieceIDs.BLACK) ? (byte) (id - 8) : (byte) (id - 24 + 8);
-        System.out.println("Pawn index for id: " + id + ", is " + index);
+        //System.out.println("Pawn index for id: " + id + ", is " + index);
         return index;
     }
 

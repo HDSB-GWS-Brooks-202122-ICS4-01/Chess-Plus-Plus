@@ -13,6 +13,7 @@ public class BoardInfo {
     boolean[] hasMoved;
     String previousMove;
     int moveCount;
+    int evaluate;
 
     byte whiteKingX;
     byte whiteKingY;
@@ -33,27 +34,18 @@ public class BoardInfo {
         this.board = board;
         this.passant = passant;
         this.hasMoved = hasMoved;
+        this.previousMove = "";
     }
     
     
     
-    /**
-     * Method for evaluating the value of the board. Evaluating a board means to
-     * apply a value for it,
-     * this is used in the minimax algorithm.
-     * 
-     * @return an Integer represnting the score for this board.
-     */
-    public int evaluate() {
-        return 0;
-    }
 
     /**
      * Method for deep copying a BoardInfo object. 
      * @return A new BoardInfo object that is a deep copy of the original. 
      */
     public BoardInfo copy(){
-        BoardInfo copy = new BoardInfo(deepCopy(board), Arrays.copyOf(passant, passant.length), Arrays.copyOf(hasMoved, hasMoved.length), moveCount);
+        BoardInfo copy = new BoardInfo(App.deepCopy(board), Arrays.copyOf(passant, passant.length), Arrays.copyOf(hasMoved, hasMoved.length), moveCount);
         copy.setKingPos(false, whiteKingX, whiteKingY);
         copy.setKingPos(true, blackKingX, blackKingY);
         return copy;
@@ -74,21 +66,7 @@ public class BoardInfo {
      * @param move The new string to set it to.
      */
     public void setPreviousMove(String move){
-        this.previousMove = move;
-
-    }
-
-    /**
-     * This method deep copies any two dimensional byte array, it is mainly meant to be used by the BoardInfo copy() method to create a deepcopy of the BoardInfo object. 
-     * @param original Original 2-d byte array to copy. 
-     * @return A new 2-d byte array containing all the same elements with no references to the original.
-     */
-    public byte[][] deepCopy(byte[][] original){
-        byte[][] newArray = new byte[original.length][original[0].length];
-        for(int i = 0; i < original.length; i++){
-            newArray[i] = Arrays.copyOf(original[i], original[i].length);
-        }
-        return newArray;
+        previousMove = previousMove + " " + move;
 
     }
 

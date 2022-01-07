@@ -16,6 +16,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
 
@@ -192,5 +193,19 @@ public class App extends Application {
 
     public static Stage getStage() {
         return stage;
+    }
+
+    /**
+     * This method deep copies any two dimensional byte array.
+     * @param original Original 2-d byte array to copy. 
+     * @return A new 2-d byte array containing all the same elements with no references to the original.
+     */
+    public static byte[][] deepCopy(byte[][] original){
+        byte[][] newArray = new byte[original.length][original[0].length];
+        for(int i = 0; i < original.length; i++){
+            newArray[i] = Arrays.copyOf(original[i], original[i].length);
+        }
+        return newArray;
+
     }
 }

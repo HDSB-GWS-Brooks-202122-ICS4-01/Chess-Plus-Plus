@@ -73,7 +73,7 @@ public class King extends Piece{
 
     public boolean canCastleLeft(byte[][] boardPositions){
         if(color == Constants.pieceIDs.WHITE){
-            if(!hasMoved && !App.GAME_PIECES[Constants.pieceIDs.WHITE_QUEENS_ROOK].hasMoved){
+            if(!hasMoved && !App.GAME_PIECES[Constants.pieceIDs.WHITE_QUEENS_ROOK].hasMoved && boardPositions[gridX-4][gridY] == Constants.pieceIDs.WHITE_QUEENS_ROOK){
                 if(boardPositions[gridX-1][gridY] == Constants.pieceIDs.EMPTY_CELL && boardPositions[gridX-2][gridY] == Constants.pieceIDs.EMPTY_CELL && boardPositions[gridX-3][gridY] == Constants.pieceIDs.EMPTY_CELL){
                     byte[] posRightNow = {gridX, gridY};
                     byte[] squareOne = {(byte) (gridX-1), gridY};
@@ -84,7 +84,7 @@ public class King extends Piece{
                 }
             }
         } else {
-            if(!hasMoved && !App.GAME_PIECES[Constants.pieceIDs.BLACK_QUEENS_ROOK].hasMoved){
+            if(!hasMoved && !App.GAME_PIECES[Constants.pieceIDs.BLACK_QUEENS_ROOK].hasMoved && boardPositions[gridX-4][gridY] == Constants.pieceIDs.BLACK_QUEENS_ROOK){
                 if(boardPositions[gridX-1][gridY] == Constants.pieceIDs.EMPTY_CELL && boardPositions[gridX-2][gridY] == Constants.pieceIDs.EMPTY_CELL && boardPositions[gridX-3][gridY] == Constants.pieceIDs.EMPTY_CELL){
                     byte[] posRightNow = {gridX, gridY};
                     byte[] squareOne = {(byte) (gridX-1), gridY};
@@ -100,7 +100,7 @@ public class King extends Piece{
 
     public boolean canCastleRight(byte[][] boardPositions){
         if(color == Constants.pieceIDs.WHITE){
-            if(!hasMoved && !App.GAME_PIECES[Constants.pieceIDs.WHITE_KINGS_ROOK].hasMoved){
+            if(!hasMoved && !App.GAME_PIECES[Constants.pieceIDs.WHITE_KINGS_ROOK].hasMoved && boardPositions[gridX+3][gridY] == Constants.pieceIDs.WHITE_KINGS_ROOK){
                 if(boardPositions[gridX+1][gridY] == Constants.pieceIDs.EMPTY_CELL && boardPositions[gridX+2][gridY] == Constants.pieceIDs.EMPTY_CELL){
                     byte[] posRightNow = {gridX, gridY};
                     byte[] squareOne = {(byte) (gridX+1), gridY};
@@ -111,7 +111,7 @@ public class King extends Piece{
                 }
             }
         } else {
-            if(!hasMoved && !App.GAME_PIECES[Constants.pieceIDs.BLACK_KINGS_ROOK].hasMoved){
+            if(!hasMoved && !App.GAME_PIECES[Constants.pieceIDs.BLACK_KINGS_ROOK].hasMoved  && boardPositions[gridX+3][gridY] == Constants.pieceIDs.BLACK_KINGS_ROOK){
                 if(boardPositions[gridX+1][gridY] == Constants.pieceIDs.EMPTY_CELL && boardPositions[gridX+2][gridY] == Constants.pieceIDs.EMPTY_CELL){
                     byte[] posRightNow = {gridX, gridY};
                     byte[] squareOne = {(byte) (gridX+1), gridY};

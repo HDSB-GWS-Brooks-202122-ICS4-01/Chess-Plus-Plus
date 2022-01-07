@@ -16,7 +16,7 @@ public class Pawn extends Piece {
 
         // 0 if the color is black, 1 if the color isn't black
         this.color = (byte) (id / 16);
-        
+
         this.sprite = new ImageView(App.getSpritesheet());
         if (this.color == 0) {
             // if the colour is black put a black pawn
@@ -43,30 +43,33 @@ public class Pawn extends Piece {
         if (color == Constants.pieceIDs.BLACK) {
             // if the pawn can move forward
             if (boardPositions[gridX][gridY + 1] == Constants.pieceIDs.EMPTY_CELL && gridY + 1 < 8) {
-                byte[] forwardMove = {gridX, (byte) (gridY+1)};
-                if(isNotUnderCheck(boardPositions, forwardMove, false)){
+                byte[] forwardMove = { gridX, (byte) (gridY + 1) };
+                if (isNotUnderCheck(boardPositions, forwardMove, false)) {
                     possibleMoves.add(forwardMove);
                 }
                 // if the pawn is at its starting position on the board.
-                if (gridX == Constants.boardData.INITIAL_POSITIONS[id][0] && gridY == Constants.boardData.INITIAL_POSITIONS[this.id][1] && gridY + 2 < 8 && boardPositions[gridX][gridY + 2] == Constants.pieceIDs.EMPTY_CELL) {
+                if (gridX == Constants.boardData.INITIAL_POSITIONS[id][0]
+                        && gridY == Constants.boardData.INITIAL_POSITIONS[this.id][1] && gridY + 2 < 8
+                        && boardPositions[gridX][gridY + 2] == Constants.pieceIDs.EMPTY_CELL) {
                     byte[] doubleForwardMove = { gridX, (byte) (gridY + 2) };
-                    if(isNotUnderCheck(boardPositions, doubleForwardMove, false)){
+                    if (isNotUnderCheck(boardPositions, doubleForwardMove, false)) {
                         possibleMoves.add(doubleForwardMove);
-                    }      
+                    }
                 }
 
             }
 
-
-            if(gridX-1 > -1 && gridY + 1 < 8 && (byte) boardPositions[gridX-1][gridY+1]/16 == Constants.pieceIDs.WHITE){
-                byte[] attackLeft = {(byte) (gridX-1), (byte) (gridY+1)};
-                if(isNotUnderCheck(boardPositions, attackLeft, false)){
+            if (gridX - 1 > -1 && gridY + 1 < 8
+                    && (byte) boardPositions[gridX - 1][gridY + 1] / 16 == Constants.pieceIDs.WHITE) {
+                byte[] attackLeft = { (byte) (gridX - 1), (byte) (gridY + 1) };
+                if (isNotUnderCheck(boardPositions, attackLeft, false)) {
                     possibleMoves.add(attackLeft);
                 }
             }
-            if(gridX+1 <8 && gridY + 1 < 8 && (byte) boardPositions[gridX+1][gridY+1]/16 == Constants.pieceIDs.WHITE){
-                byte[] attackRight = {(byte) (gridX+1), (byte) (gridY+1)};
-                if(isNotUnderCheck(boardPositions, attackRight, false)){
+            if (gridX + 1 < 8 && gridY + 1 < 8
+                    && (byte) boardPositions[gridX + 1][gridY + 1] / 16 == Constants.pieceIDs.WHITE) {
+                byte[] attackRight = { (byte) (gridX + 1), (byte) (gridY + 1) };
+                if (isNotUnderCheck(boardPositions, attackRight, false)) {
                     possibleMoves.add(attackRight);
                 }
             }
@@ -74,37 +77,38 @@ public class Pawn extends Piece {
         } else {
             if (boardPositions[gridX][gridY - 1] == Constants.pieceIDs.EMPTY_CELL && gridY - 1 > -1) {
                 byte[] forwardMove = { gridX, (byte) (gridY - 1) };
-                if(isNotUnderCheck(boardPositions, forwardMove, false)){
+                if (isNotUnderCheck(boardPositions, forwardMove, false)) {
                     possibleMoves.add(forwardMove);
                 }
                 // if the pawn is at its starting position on the board.
-                if (gridX == Constants.boardData.INITIAL_POSITIONS[id][0] && gridY == Constants.boardData.INITIAL_POSITIONS[this.id][1] && gridY - 2 > -1 && boardPositions[gridX][gridY - 2] == Constants.pieceIDs.EMPTY_CELL) {
+                if (gridX == Constants.boardData.INITIAL_POSITIONS[id][0]
+                        && gridY == Constants.boardData.INITIAL_POSITIONS[this.id][1] && gridY - 2 > -1
+                        && boardPositions[gridX][gridY - 2] == Constants.pieceIDs.EMPTY_CELL) {
                     byte[] doubleForwardMove = { gridX, (byte) (gridY - 2) };
-                    if(isNotUnderCheck(boardPositions, doubleForwardMove, false)){
+                    if (isNotUnderCheck(boardPositions, doubleForwardMove, false)) {
                         possibleMoves.add(doubleForwardMove);
-                    }      
+                    }
                 }
             }
 
-   
-            if(gridX-1 > -1 && gridY - 1 > -1 && (byte) boardPositions[gridX-1][gridY-1] != Constants.pieceIDs.EMPTY_CELL && boardPositions[gridX-1][gridY-1]/16 == Constants.pieceIDs.BLACK){
-                byte[] attackLeft = {(byte) (gridX-1), (byte) (gridY-1)};
-                if(isNotUnderCheck(boardPositions, attackLeft, false)){
+            if (gridX - 1 > -1 && gridY - 1 > -1
+                    && (byte) boardPositions[gridX - 1][gridY - 1] != Constants.pieceIDs.EMPTY_CELL
+                    && boardPositions[gridX - 1][gridY - 1] / 16 == Constants.pieceIDs.BLACK) {
+                byte[] attackLeft = { (byte) (gridX - 1), (byte) (gridY - 1) };
+                if (isNotUnderCheck(boardPositions, attackLeft, false)) {
                     possibleMoves.add(attackLeft);
                 }
             }
-            if(gridX+1 <8 && gridY - 1 > -1 && (byte) boardPositions[gridX+1][gridY-1] != Constants.pieceIDs.EMPTY_CELL && boardPositions[gridX+1][gridY-1]/16 == Constants.pieceIDs.BLACK){
-                byte[] attackRight = {(byte) (gridX+1), (byte) (gridY-1)};
-                if(isNotUnderCheck(boardPositions, attackRight, false)){
+            if (gridX + 1 < 8 && gridY - 1 > -1
+                    && (byte) boardPositions[gridX + 1][gridY - 1] != Constants.pieceIDs.EMPTY_CELL
+                    && boardPositions[gridX + 1][gridY - 1] / 16 == Constants.pieceIDs.BLACK) {
+                byte[] attackRight = { (byte) (gridX + 1), (byte) (gridY - 1) };
+                if (isNotUnderCheck(boardPositions, attackRight, false)) {
                     possibleMoves.add(attackRight);
                 }
             }
 
         }
-
-
-
-
 
         byte[][] moves = new byte[possibleMoves.size()][];
 
@@ -119,20 +123,75 @@ public class Pawn extends Piece {
         return moves;
     }
 
+    public boolean canPassantLeft(byte pawnLeft, byte[][] boardPositions) {
+        if (color == Constants.pieceIDs.BLACK) {
+            if (pawnLeft > 23 && pawnLeft < 32
+                    && ((Pawn) App.GAME_PIECES[pawnLeft]).getPassant() == App.MOVE_COUNT - 1 && gridY + 1 < 8) {
+                        byte[][] newBoardPositions = App.deepCopy(boardPositions);
+                        newBoardPositions[gridX-1][gridY] = Constants.pieceIDs.EMPTY_CELL;
+                        byte[] attackSquare = {(byte) (gridX-1), (byte) (gridY+1)};
+                        if(isNotUnderCheck(newBoardPositions, attackSquare, false)){
+                            return true;
+                        }
+                }
+        } else {
+            if (pawnLeft > 7 && pawnLeft < 16
+                    && ((Pawn) App.GAME_PIECES[pawnLeft]).getPassant() == App.MOVE_COUNT - 1 && gridY - 1 > -1) {
+                        byte[][] newBoardPositions = App.deepCopy(boardPositions);
+                        newBoardPositions[gridX-1][gridY] = Constants.pieceIDs.EMPTY_CELL;
+                        byte[] attackSquare = {(byte) (gridX-1), (byte) (gridY-1)};
+                        if(isNotUnderCheck(newBoardPositions, attackSquare, false)){
+                            return true;
+                        }
+            }
+        }
+
+        return false;
+    }
+
+    public boolean canPassantRight(byte pawnRight, byte[][] boardPositions) {
+        if (color == Constants.pieceIDs.BLACK) {
+            if (pawnRight > 23 && pawnRight < 32
+                    && ((Pawn) App.GAME_PIECES[pawnRight]).getPassant() == App.MOVE_COUNT - 1 && gridY + 1 < 8) {
+                        byte[][] newBoardPositions = App.deepCopy(boardPositions);
+                        newBoardPositions[gridX+1][gridY] = Constants.pieceIDs.EMPTY_CELL;
+                        byte[] attackSquare = {(byte) (gridX+1), (byte) (gridY+1)};
+                        if(isNotUnderCheck(newBoardPositions, attackSquare, false)){
+                            System.out.println("Not under check");
+                            return true;
+                        }
+                }
+        } else {
+            if (pawnRight > 7 && pawnRight < 16
+                    && ((Pawn) App.GAME_PIECES[pawnRight]).getPassant() == App.MOVE_COUNT - 1 && gridY - 1 > -1) {
+                        byte[][] newBoardPositions = App.deepCopy(boardPositions);
+                        newBoardPositions[gridX+1][gridY] = Constants.pieceIDs.EMPTY_CELL;
+                        byte[] attackSquare = {(byte) (gridX+1), (byte) (gridY-1)};
+                        if(isNotUnderCheck(boardPositions, attackSquare, false)){
+                            System.out.println("not under check");
+                            return true;
+                        }
+            }
+        }
+        return false;
+
+    }
+
     /**
-     * Method for setting the passant value of a pawn. 
+     * Method for setting the passant value of a pawn.
      * 
      * @param num New number to set the passant value to.
      */
-    public void setPassant(int num){
+    public void setPassant(int num) {
         this.passant = num;
     }
 
     /**
      * Method for getting the passant value of a pawn.
-     * @return an integer, representing the passant value. 
+     * 
+     * @return an integer, representing the passant value.
      */
-    public int getPassant(){
+    public int getPassant() {
         return this.passant;
     }
 
