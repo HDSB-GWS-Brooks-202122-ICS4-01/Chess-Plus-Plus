@@ -6,6 +6,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
 import com.google.firebase.cloud.StorageClient;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -209,7 +210,6 @@ public class StartScreenController {
                 .getReference("servers");
 
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
-            byte turn;
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 boolean foundServer = false;
@@ -217,26 +217,70 @@ public class StartScreenController {
                 if (dataSnapshot.getChildrenCount() == 1) {
                     DatabaseReference newRef = ref.push();
 
-                    newRef.child("connected1").setValueAsync(config.getProperty("UID"));
-                    newRef.child("connected2").setValueAsync("null");
-                    newRef.child("matchBegun").setValueAsync("false");
-                    newRef.child("turn").setValueAsync(0);
-                    turn = 0;
+                    DatabaseReference user1 = newRef.child("USER " + config.getProperty("UID"));
+                    user1.child("turn").setValueAsync("true");
+                    user1.child("timer").setValueAsync(600000);
+
+                    newRef.child("matchBegun").setValueAsync(false);
+                    newRef.child("move").setValueAsync("");
+
+                    newRef.addChildEventListener(new ChildEventListener() {
+
+                        @Override
+                        public void onChildAdded(DataSnapshot snapshot, String previousChildName) {
+                            // TODO Auto-generated method stub
+                            String key = snapshot.getKey();
+
+                            if (key.contains("USER") && !key.contains(config.getProperty("UID"))) {
+                                App.setServerReference(newRef);
+                                App.setGameMode(Constants.boardData.MODE_ONLINE);
+                                transition("game");
+
+                                newRef.child("matchBegun").setValueAsync(true);
+                            }
+                        }
+
+                        @Override
+                        public void onChildChanged(DataSnapshot snapshot, String previousChildName) {
+                            // TODO Auto-generated method stub
+
+                        }
+
+                        @Override
+                        public void onChildRemoved(DataSnapshot snapshot) {
+                            // TODO Auto-generated method stub
+
+                        }
+
+                        @Override
+                        public void onChildMoved(DataSnapshot snapshot, String previousChildName) {
+                            // TODO Auto-generated method stub
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError error) {
+                            // TODO Auto-generated method stub
+
+                        }
+
+                    });
                 }
 
                 for (DataSnapshot server : dataSnapshot.getChildren()) {
-                    boolean matchBegun = Boolean.parseBoolean((String)server.child("matchBegun").getValue());
+                    boolean matchBegun = (Boolean) server.child("matchBegun").getValue();
 
                     if (matchBegun)
                         continue;
 
-                    String connected2 = (String)server.child("connected2").getValue();
+                    DatabaseReference user2 = server.getRef().child("USER " + config.getProperty("UID"));
 
-                    if (connected2.equalsIgnoreCase("null")) {
-                        DatabaseReference serverRef = server.getRef();
-                        
-                        serverRef.push().child("connected2").setValueAsync(config.getProperty("UID"));
-                    }
+                    user2.child("turn").setValueAsync("false");
+                    user2.child("timer").setValueAsync(600000);
+
+                    App.setServerReference(server.getRef());
+                    App.setGameMode(Constants.boardData.MODE_ONLINE);
+                    transition("game");
                 }
             }
 
@@ -244,8 +288,6 @@ public class StartScreenController {
             public void onCancelled(DatabaseError error) {
             }
         });
-
-        
     }
 
     /**

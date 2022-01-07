@@ -47,11 +47,15 @@ public class GameController {
    @FXML
    VBox vb_gameover;
 
-   private Board board;
+   private Board board = null;
+   private OnlineBoard oBoard = null;
 
    @FXML
    public void initialize() throws FirebaseAuthException {
-      board = new Board(this, new GridPane[] { gp_board, gp_blackDeadCells, gp_whiteDeadCells }, App.getGameMode());
+      if (App.getGameMode() != Constants.boardData.MODE_ONLINE)
+         board = new Board(this, new GridPane[] { gp_board, gp_blackDeadCells, gp_whiteDeadCells }, App.getGameMode());
+      else
+         oBoard = new OnlineBoard(this, new GridPane[] { gp_board, gp_blackDeadCells, gp_whiteDeadCells });
 
       if (config.getProperty("signedIn").equalsIgnoreCase("t")) {
          UserRecord userRecord = FirebaseAuth.getInstance().getUser(config.getProperty("UID"));
