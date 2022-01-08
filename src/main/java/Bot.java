@@ -65,8 +65,9 @@ public class Bot {
         boardInfo.setKingPos(false, App.GAME_PIECES[Constants.pieceIDs.WHITE_KING].gridX,
                 App.GAME_PIECES[Constants.pieceIDs.WHITE_KING].gridY);
 
+
         BoardInfo calculated = minimax(depth, black, boardInfo);
-        System.out.println("Evaluation: " + evaluate(calculated));
+        System.out.println("Move: " + calculated.previousMove);
         return calculated.previousMove;
     }
 

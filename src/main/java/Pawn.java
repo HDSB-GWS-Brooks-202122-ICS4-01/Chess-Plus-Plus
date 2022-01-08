@@ -157,7 +157,6 @@ public class Pawn extends Piece {
                         newBoardPositions[gridX+1][gridY] = Constants.pieceIDs.EMPTY_CELL;
                         byte[] attackSquare = {(byte) (gridX+1), (byte) (gridY+1)};
                         if(isNotUnderCheck(newBoardPositions, attackSquare, false)){
-                            System.out.println("Not under check");
                             return true;
                         }
                 }
@@ -168,7 +167,6 @@ public class Pawn extends Piece {
                         newBoardPositions[gridX+1][gridY] = Constants.pieceIDs.EMPTY_CELL;
                         byte[] attackSquare = {(byte) (gridX+1), (byte) (gridY-1)};
                         if(isNotUnderCheck(boardPositions, attackSquare, false)){
-                            System.out.println("not under check");
                             return true;
                         }
             }

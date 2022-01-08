@@ -10,7 +10,12 @@ import java.util.Map;
 import java.util.Scanner;
 
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.core.view.Change;
 
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -494,36 +499,54 @@ public class Board {
       System.out.println("Next turn: " + turn);
 
       if (GAME_MODE == Constants.boardData.MODE_AI) {
-         //Bot.BoardInteractions bi = bot.BI.parseAiMove(bot.getMove(GRID, DEAD_PIECES));
-         playAi(bot.getMove(GRID, DEAD_PIECES));
+         // Bot.BoardInteractions bi = bot.BI.parseAiMove(bot.getMove(GRID,
+         // DEAD_PIECES));
+         Task<String> move = new Task<String>() {
+
+            @Override
+            protected String call() throws Exception {
+               // TODO Auto-generated method stub
+               return bot.getMove(GRID, DEAD_PIECES);
+            }
+
+         };
+         // bot.getMove(GRID, DEAD_PIECES);
       }
    }
 
    private void playAi(String move) {
       // TODO Need way of fetching promoted piece data
-      switch(move.charAt(0)){
-         case 'R':
-            int endFrom = (move.charAt(3) == '.') ? 3 : 4;
-            Piece piece = GAME_PIECES[Integer.parseInt(move.substring(2,endFrom))];
+      move = move.substring(1);
+      switch (move.substring(0, 1)) {
+         case Constants.moveTypes.REGULAR:
+            System.out.println("Plays regular  move");
+            int endFrom = (move.charAt(3) == 'f') ? 3 : 2;
+            Piece piece = GAME_PIECES[Integer.parseInt(move.substring(1, endFrom))];
+            System.out.println("Piece id: " + piece.getId());
             piece.hasMoved = true;
-            byte x = Byte.parseByte(move.substring(endFrom+1, endFrom+2));
-            byte y = Byte.parseByte(move.substring(endFrom+1, endFrom+2));
+            byte x = Byte.parseByte(move.substring(endFrom + 4, endFrom + 5));
+            byte y = Byte.parseByte(move.substring(endFrom + 5, endFrom + 6));
+            System.out.println("about to try moving");
             movePiece(piece, piece.getGridX(), piece.getGridY(), x, y, false);
             nextTurn();
+            System.out.println("finished trying");
             break;
-         case 'C':
+         case Constants.moveTypes.CASTLE_RIGHT:
+            // castle right
             break;
-         case 'c':
+         case Constants.moveTypes.CASTLE_LEFT:
+            // castle left
             break;
-         case 'e':
+         case Constants.moveTypes.PASSANT_RIGHT:
             break;
-         case 'E':
+         case Constants.moveTypes.PASSANT_LEFT:
             break;
-         case 'P':
+         case Constants.moveTypes.PROMOTION:
             break;
-         case 'I':
+         case Constants.moveTypes.NO_MOVES:
             break;
-         
+         default:
+            return;
       }
    }
 
@@ -571,46 +594,36 @@ public class Board {
             setCastleMoveMouseClicked(s_rightCastle, piece, piece.getColor(), false);
             POSSIBLE_MOVES.add(s_rightCastle);
          }
-      } else if ((piece.getId() > 7 && piece.getId() < 16) || (piece.getId() > 23 && piece.getId() < 32)) {
-         pawn = (Pawn) piece;
+      } else if ((piece.getId() > Constants.pieceIDs.BEGIN_BLACK_PAWNS
+            && piece.getId() < Constants.pieceIDs.END_BLACK_PAWNS)
+            || (piece.getId() > Constants.pieceIDs.BEGIN_WHITE_PAWNS
+                  && piece.getId() < Constants.pieceIDs.END_WHITE_PAWNS)) {
+                     //logic for en passant
 
-         // gets the id of the piece to the right and left
-         // makes sure it can check to the left
-         byte pawnLeft = (pawn.gridX - 1 > -1) ? GRID[piece.gridX - 1][piece.gridY] : -1;
-         byte pawnRight = (pawn.gridX + 1 < 8) ? GRID[piece.gridX + 1][piece.gridY] : -1;
+                     //if the piece is a pawn
+                     pawn = (Pawn) piece;
 
-         if ((pawnLeft > 7 && pawnLeft < 16) || (pawnLeft > 23 && pawnLeft < 32)) {
-            if (pawn.getColor() == Constants.pieceIDs.BLACK && pawn.canPassantLeft(pawnLeft, GRID)) {
-               StackPane s_leftPawn = CELLS[pawn.gridX - 1][pawn.gridY + 1];
-               s_leftPawn.getStyleClass().add("cell-enemy");
-               setPassantMoveMouseClicked(s_leftPawn, pawn, (Pawn) GAME_PIECES[pawnLeft]);
-               POSSIBLE_MOVES.add(s_leftPawn);
-               
-            } else if(pawn.getColor() == Constants.pieceIDs.WHITE && pawn.canPassantLeft(pawnLeft, GRID)){
-               StackPane s_leftPawn = CELLS[pawn.gridX - 1][pawn.gridY - 1];
-               s_leftPawn.getStyleClass().add("cell-enemy");
-               setPassantMoveMouseClicked(s_leftPawn, pawn, (Pawn) GAME_PIECES[pawnLeft]);
-               POSSIBLE_MOVES.add(s_leftPawn);
+                     // gets the id of the piece to the right and left
+                     // makes sure it can check to the left and can check to the right
+                     byte pawnLeft = (pawn.gridX - 1 > -1) ? GRID[piece.gridX - 1][piece.gridY] : -1;
+                     byte pawnRight = (pawn.gridX + 1 < 8) ? GRID[piece.gridX + 1][piece.gridY] : -1;
 
-            }
-            System.out.println("piece to the left is a pawn");
-         }
+                     int pawnDirection = (pawn.getColor() == Constants.pieceIDs.BLACK) ? 1 : -1;
 
-         if ((pawnRight > 7 && pawnRight < 16) || (pawnRight > 23 && pawnRight < 32)) {
-            if (pawn.getColor() == Constants.pieceIDs.BLACK && pawn.canPassantLeft(pawnLeft, GRID)) {
-               StackPane s_rightPawn = CELLS[pawn.gridX + 1][pawn.gridY + 1];
-               s_rightPawn.getStyleClass().add("cell-enemy");
-               setPassantMoveMouseClicked(s_rightPawn, pawn, (Pawn) GAME_PIECES[pawnRight]);
-               POSSIBLE_MOVES.add(s_rightPawn);
-            } else if( pawn.getColor() == Constants.pieceIDs.WHITE && pawn.canPassantLeft(pawnLeft, GRID)){
-               StackPane s_rightPawn = CELLS[pawn.gridX + 1][pawn.gridY - 1];
-               s_rightPawn.getStyleClass().add("cell-enemy");
-               setPassantMoveMouseClicked(s_rightPawn, pawn, (Pawn) GAME_PIECES[pawnRight]);
-               POSSIBLE_MOVES.add(s_rightPawn);
+                     if(pawn.canPassantRight(pawnRight, GRID)){
+                        StackPane s_rightPawn = CELLS[pawn.gridX + 1][pawn.gridY + 1*pawnDirection];
+                        s_rightPawn.getStyleClass().add("cell-enemy");
+                        setPassantMoveMouseClicked(s_rightPawn, pawn, (Pawn) GAME_PIECES[pawnRight]);
+                        POSSIBLE_MOVES.add(s_rightPawn);
+                     }
 
-            }
-            System.out.println("piece to the right is a pawn");
-         }
+                     if (pawn.canPassantLeft(pawnLeft, GRID)) {
+                        StackPane s_leftPawn = CELLS[pawn.gridX - 1][pawn.gridY + 1*pawnDirection];
+                        s_leftPawn.getStyleClass().add("cell-enemy");
+                        setPassantMoveMouseClicked(s_leftPawn, pawn, (Pawn) GAME_PIECES[pawnLeft]);
+                        POSSIBLE_MOVES.add(s_leftPawn);
+
+                     }
 
       }
 
@@ -969,11 +982,35 @@ public class Board {
    }
 
    public void devRequest(byte request) {
-      System.out.println(1);
       switch (request) {
          case Constants.Dev.GET_AI_MOVES:
-            Bot.BoardInteractions bi = bot.BI.parseAiMove(bot.getMove(GRID, DEAD_PIECES));
-            System.out.println(Arrays.toString(bi.getMove()));
+            Task<String> move = new Task<String>() {
+
+               @Override
+               protected String call() throws Exception {
+                  return bot.getMove(GRID, DEAD_PIECES);
+               }
+
+            };
+
+            move.valueProperty();
+            ChangeListener<String> listener = new ChangeListener<String>() {
+
+               @Override
+               public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                  move.valueProperty().removeListener(this);
+                  playAi(move.getValue());
+               }
+
+            };
+            move.valueProperty().addListener(listener);
+
+            Thread botThread = new Thread(move);
+            botThread.setDaemon(false);
+            botThread.start();
+            // Bot.BoardInteractions bi = bot.BI.parseAiMove(bot.getMove(GRID,
+            // DEAD_PIECES));
+            // System.out.println(Arrays.toString(bi.getMove()));
             break;
       }
    }
