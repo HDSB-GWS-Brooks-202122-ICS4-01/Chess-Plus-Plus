@@ -13,7 +13,7 @@ public class Bishop extends Piece{
     public Bishop(Byte id) {
         this.id = id;
         setType();
-        this.color = (byte) (id / 16);
+        this.color = (byte) (id / Constants.pieceIDs.COLOR_DIVISOR);
         this.sprite = new ImageView(App.getSpritesheet());
         if (this.color == 0) {
             // if the colour is black put a black pawn
@@ -80,7 +80,7 @@ public class Bishop extends Piece{
                 }
                 return upRightDiagonalMoves(possibleMoves, boardPositions, possibleMove);
             } else {
-                if(upRightSquare/16 != color){
+                if(upRightSquare/Constants.pieceIDs.COLOR_DIVISOR != color){
                     if(isNotUnderCheck(boardPositions, possibleMove, false)){
                         possibleMoves.add(possibleMove);
                     }
@@ -115,7 +115,7 @@ public class Bishop extends Piece{
                 }
                 return upLeftDiagonalMoves(possibleMoves, boardPositions, possibleMove);
             } else {
-                if(upRightSquare/16 != color){
+                if(upRightSquare/Constants.pieceIDs.COLOR_DIVISOR != color){
                     if(isNotUnderCheck(boardPositions, possibleMove, false)){
                         possibleMoves.add(possibleMove);
                     }
@@ -149,7 +149,7 @@ public class Bishop extends Piece{
                 }
                 return downRightDiagonalMoves(possibleMoves, boardPositions, possibleMove);
             } else {
-                if(upRightSquare/16 != color){
+                if(upRightSquare/Constants.pieceIDs.COLOR_DIVISOR != color){
                     if(isNotUnderCheck(boardPositions, possibleMove, false)){
                         possibleMoves.add(possibleMove);
                     }
@@ -183,7 +183,7 @@ public class Bishop extends Piece{
                 }
                 return downLeftDiagonalMoves(possibleMoves, boardPositions, possibleMove);
             } else {
-                if(upRightSquare/16 != color){
+                if(upRightSquare/Constants.pieceIDs.COLOR_DIVISOR != color){
                     if(isNotUnderCheck(boardPositions, possibleMove, false)){
                         possibleMoves.add(possibleMove);
                     }

@@ -132,13 +132,11 @@ public class OnlineBoard {
       SERVER_REF.child("move").addValueEventListener(new ValueEventListener() {
          @Override
          public void onCancelled(DatabaseError error) {
-            // TODO Auto-generated method stub
 
          }
 
          @Override
          public void onDataChange(DataSnapshot snapshot) {
-            // TODO Auto-generated method stub
             String value = (String) snapshot.getValue();
             System.out.println("Move Value: " + value);
 

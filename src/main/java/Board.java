@@ -58,7 +58,7 @@ public class Board {
          new HashMap<String, String>() };
    private byte winner;
 
-   private final Bot bot = new Bot(App.getDiff(), false);
+   private final Bot bot = new Bot(App.getDiff(), true);
    private final DatabaseReference SERVER_REF;
 
    private final byte GAME_MODE;
@@ -494,12 +494,37 @@ public class Board {
       System.out.println("Next turn: " + turn);
 
       if (GAME_MODE == Constants.boardData.MODE_AI) {
-         Bot.BoardInteractions bi = bot.BI.parseAiMove(bot.getMove(GRID, DEAD_PIECES));
-         playAi(bi.getMovedPiece(), bi.getMove());
+         //Bot.BoardInteractions bi = bot.BI.parseAiMove(bot.getMove(GRID, DEAD_PIECES));
+         playAi(bot.getMove(GRID, DEAD_PIECES));
       }
    }
 
-   private void playAi(Piece piece, byte[] move) {
+   private void playAi(String move) {
+      // TODO Need way of fetching promoted piece data
+      switch(move.charAt(0)){
+         case 'R':
+            int endFrom = (move.charAt(3) == '.') ? 3 : 4;
+            Piece piece = GAME_PIECES[Integer.parseInt(move.substring(2,endFrom))];
+            piece.hasMoved = true;
+            byte x = Byte.parseByte(move.substring(endFrom+1, endFrom+2));
+            byte y = Byte.parseByte(move.substring(endFrom+1, endFrom+2));
+            movePiece(piece, piece.getGridX(), piece.getGridY(), x, y, false);
+            nextTurn();
+            break;
+         case 'C':
+            break;
+         case 'c':
+            break;
+         case 'e':
+            break;
+         case 'E':
+            break;
+         case 'P':
+            break;
+         case 'I':
+            break;
+         
+      }
    }
 
    /**
@@ -591,12 +616,12 @@ public class Board {
 
       System.out.println(Arrays.toString(moves));
       // Loop through the moves
-      for (byte i = 0; i < moves.length; i++) {
+      for (int i = 0; i < moves.length; i++) {
          final byte x = moves[i][0];
          final byte y = moves[i][1];
 
          // Get instance of CELLS at specified indexes
-         StackPane sp_move = CELLS[moves[i][0]][moves[i][1]];
+         StackPane sp_move = CELLS[x][y];
          // Add a css style class
          if (sp_move.getChildren().size() == 0) {
             sp_move.getStyleClass().add("cell-move");

@@ -23,7 +23,7 @@ public class Rook extends Piece {
         }else if(this.id == Constants.pieceIDs.WHITE_PROMOTED_ROOK){
             this.color = 1;
         }else {
-            this.color = (byte) (id / 16);
+            this.color = (byte) (id / Constants.pieceIDs.COLOR_DIVISOR);
         }
         this.sprite = new ImageView(App.getSpritesheet());
         if (this.color == 0) {
@@ -86,7 +86,7 @@ public class Rook extends Piece {
                 }
                 return upMoves(possibleMoves, boardPositions, possibleMove);
             } else {
-                if (upSquare / 16 != color) {
+                if (upSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
                     if(isNotUnderCheck(boardPositions, possibleMove, false)){
                         possibleMoves.add(possibleMove);
                     }
@@ -119,7 +119,7 @@ public class Rook extends Piece {
                 }
                 return downMoves(possibleMoves, boardPositions, possibleMove);
             } else {
-                if (upSquare / 16 != color) {
+                if (upSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
                     if(isNotUnderCheck(boardPositions, possibleMove, false)){
                         possibleMoves.add(possibleMove);
                     }
@@ -151,7 +151,7 @@ public class Rook extends Piece {
                 }
                 return leftMoves(possibleMoves, boardPositions, possibleMove);
             } else {
-                if (upSquare / 16 != color) {
+                if (upSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
                     if(isNotUnderCheck(boardPositions, possibleMove, false)){
                         possibleMoves.add(possibleMove);
                     }
@@ -183,7 +183,7 @@ public class Rook extends Piece {
                 }
                 return rightMoves(possibleMoves, boardPositions, possibleMove);
             } else {
-                if (upSquare / 16 != color) {
+                if (upSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
                     if(isNotUnderCheck(boardPositions, possibleMove, false)){
                         possibleMoves.add(possibleMove);
                     }

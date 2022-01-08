@@ -17,7 +17,7 @@ public class Knight extends Piece{
     public Knight(Byte id) {
         this.id = id;
         setType();
-        this.color = (byte) (id / 16);
+        this.color = (byte) (id / Constants.pieceIDs.COLOR_DIVISOR);
         this.sprite = new ImageView(App.getSpritesheet());
         if (this.color == 0) {
             // if the colour is black put a black pawn
@@ -53,7 +53,7 @@ public class Knight extends Piece{
         };
 
         for(byte[] move : moveList){
-            if(inBoardRange(move) && (boardPositions[move[0]][move[1]] == Constants.pieceIDs.EMPTY_CELL || boardPositions[move[0]][move[1]]/16 != color)){
+            if(inBoardRange(move) && (boardPositions[move[0]][move[1]] == Constants.pieceIDs.EMPTY_CELL || boardPositions[move[0]][move[1]]/Constants.pieceIDs.COLOR_DIVISOR != color)){
                 if(isNotUnderCheck(boardPositions, move,false)){
                     possibleMoves.add(move);
                 }

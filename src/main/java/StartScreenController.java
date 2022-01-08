@@ -229,7 +229,6 @@ public class StartScreenController {
 
                         @Override
                         public void onChildAdded(DataSnapshot snapshot, String previousChildName) {
-                            // TODO Auto-generated method stub
                             String key = snapshot.getKey();
 
                             if (key.contains("USER") && !key.contains(config.getProperty("UID"))) {
@@ -243,25 +242,21 @@ public class StartScreenController {
 
                         @Override
                         public void onChildChanged(DataSnapshot snapshot, String previousChildName) {
-                            // TODO Auto-generated method stub
 
                         }
 
                         @Override
                         public void onChildRemoved(DataSnapshot snapshot) {
-                            // TODO Auto-generated method stub
 
                         }
 
                         @Override
                         public void onChildMoved(DataSnapshot snapshot, String previousChildName) {
-                            // TODO Auto-generated method stub
 
                         }
 
                         @Override
                         public void onCancelled(DatabaseError error) {
-                            // TODO Auto-generated method stub
 
                         }
 

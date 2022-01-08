@@ -15,7 +15,7 @@ public class Pawn extends Piece {
         setType();
 
         // 0 if the color is black, 1 if the color isn't black
-        this.color = (byte) (id / 16);
+        this.color = (byte) (id / Constants.pieceIDs.COLOR_DIVISOR);
 
         this.sprite = new ImageView(App.getSpritesheet());
         if (this.color == 0) {
@@ -60,14 +60,14 @@ public class Pawn extends Piece {
             }
 
             if (gridX - 1 > -1 && gridY + 1 < 8
-                    && (byte) boardPositions[gridX - 1][gridY + 1] / 16 == Constants.pieceIDs.WHITE) {
+                    && (byte) boardPositions[gridX - 1][gridY + 1] / Constants.pieceIDs.COLOR_DIVISOR == Constants.pieceIDs.WHITE) {
                 byte[] attackLeft = { (byte) (gridX - 1), (byte) (gridY + 1) };
                 if (isNotUnderCheck(boardPositions, attackLeft, false)) {
                     possibleMoves.add(attackLeft);
                 }
             }
             if (gridX + 1 < 8 && gridY + 1 < 8
-                    && (byte) boardPositions[gridX + 1][gridY + 1] / 16 == Constants.pieceIDs.WHITE) {
+                    && (byte) boardPositions[gridX + 1][gridY + 1] / Constants.pieceIDs.COLOR_DIVISOR == Constants.pieceIDs.WHITE) {
                 byte[] attackRight = { (byte) (gridX + 1), (byte) (gridY + 1) };
                 if (isNotUnderCheck(boardPositions, attackRight, false)) {
                     possibleMoves.add(attackRight);
@@ -93,7 +93,7 @@ public class Pawn extends Piece {
 
             if (gridX - 1 > -1 && gridY - 1 > -1
                     && (byte) boardPositions[gridX - 1][gridY - 1] != Constants.pieceIDs.EMPTY_CELL
-                    && boardPositions[gridX - 1][gridY - 1] / 16 == Constants.pieceIDs.BLACK) {
+                    && boardPositions[gridX - 1][gridY - 1] / Constants.pieceIDs.COLOR_DIVISOR == Constants.pieceIDs.BLACK) {
                 byte[] attackLeft = { (byte) (gridX - 1), (byte) (gridY - 1) };
                 if (isNotUnderCheck(boardPositions, attackLeft, false)) {
                     possibleMoves.add(attackLeft);
@@ -101,7 +101,7 @@ public class Pawn extends Piece {
             }
             if (gridX + 1 < 8 && gridY - 1 > -1
                     && (byte) boardPositions[gridX + 1][gridY - 1] != Constants.pieceIDs.EMPTY_CELL
-                    && boardPositions[gridX + 1][gridY - 1] / 16 == Constants.pieceIDs.BLACK) {
+                    && boardPositions[gridX + 1][gridY - 1] / Constants.pieceIDs.COLOR_DIVISOR == Constants.pieceIDs.BLACK) {
                 byte[] attackRight = { (byte) (gridX + 1), (byte) (gridY - 1) };
                 if (isNotUnderCheck(boardPositions, attackRight, false)) {
                     possibleMoves.add(attackRight);
@@ -125,7 +125,7 @@ public class Pawn extends Piece {
 
     public boolean canPassantLeft(byte pawnLeft, byte[][] boardPositions) {
         if (color == Constants.pieceIDs.BLACK) {
-            if (pawnLeft > 23 && pawnLeft < 32
+            if (pawnLeft > Constants.pieceIDs.BEGIN_WHITE_PAWNS && pawnLeft < Constants.pieceIDs.END_WHITE_PAWNS
                     && ((Pawn) App.GAME_PIECES[pawnLeft]).getPassant() == App.MOVE_COUNT - 1 && gridY + 1 < 8) {
                         byte[][] newBoardPositions = App.deepCopy(boardPositions);
                         newBoardPositions[gridX-1][gridY] = Constants.pieceIDs.EMPTY_CELL;
@@ -135,7 +135,7 @@ public class Pawn extends Piece {
                         }
                 }
         } else {
-            if (pawnLeft > 7 && pawnLeft < 16
+            if (pawnLeft > Constants.pieceIDs.BEGIN_BLACK_PAWNS && pawnLeft < Constants.pieceIDs.END_BLACK_PAWNS
                     && ((Pawn) App.GAME_PIECES[pawnLeft]).getPassant() == App.MOVE_COUNT - 1 && gridY - 1 > -1) {
                         byte[][] newBoardPositions = App.deepCopy(boardPositions);
                         newBoardPositions[gridX-1][gridY] = Constants.pieceIDs.EMPTY_CELL;
@@ -151,7 +151,7 @@ public class Pawn extends Piece {
 
     public boolean canPassantRight(byte pawnRight, byte[][] boardPositions) {
         if (color == Constants.pieceIDs.BLACK) {
-            if (pawnRight > 23 && pawnRight < 32
+            if (pawnRight > Constants.pieceIDs.BEGIN_WHITE_PAWNS && pawnRight < Constants.pieceIDs.END_WHITE_PAWNS
                     && ((Pawn) App.GAME_PIECES[pawnRight]).getPassant() == App.MOVE_COUNT - 1 && gridY + 1 < 8) {
                         byte[][] newBoardPositions = App.deepCopy(boardPositions);
                         newBoardPositions[gridX+1][gridY] = Constants.pieceIDs.EMPTY_CELL;
@@ -162,7 +162,7 @@ public class Pawn extends Piece {
                         }
                 }
         } else {
-            if (pawnRight > 7 && pawnRight < 16
+            if (pawnRight > Constants.pieceIDs.BEGIN_BLACK_PAWNS && pawnRight < Constants.pieceIDs.END_BLACK_PAWNS
                     && ((Pawn) App.GAME_PIECES[pawnRight]).getPassant() == App.MOVE_COUNT - 1 && gridY - 1 > -1) {
                         byte[][] newBoardPositions = App.deepCopy(boardPositions);
                         newBoardPositions[gridX+1][gridY] = Constants.pieceIDs.EMPTY_CELL;

@@ -2,6 +2,7 @@ public class Constants {
         public static final class Screen {
                 public static final int WIDTH = 1250, HEIGHT = 850;
         }
+
         public static final class pieceIDs {
                 public static final byte EMPTY_CELL = -1;
 
@@ -42,11 +43,28 @@ public class Constants {
                 public static final byte WHITE_PAWN_SIX = 30;
                 public static final byte WHITE_PAWN_SEVEN = 31;
 
-                //Any promoted rooks will not fall into a general colour check, they must be checked for individually.
-                //They will not return their color wheny you divide by 16, for example BLACK_PROMOTED_ROOK/16 == BLACK will return false. 
+                // Any promoted rooks will not fall into a general colour check, they must be
+                // checked for individually.
+                // They will not return their color wheny you divide by 16, for example
+                // BLACK_PROMOTED_ROOK/16 == BLACK will return false.
                 public static final byte BLACK_PROMOTED_ROOK = 32;
                 public static final byte WHITE_PROMOTED_ROOK = 33;
 
+
+                //ranges for each teams pawns.
+                public static final byte BEGIN_WHITE_PAWNS = 23;
+                public static final byte END_WHITE_PAWNS = 32;
+                public static final byte BEGIN_BLACK_PAWNS = 7;
+                public static final byte END_BLACK_PAWNS = 16;
+
+                //number used to get the color of an id.
+                public static final int COLOR_DIVISOR = 16;
+
+        }
+
+        public static class ScoringIDs {
+                public static final int[] scoringMap = { 0, 8, 4, 4, 5, 5, 4, 4, 1, 1, 1, 1, 1, 1, 1, 1, 0, -8, -4, -4,
+                                -5, -5, -4, -4, -1, -1, -1, -1, -1, -1, -1, -1, 4, -4 };
         }
 
         public static class pieceType {
@@ -65,7 +83,7 @@ public class Constants {
                 public static final String PASSANT_LEFT = "e";
                 public static final String PASSANT_RIGHT = "E";
                 public static final String PROMOTION = "P";
-                public static final String NO_MOVES = "I";
+                // public static final String NO_MOVES = "I";
         }
 
         public static final class boardData {

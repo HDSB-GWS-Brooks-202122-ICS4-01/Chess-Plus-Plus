@@ -3,8 +3,9 @@ import javafx.scene.image.ImageView;
 
 /**
  * Abstract class for pieces.
+ * 
  * @author Akil Pathiranage
- * @version 1.0 
+ * @version 1.0
  */
 public abstract class Piece {
     protected ImageView sprite;
@@ -27,24 +28,24 @@ public abstract class Piece {
     /**
      * Method for setting the type of a piece when it is instantiated.
      */
-    protected void setType(){
+    protected void setType() {
         if (id == Constants.pieceIDs.BLACK_KING || id == Constants.pieceIDs.WHITE_KING) {
             this.pieceType = Constants.pieceType.KING;
-         } else if (id == Constants.pieceIDs.BLACK_QUEEN || id == Constants.pieceIDs.WHITE_QUEEN) {
+        } else if (id == Constants.pieceIDs.BLACK_QUEEN || id == Constants.pieceIDs.WHITE_QUEEN) {
             this.pieceType = Constants.pieceType.QUEEN;
-         } else if (id == Constants.pieceIDs.BLACK_KINGS_BISHOP || id == Constants.pieceIDs.BLACK_QUEENS_BISHOP
-               || id == Constants.pieceIDs.WHITE_KINGS_BISHOP || id == Constants.pieceIDs.WHITE_QUEENS_BISHOP) {
+        } else if (id == Constants.pieceIDs.BLACK_KINGS_BISHOP || id == Constants.pieceIDs.BLACK_QUEENS_BISHOP
+                || id == Constants.pieceIDs.WHITE_KINGS_BISHOP || id == Constants.pieceIDs.WHITE_QUEENS_BISHOP) {
             this.pieceType = Constants.pieceType.BISHOP;
-         } else if (id == Constants.pieceIDs.BLACK_KINGS_KNIGHT || id == Constants.pieceIDs.BLACK_QUEENS_KNIGHT
-               || id == Constants.pieceIDs.WHITE_KINGS_KNIGHT || id == Constants.pieceIDs.WHITE_QUEENS_KNIGHT) {
+        } else if (id == Constants.pieceIDs.BLACK_KINGS_KNIGHT || id == Constants.pieceIDs.BLACK_QUEENS_KNIGHT
+                || id == Constants.pieceIDs.WHITE_KINGS_KNIGHT || id == Constants.pieceIDs.WHITE_QUEENS_KNIGHT) {
             this.pieceType = Constants.pieceType.KNIGHT;
-         } else if (id == Constants.pieceIDs.BLACK_KINGS_ROOK || id == Constants.pieceIDs.BLACK_QUEENS_ROOK
-               || id == Constants.pieceIDs.WHITE_KINGS_ROOK || id == Constants.pieceIDs.WHITE_QUEENS_ROOK
-               || id == Constants.pieceIDs.BLACK_PROMOTED_ROOK || id == Constants.pieceIDs.WHITE_PROMOTED_ROOK) {
+        } else if (id == Constants.pieceIDs.BLACK_KINGS_ROOK || id == Constants.pieceIDs.BLACK_QUEENS_ROOK
+                || id == Constants.pieceIDs.WHITE_KINGS_ROOK || id == Constants.pieceIDs.WHITE_QUEENS_ROOK
+                || id == Constants.pieceIDs.BLACK_PROMOTED_ROOK || id == Constants.pieceIDs.WHITE_PROMOTED_ROOK) {
             this.pieceType = Constants.pieceType.ROOK;
-         } else {
+        } else {
             this.pieceType = Constants.pieceType.PAWN;
-         }
+        }
 
     }
 
@@ -64,7 +65,7 @@ public abstract class Piece {
             }
         }
 
-        //System.out.println("Checking this move: " + Arrays.toString(possibleMove));
+        // System.out.println("Checking this move: " + Arrays.toString(possibleMove));
 
         byte[] kingPos = new byte[2];
         if (isKing) {
@@ -76,12 +77,11 @@ public abstract class Piece {
         newBoardPositions[possibleMove[0]][possibleMove[1]] = id;
         newBoardPositions[gridX][gridY] = Constants.pieceIDs.EMPTY_CELL;
 
-        
-        if(checkPawnAttack(newBoardPositions, kingPos)){
-          System.out.println("Check from a pawn");
-          return false;
+        if (checkPawnAttack(newBoardPositions, kingPos)) {
+            System.out.println("Check from a pawn");
+            return false;
         }
-         
+
         if (checkLeft(newBoardPositions, kingPos)) {
             System.out.println("Check from left side");
             return false;
@@ -133,8 +133,8 @@ public abstract class Piece {
                 if (!inBoardRange(position)) {
                     continue;
                 }
-                byte id =newBoardPositions[position[0]][position[1]];
-                if(id == Constants.pieceIDs.WHITE_KINGS_KNIGHT || id == Constants.pieceIDs.WHITE_QUEENS_KNIGHT){
+                byte id = newBoardPositions[position[0]][position[1]];
+                if (id == Constants.pieceIDs.WHITE_KINGS_KNIGHT || id == Constants.pieceIDs.WHITE_QUEENS_KNIGHT) {
                     return false;
                 }
             }
@@ -143,8 +143,8 @@ public abstract class Piece {
                 if (!inBoardRange(position)) {
                     continue;
                 }
-                byte id =newBoardPositions[position[0]][position[1]];
-                if(id == Constants.pieceIDs.BLACK_KINGS_KNIGHT || id == Constants.pieceIDs.BLACK_QUEENS_KNIGHT){
+                byte id = newBoardPositions[position[0]][position[1]];
+                if (id == Constants.pieceIDs.BLACK_KINGS_KNIGHT || id == Constants.pieceIDs.BLACK_QUEENS_KNIGHT) {
                     return false;
                 }
             }
@@ -181,7 +181,7 @@ public abstract class Piece {
             }
         }
 
-        //System.out.println("Done checks");
+        // System.out.println("Done checks");
         return true;
 
     }
@@ -215,17 +215,31 @@ public abstract class Piece {
      */
     private boolean checkPawnAttack(byte[][] boardPositions, byte[] pos) {
         if (color == Constants.pieceIDs.BLACK) {
-            byte pieceToTheRight = (inBoardRange((byte) (pos[0]+1), (byte) (pos[1]+1))) ? boardPositions[pos[0] + 1][pos[1] + 1] : -1;
-            byte pieceToTheLeft = (inBoardRange((byte) (pos[0]-1), (byte) (pos[1]+1))) ? boardPositions[pos[0] - 1][pos[1] + 1] : -1;
-            if ((pieceToTheRight > 23 && pieceToTheRight < 32) || (pieceToTheLeft > 23 && pieceToTheLeft < 32)) {
+            byte pieceToTheRight = (inBoardRange((byte) (pos[0] + 1), (byte) (pos[1] + 1)))
+                    ? boardPositions[pos[0] + 1][pos[1] + 1]
+                    : -1;
+            byte pieceToTheLeft = (inBoardRange((byte) (pos[0] - 1), (byte) (pos[1] + 1)))
+                    ? boardPositions[pos[0] - 1][pos[1] + 1]
+                    : -1;
+            if ((pieceToTheRight > Constants.pieceIDs.BEGIN_WHITE_PAWNS
+                    && pieceToTheRight < Constants.pieceIDs.END_WHITE_PAWNS)
+                    || (pieceToTheLeft > Constants.pieceIDs.BEGIN_WHITE_PAWNS
+                            && pieceToTheLeft < Constants.pieceIDs.END_WHITE_PAWNS)) {
                 return true;
             } else {
                 return false;
             }
         } else {
-            byte pieceToTheRight = (inBoardRange((byte) (pos[0]+1), (byte) (pos[1]-1))) ? boardPositions[pos[0] + 1][pos[1] - 1] : -1;
-            byte pieceToTheLeft = (inBoardRange((byte) (pos[0]-1), (byte) (pos[1]-1))) ? boardPositions[pos[0] - 1][pos[1] - 1] : -1;
-            if ((pieceToTheRight > 7 && pieceToTheRight < 16) || (pieceToTheLeft > 7 && pieceToTheLeft < 16)) {
+            byte pieceToTheRight = (inBoardRange((byte) (pos[0] + 1), (byte) (pos[1] - 1)))
+                    ? boardPositions[pos[0] + 1][pos[1] - 1]
+                    : -1;
+            byte pieceToTheLeft = (inBoardRange((byte) (pos[0] - 1), (byte) (pos[1] - 1)))
+                    ? boardPositions[pos[0] - 1][pos[1] - 1]
+                    : -1;
+            if ((pieceToTheRight > Constants.pieceIDs.BEGIN_BLACK_PAWNS
+                    && pieceToTheRight < Constants.pieceIDs.END_BLACK_PAWNS)
+                    || (pieceToTheLeft > Constants.pieceIDs.BEGIN_BLACK_PAWNS
+                            && pieceToTheLeft < Constants.pieceIDs.END_BLACK_PAWNS)) {
                 return true;
             } else {
                 return false;
@@ -246,7 +260,7 @@ public abstract class Piece {
         for (int i = pos[0] - 1; i > -1; i--) {
             byte pieceAtSquare = boardPositions[i][pos[1]];
             //
-            if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / 16 != color) {
+            if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
                 if (color == Constants.pieceIDs.BLACK) {
                     if (pieceAtSquare == Constants.pieceIDs.WHITE_KINGS_ROOK
                             || pieceAtSquare == Constants.pieceIDs.WHITE_QUEENS_ROOK
@@ -267,7 +281,7 @@ public abstract class Piece {
                     }
 
                 }
-            } else if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / 16 == color) {
+            } else if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR == color) {
                 return false;
             } else {
                 continue;
@@ -288,7 +302,7 @@ public abstract class Piece {
         for (int i = pos[0] + 1; i < 8; i++) {
             byte pieceAtSquare = boardPositions[i][pos[1]];
             //
-            if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / 16 != color) {
+            if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
                 if (color == Constants.pieceIDs.BLACK) {
                     if (pieceAtSquare == Constants.pieceIDs.WHITE_KINGS_ROOK
                             || pieceAtSquare == Constants.pieceIDs.WHITE_QUEENS_ROOK
@@ -309,7 +323,7 @@ public abstract class Piece {
                     }
 
                 }
-            } else if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / 16 == color) {
+            } else if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR == color) {
                 return false;
             } else {
                 continue;
@@ -329,7 +343,7 @@ public abstract class Piece {
     private boolean checkUp(byte[][] boardPositions, byte[] pos) {
         for (int i = pos[1] - 1; i > -1; i--) {
             byte pieceAtSquare = boardPositions[pos[0]][i];
-            if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / 16 != color) {
+            if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
                 if (color == Constants.pieceIDs.BLACK) {
                     if (pieceAtSquare == Constants.pieceIDs.WHITE_KINGS_ROOK
                             || pieceAtSquare == Constants.pieceIDs.WHITE_QUEENS_ROOK
@@ -350,7 +364,7 @@ public abstract class Piece {
                     }
 
                 }
-            } else if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / 16 == color) {
+            } else if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR == color) {
                 return false;
             } else {
                 continue;
@@ -371,7 +385,7 @@ public abstract class Piece {
         for (int i = pos[1] + 1; i < 8; i++) {
             byte pieceAtSquare = boardPositions[pos[0]][i];
             //
-            if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / 16 != color) {
+            if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
                 if (color == Constants.pieceIDs.BLACK) {
                     if (pieceAtSquare == Constants.pieceIDs.WHITE_KINGS_ROOK
                             || pieceAtSquare == Constants.pieceIDs.WHITE_QUEENS_ROOK
@@ -392,7 +406,7 @@ public abstract class Piece {
                     }
 
                 }
-            } else if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / 16 == color) {
+            } else if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR == color) {
                 return false;
             } else {
                 continue;
@@ -418,7 +432,7 @@ public abstract class Piece {
             }
             byte pieceAtSquare = boardPositions[i][j];
             //
-            if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / 16 != color) {
+            if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR == color) {
                 if (color == Constants.pieceIDs.BLACK) {
                     if (pieceAtSquare == Constants.pieceIDs.WHITE_KINGS_BISHOP
                             || pieceAtSquare == Constants.pieceIDs.WHITE_QUEENS_BISHOP
@@ -437,7 +451,7 @@ public abstract class Piece {
                     }
 
                 }
-            } else if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / 16 == color) {
+            } else if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR == color) {
                 return false;
             } else {
                 j--;
@@ -462,7 +476,7 @@ public abstract class Piece {
                 break;
             }
             byte pieceAtSquare = boardPositions[i][j];
-            if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / 16 != color) {
+            if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
                 if (color == Constants.pieceIDs.BLACK) {
                     if (pieceAtSquare == Constants.pieceIDs.WHITE_KINGS_BISHOP
                             || pieceAtSquare == Constants.pieceIDs.WHITE_QUEENS_BISHOP
@@ -481,7 +495,7 @@ public abstract class Piece {
                     }
 
                 }
-            } else if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / 16 == color) {
+            } else if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR == color) {
                 return false;
             } else {
                 j--;
@@ -507,7 +521,7 @@ public abstract class Piece {
                 break;
             }
             byte pieceAtSquare = boardPositions[i][j];
-            if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / 16 != color) {
+            if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
                 if (color == Constants.pieceIDs.BLACK) {
                     if (pieceAtSquare == Constants.pieceIDs.WHITE_KINGS_BISHOP
                             || pieceAtSquare == Constants.pieceIDs.WHITE_QUEENS_BISHOP
@@ -526,7 +540,7 @@ public abstract class Piece {
                     }
 
                 }
-            } else if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / 16 == color) {
+            } else if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR == color) {
                 return false;
             } else {
                 j++;
@@ -551,7 +565,7 @@ public abstract class Piece {
                 break;
             }
             byte pieceAtSquare = boardPositions[i][j];
-            if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / 16 != color) {
+            if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
                 if (color == Constants.pieceIDs.BLACK) {
                     if (pieceAtSquare == Constants.pieceIDs.WHITE_KINGS_BISHOP
                             || pieceAtSquare == Constants.pieceIDs.WHITE_QUEENS_BISHOP
@@ -570,7 +584,7 @@ public abstract class Piece {
                     }
 
                 }
-            } else if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / 16 == color) {
+            } else if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR == color) {
                 return false;
             } else {
                 j++;
@@ -592,11 +606,12 @@ public abstract class Piece {
 
     /**
      * Checks to see if this position is in the board.
+     * 
      * @param x The x position.
      * @param y The y position.
-     * @return true if the position is in the board, false if not. 
+     * @return true if the position is in the board, false if not.
      */
-    protected boolean inBoardRange(byte x, byte y){
+    protected boolean inBoardRange(byte x, byte y) {
         return (x > -1 && x < 8) && (y > -1 && y < 8);
     }
 
@@ -629,9 +644,10 @@ public abstract class Piece {
 
     /**
      * Method for getting the type of a piece.
+     * 
      * @return a byte representing the piece type.
      */
-    public byte getType(){
+    public byte getType() {
         return this.pieceType;
     }
 
