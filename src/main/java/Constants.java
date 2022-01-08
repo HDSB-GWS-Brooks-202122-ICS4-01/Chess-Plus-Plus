@@ -57,6 +57,12 @@ public class Constants {
                 public static final byte BEGIN_BLACK_PAWNS = 7;
                 public static final byte END_BLACK_PAWNS = 16;
 
+                //ranges for each team
+                public static final byte BEGIN_BLACK_RANGE = -1;
+                public static final byte END_BLACK_RANGE = 16;
+                public static final byte BEGIN_WHITE_RANGE = 23;
+                public static final byte END_WHITE_RANGE = 32;
+
                 //number used to get the color of an id.
                 public static final int COLOR_DIVISOR = 16;
 

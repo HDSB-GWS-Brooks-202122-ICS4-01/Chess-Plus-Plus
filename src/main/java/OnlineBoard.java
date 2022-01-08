@@ -534,57 +534,36 @@ public class OnlineBoard {
             setCastleMoveMouseClicked(s_rightCastle, piece, piece.getColor(), false);
             POSSIBLE_MOVES.add(s_rightCastle);
          }
-      } else if ((piece.getId() > 7 && piece.getId() < 16) || (piece.getId() > 23 && piece.getId() < 32)) {
-         pawn = (Pawn) piece;
+      } else if ((piece.getId() > Constants.pieceIDs.BEGIN_BLACK_PAWNS
+            && piece.getId() < Constants.pieceIDs.END_BLACK_PAWNS)
+            || (piece.getId() > Constants.pieceIDs.BEGIN_WHITE_PAWNS
+                  && piece.getId() < Constants.pieceIDs.END_WHITE_PAWNS)) {
+            // logic for en passant
 
-         // gets the id of the piece to the right and left
-         // makes sure it can check to the left
-         byte pawnLeft = (pawn.gridX - 1 > -1) ? GRID[piece.gridX - 1][piece.gridY] : -1;
-         byte pawnRight = (pawn.gridX + 1 < 8) ? GRID[piece.gridX + 1][piece.gridY] : -1;
+            // if the piece is a pawn
+            pawn = (Pawn) piece;
 
-         if ((pawnLeft > 7 && pawnLeft < 16) || (pawnLeft > 23 && pawnLeft < 32)) {
-            if (pawn.getColor() == Constants.pieceIDs.BLACK) {
-               if (pawnLeft > 23 && pawnLeft < 32
-                     && ((Pawn) GAME_PIECES[pawnLeft]).getPassant() == App.MOVE_COUNT - 1 && pawn.gridY + 1 < 8) {
-                  StackPane s_leftPawn = CELLS[pawn.gridX - 1][pawn.gridY + 1];
-                  s_leftPawn.getStyleClass().add("cell-enemy");
-                  setPassantMoveMouseClicked(s_leftPawn, pawn, (Pawn) GAME_PIECES[pawnLeft]);
-                  POSSIBLE_MOVES.add(s_leftPawn);
-               }
-            } else {
-               if (pawnLeft > 7 && pawnLeft < 16
-                     && ((Pawn) GAME_PIECES[pawnLeft]).getPassant() == App.MOVE_COUNT - 1 && pawn.gridY - 1 > -1) {
-                  StackPane s_leftPawn = CELLS[pawn.gridX - 1][pawn.gridY - 1];
-                  s_leftPawn.getStyleClass().add("cell-enemy");
-                  setPassantMoveMouseClicked(s_leftPawn, pawn, (Pawn) GAME_PIECES[pawnLeft]);
-                  POSSIBLE_MOVES.add(s_leftPawn);
-               }
+            // gets the id of the piece to the right and left
+            // makes sure it can check to the left and can check to the right
+            byte pawnLeft = (pawn.gridX - 1 > -1) ? GRID[piece.gridX - 1][piece.gridY] : -1;
+            byte pawnRight = (pawn.gridX + 1 < 8) ? GRID[piece.gridX + 1][piece.gridY] : -1;
+
+            int pawnDirection = (pawn.getColor() == Constants.pieceIDs.BLACK) ? 1 : -1;
+
+            if (pawn.canPassantRight(pawnRight, GRID)) {
+               StackPane s_rightPawn = CELLS[pawn.gridX + 1][pawn.gridY + 1 * pawnDirection];
+               s_rightPawn.getStyleClass().add("cell-enemy");
+               setPassantMoveMouseClicked(s_rightPawn, pawn, (Pawn) GAME_PIECES[pawnRight]);
+               POSSIBLE_MOVES.add(s_rightPawn);
+            }
+
+            if (pawn.canPassantLeft(pawnLeft, GRID)) {
+               StackPane s_leftPawn = CELLS[pawn.gridX - 1][pawn.gridY + 1 * pawnDirection];
+               s_leftPawn.getStyleClass().add("cell-enemy");
+               setPassantMoveMouseClicked(s_leftPawn, pawn, (Pawn) GAME_PIECES[pawnLeft]);
+               POSSIBLE_MOVES.add(s_leftPawn);
 
             }
-            System.out.println("piece to the left is a pawn");
-         }
-
-         if ((pawnRight > 7 && pawnRight < 16) || (pawnRight > 23 && pawnRight < 32)) {
-            if (pawn.getColor() == Constants.pieceIDs.BLACK) {
-               if (pawnRight > 23 && pawnRight < 32
-                     && ((Pawn) GAME_PIECES[pawnRight]).getPassant() == App.MOVE_COUNT - 1 && pawn.gridY + 1 < 8) {
-                  StackPane s_rightPawn = CELLS[pawn.gridX + 1][pawn.gridY + 1];
-                  s_rightPawn.getStyleClass().add("cell-enemy");
-                  setPassantMoveMouseClicked(s_rightPawn, pawn, (Pawn) GAME_PIECES[pawnRight]);
-                  POSSIBLE_MOVES.add(s_rightPawn);
-               }
-            } else {
-               if (pawnRight > 7 && pawnRight < 16
-                     && ((Pawn) GAME_PIECES[pawnRight]).getPassant() == App.MOVE_COUNT - 1 && pawn.gridY - 1 < 8) {
-                  StackPane s_rightPawn = CELLS[pawn.gridX + 1][pawn.gridY - 1];
-                  s_rightPawn.getStyleClass().add("cell-enemy");
-                  setPassantMoveMouseClicked(s_rightPawn, pawn, (Pawn) GAME_PIECES[pawnRight]);
-                  POSSIBLE_MOVES.add(s_rightPawn);
-               }
-
-            }
-            System.out.println("piece to the right is a pawn");
-         }
 
       }
 

@@ -40,13 +40,23 @@ public class BoardInfo {
     
     
 
+    public void movePiece(byte id, int fromX, int fromY, int toX, int toY){
+        if(board[toX][toY] != Constants.pieceIDs.EMPTY_CELL){
+            board[toX][toY] = id;
+            board[fromX][fromY] = Constants.pieceIDs.EMPTY_CELL;
+        } else {
+            board[toX][toY] = id;
+            board[fromX][fromY] = Constants.pieceIDs.EMPTY_CELL;
+        }
+
+    }
+
     /**
      * Method for deep copying a BoardInfo object. 
      * @return A new BoardInfo object that is a deep copy of the original. 
      */
     public BoardInfo copy(){
         BoardInfo copy = new BoardInfo(App.deepCopy(board), Arrays.copyOf(passant, passant.length), Arrays.copyOf(hasMoved, hasMoved.length), moveCount);
-        copy.previousMove = this.previousMove;
         copy.setKingPos(false, whiteKingX, whiteKingY);
         copy.setKingPos(true, blackKingX, blackKingY);
         return copy;
@@ -67,7 +77,7 @@ public class BoardInfo {
      * @param move The new string to set it to.
      */
     public void setPreviousMove(String move){
-        previousMove = previousMove + " " + move;
+        previousMove = " "+ move;
 
     }
 
@@ -88,5 +98,24 @@ public class BoardInfo {
             board[x][y] = Constants.pieceIDs.WHITE_KING;
         }
     }
-    
+
+
+    /**
+     * This method deep copies an ArrayList of type byte[]. 
+     * 
+     * @param original Original ArrayList to copy. 
+     * @return An ArrayList<byte[]> object, that contains no references to the original.
+     */
+    public ArrayList<byte[]> copyArrayList(ArrayList<byte[]> original){
+        ArrayList<byte[]> copied = new ArrayList<byte[]>();
+        byte[] arr;
+        for(int i = 0; i < original.size(); i++){
+
+            arr = Arrays.copyOf(original.get(i), original.get(i).length);
+            copied.add(arr);
+        }
+
+        return copied; 
+
+    }
 }
