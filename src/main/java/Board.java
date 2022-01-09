@@ -517,11 +517,18 @@ public class Board {
 
    private void playAi(String move) {
       // TODO Need way of fetching promoted piece data
-      System.out.println(move);
+      System.out.println("Move: " + move);
+      int endFrom;
+      byte id;
+      int enemyX;
+      int enemyY;
+      Pawn primaryPawn;
+      Pawn enemyPawn;
+      
       switch (move.substring(0, 1)) {
          case Constants.moveTypes.REGULAR:
             System.out.println("Plays regular  move");
-            int endFrom = (move.charAt(3) == 'f') ? 3 : 2;
+            endFrom = (move.charAt(3) == 'f') ? 3 : 2;
             int fromX = Integer.parseInt(move.substring(endFrom+1, endFrom+2));
             int fromY = Integer.parseInt(move.substring(endFrom+2, endFrom+3));
             Piece piece = getPieceOnGrid(fromX, fromY);
@@ -533,14 +540,32 @@ public class Board {
             nextTurn();
             break;
          case Constants.moveTypes.CASTLE_RIGHT:
+            endFrom = (move.charAt(3) == '.') ? 3 : 2;
+            id = (byte) Integer.parseInt(move.substring(1, endFrom));
+            castle(GAME_PIECES[id], (byte) (id/Constants.pieceIDs.COLOR_DIVISOR), false);
             // castle right
             break;
          case Constants.moveTypes.CASTLE_LEFT:
+            endFrom = (move.charAt(3) == '.') ? 3 : 2;
+            id = (byte) Integer.parseInt(move.substring(1, endFrom));
+            castle(GAME_PIECES[id], (byte) (id/Constants.pieceIDs.COLOR_DIVISOR), true);
             // castle left
             break;
          case Constants.moveTypes.PASSANT_RIGHT:
+            endFrom = (move.charAt(3) == 'f') ? 3 : 2;
+            primaryPawn = (Pawn) GAME_PIECES[Byte.parseByte(move.substring(1, endFrom))];
+            enemyX = Integer.parseInt(move.substring(endFrom+4, endFrom+5));
+            enemyY = Integer.parseInt(move.substring(endFrom+4, endFrom+5));
+            enemyPawn = (Pawn) getPieceOnGrid(enemyX,enemyY);
+            enPassant(primaryPawn, enemyPawn);
             break;
          case Constants.moveTypes.PASSANT_LEFT:
+            endFrom = (move.charAt(3) == 'f') ? 3 : 2;
+            primaryPawn = (Pawn) GAME_PIECES[Byte.parseByte(move.substring(1, endFrom))];
+            enemyX = Integer.parseInt(move.substring(endFrom+4, endFrom+5));
+            enemyY = Integer.parseInt(move.substring(endFrom+4, endFrom+5));
+            enemyPawn = (Pawn) getPieceOnGrid(enemyX,enemyY);
+            enPassant(primaryPawn, enemyPawn);
             break;
          case Constants.moveTypes.PROMOTION:
             break;
@@ -549,6 +574,7 @@ public class Board {
          default:
             return;
       }
+      nextTurn();
    }
 
    /**
@@ -817,7 +843,36 @@ public class Board {
       sp.setOnMouseClicked(new EventHandler<MouseEvent>() {
          public void handle(MouseEvent me) {
             // When clicked move the piece.
-            piece.hasMoved = true;
+            castle(piece, color, left);
+         }
+      });
+
+   }
+
+   /**
+    * This method serves the same purpose as setPossibleMoveMouseClicked, except it
+    * is only made for
+    * en passant moves from pawns. This is because in en passant, a pawn moves to
+    * the square behind the other pawn and the other pawn still gets deleted.
+    * 
+    * @param sp          StackPane of the primary pawn.
+    * @param primaryPawn Pawn object of the primary pawn.
+    * @param enemyPawn   Pawn object of the enemy pawn.
+    */
+   private void setPassantMoveMouseClicked(StackPane sp, Pawn primaryPawn, Pawn enemyPawn) {
+      sp.setOnMouseClicked(new EventHandler<MouseEvent>() {
+         @Override
+         public void handle(MouseEvent event) {
+            enPassant(primaryPawn, enemyPawn);
+         }
+
+      });
+
+   }
+
+
+   public void castle(Piece piece, byte color, boolean left){
+      piece.hasMoved = true;
             if (left) {
                movePiece(piece, piece.getGridX(), piece.getGridY(), (byte) (piece.getGridX() - 2), piece.getGridY(),
                      false);
@@ -848,64 +903,45 @@ public class Board {
                }
             }
             nextTurn();
-         }
-      });
+      
 
    }
 
-   /**
-    * This method serves the same purpose as setPossibleMoveMouseClicked, except it
-    * is only made for
-    * en passant moves from pawns. This is because in en passant, a pawn moves to
-    * the square behind the other pawn and the other pawn still gets deleted.
-    * 
-    * @param sp          StackPane of the primary pawn.
-    * @param primaryPawn Pawn object of the primary pawn.
-    * @param enemyPawn   Pawn object of the enemy pawn.
-    */
-   private void setPassantMoveMouseClicked(StackPane sp, Pawn primaryPawn, Pawn enemyPawn) {
-      sp.setOnMouseClicked(new EventHandler<MouseEvent>() {
-         @Override
-         public void handle(MouseEvent event) {
+   public void enPassant(Pawn primaryPawn, Pawn enemyPawn){
+      // Moves the primary pawn to its new spot.
+      if (primaryPawn.getColor() == Constants.pieceIDs.BLACK) {
+         if (enemyPawn.getGridX() < primaryPawn.getGridX()) {
+            // pawn is to the left
+            movePiece(primaryPawn, primaryPawn.gridX, primaryPawn.gridY, (byte) (primaryPawn.gridX - 1),
+                  (byte) (primaryPawn.gridY + 1), false);
 
-            // Moves the primary pawn to its new spot.
-            if (primaryPawn.getColor() == Constants.pieceIDs.BLACK) {
-               if (enemyPawn.getGridX() < primaryPawn.getGridX()) {
-                  // pawn is to the left
-                  movePiece(primaryPawn, primaryPawn.gridX, primaryPawn.gridY, (byte) (primaryPawn.gridX - 1),
-                        (byte) (primaryPawn.gridY + 1), false);
-
-               } else {
-                  // pawn is to the right
-                  movePiece(primaryPawn, primaryPawn.gridX, primaryPawn.gridY, (byte) (primaryPawn.gridX + 1),
-                        (byte) (primaryPawn.gridY + 1), false);
-               }
-            } else {
-               if (enemyPawn.getGridX() < primaryPawn.getGridX()) {
-                  // pawn to the left
-                  movePiece(primaryPawn, primaryPawn.gridX, primaryPawn.gridY, (byte) (primaryPawn.gridX - 1),
-                        (byte) (primaryPawn.gridY - 1), false);
-               } else {
-                  // pawn is to the right
-                  movePiece(primaryPawn, primaryPawn.gridX, primaryPawn.gridY, (byte) (primaryPawn.gridX + 1),
-                        (byte) (primaryPawn.gridY - 1), false);
-               }
-
-            }
-
-            // Removes enemyPawn from the game.
-            GRID[enemyPawn.gridX][enemyPawn.gridY] = Constants.pieceIDs.EMPTY_CELL;
-            StackPane enemyPane = CELLS[enemyPawn.gridX][enemyPawn.gridY];
-            enemyPane.getChildren().clear();
-            LIVE_PIECES.remove(enemyPawn);
-            DEAD_PIECES.add(enemyPawn);
-
-            displayDeadPiece(enemyPawn);
-            nextTurn();
+         } else {
+            // pawn is to the right
+            movePiece(primaryPawn, primaryPawn.gridX, primaryPawn.gridY, (byte) (primaryPawn.gridX + 1),
+                  (byte) (primaryPawn.gridY + 1), false);
+         }
+      } else {
+         if (enemyPawn.getGridX() < primaryPawn.getGridX()) {
+            // pawn to the left
+            movePiece(primaryPawn, primaryPawn.gridX, primaryPawn.gridY, (byte) (primaryPawn.gridX - 1),
+                  (byte) (primaryPawn.gridY - 1), false);
+         } else {
+            // pawn is to the right
+            movePiece(primaryPawn, primaryPawn.gridX, primaryPawn.gridY, (byte) (primaryPawn.gridX + 1),
+                  (byte) (primaryPawn.gridY - 1), false);
          }
 
-      });
+      }
 
+      // Removes enemyPawn from the game.
+      GRID[enemyPawn.gridX][enemyPawn.gridY] = Constants.pieceIDs.EMPTY_CELL;
+      StackPane enemyPane = CELLS[enemyPawn.gridX][enemyPawn.gridY];
+      enemyPane.getChildren().clear();
+      LIVE_PIECES.remove(enemyPawn);
+      DEAD_PIECES.add(enemyPawn);
+
+      displayDeadPiece(enemyPawn);
+      nextTurn();
    }
 
    /**
