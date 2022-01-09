@@ -375,6 +375,7 @@ public class Board {
             return piece;
       }
 
+      System.out.println("No piece found at: " + Integer.toString(x) + " " + Integer.toString(y));
       return null;
    }
 
@@ -516,20 +517,20 @@ public class Board {
 
    private void playAi(String move) {
       // TODO Need way of fetching promoted piece data
-      move = move.substring(1);
+      System.out.println(move);
       switch (move.substring(0, 1)) {
          case Constants.moveTypes.REGULAR:
             System.out.println("Plays regular  move");
             int endFrom = (move.charAt(3) == 'f') ? 3 : 2;
-            Piece piece = GAME_PIECES[Integer.parseInt(move.substring(1, endFrom))];
+            int fromX = Integer.parseInt(move.substring(endFrom+1, endFrom+2));
+            int fromY = Integer.parseInt(move.substring(endFrom+2, endFrom+3));
+            Piece piece = getPieceOnGrid(fromX, fromY);
             System.out.println("Piece id: " + piece.getId());
             piece.hasMoved = true;
             byte x = Byte.parseByte(move.substring(endFrom + 4, endFrom + 5));
             byte y = Byte.parseByte(move.substring(endFrom + 5, endFrom + 6));
-            System.out.println("about to try moving");
             movePiece(piece, piece.getGridX(), piece.getGridY(), x, y, false);
             nextTurn();
-            System.out.println("finished trying");
             break;
          case Constants.moveTypes.CASTLE_RIGHT:
             // castle right
@@ -575,8 +576,6 @@ public class Board {
       System.out.println("move count: " + App.MOVE_COUNT);
       // Get array of possible moves.
       byte[][] moves = piece.getPossibleMoves(GRID);
-      boolean passantLeft = false;
-      boolean passantRight = false;
       King king = null;
       Pawn pawn = null;
 

@@ -14,6 +14,7 @@ public class BoardInfo {
     String previousMove;
     int moveCount;
     int evaluate;
+    int sortingValue = 0;
 
     byte whiteKingX;
     byte whiteKingY;
@@ -42,6 +43,7 @@ public class BoardInfo {
 
     public void movePiece(byte id, int fromX, int fromY, int toX, int toY){
         if(board[toX][toY] != Constants.pieceIDs.EMPTY_CELL){
+            sortingValue = Constants.ScoringIDs.scoringMap[board[toX][toY]];
             board[toX][toY] = id;
             board[fromX][fromY] = Constants.pieceIDs.EMPTY_CELL;
         } else {
@@ -77,7 +79,7 @@ public class BoardInfo {
      * @param move The new string to set it to.
      */
     public void setPreviousMove(String move){
-        previousMove = " "+ move;
+        previousMove = move;
 
     }
 

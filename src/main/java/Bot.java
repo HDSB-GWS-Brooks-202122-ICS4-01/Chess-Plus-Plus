@@ -148,14 +148,22 @@ public class Bot {
         // black is maximizing colors
         int score = 0;
 
-        if (!isNotUnderCheck(boardInfo, true)) {
+        if (!isNotUnderCheck(boardInfo, false)) {
             // System.out.println("Check for black Previous move leading to this one: " +
             // boardInfo.previousMove);
-            score += 100;
-        } else if (!isNotUnderCheck(boardInfo, false)) {
+            score += 50;
+            if(generateBoards(boardInfo, false).length == 0){
+                score += 1000;
+                //System.out.println("Checkmate for black detected");
+            }
+        } else if (!isNotUnderCheck(boardInfo, true)) {
             // System.out.println("Check for white Previous move leading to this one: " +
             // boardInfo.previousMove);
-            score -= 100;
+            score -= 50;
+            if(generateBoards(boardInfo, true).length == 0){
+                //System.out.println("checkmate for white detected");
+                score -= 1000;
+            }
         }
 
         for (int x = 0; x < 8; x++) {
@@ -267,9 +275,9 @@ public class Bot {
             }
 
         }
-        BoardInfo[] generatedBoardsArray = generatedBoards.toArray(new BoardInfo[generatedBoards.size()]);
+        //BoardInfo[] generatedBoardsArray = generatedBoards.toArray(new BoardInfo[generatedBoards.size()]);
 
-        return generatedBoardsArray;
+        return sortBoards(generatedBoards.toArray(new BoardInfo[generatedBoards.size()]), color);
     }
 
     /**
@@ -1417,6 +1425,42 @@ public class Bot {
         }
 
     }
+
+    /**
+     * Sorting method used for the board generation. Alpha beta pruning is the most efficient when
+     * moves in the tree are sorted from best to worst. All boards have a sorting value, that they are sorted on to order
+     * the moves from best to worst. The sorting value is based on whether that move was a result of capturing a piece. If the 
+     * team is black, they want to have the highest sorting values first, if the team is white, they want the lowest sorting values first. 
+     * @param boards Array of BoardInfo objects to sort.
+     * @param color  Variable used to determine the color, true if black, false if not. 
+     * @return
+     */
+    public BoardInfo[] sortBoards(BoardInfo[] boards, boolean color){
+        BoardInfo temp;
+        if(color){
+            for(int i = 0; i < boards.length; i++){
+                for (int j = 1; j < boards.length; j++){
+                    if(boards[j].sortingValue > boards[i].sortingValue){
+                        temp  = boards[i];
+                        boards[i] = boards[j];
+                        boards[j] = temp;
+                    }
+                }
+            }
+        } else {
+            for(int i = 0; i < boards.length; i++){
+                for (int j = 1; j < boards.length; j++){
+                    if(boards[j].sortingValue < boards[i].sortingValue){
+                        temp  = boards[i];
+                        boards[i] = boards[j];
+                        boards[j] = temp;
+                    }
+                }
+            }
+        }
+        return boards;
+    }
+
 
     /**
      * Class for BoardInteractions.
