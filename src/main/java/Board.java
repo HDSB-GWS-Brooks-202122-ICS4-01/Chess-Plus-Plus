@@ -499,18 +499,33 @@ public class Board {
 
       System.out.println("Next turn: " + turn);
 
-      if (GAME_MODE == Constants.boardData.MODE_AI) {
+      if (GAME_MODE == Constants.boardData.MODE_AI && turn == Constants.pieceIDs.BLACK) {
          // Bot.BoardInteractions bi = bot.BI.parseAiMove(bot.getMove(GRID,
          // DEAD_PIECES));
          Task<String> move = new Task<String>() {
 
             @Override
             protected String call() throws Exception {
-               // TODO Auto-generated method stub
                return bot.getMove(GRID, DEAD_PIECES);
             }
 
          };
+
+         move.valueProperty();
+         ChangeListener<String> listener = new ChangeListener<String>() {
+
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+               move.valueProperty().removeListener(this);
+               playAi(move.getValue());
+            }
+
+         };
+         move.valueProperty().addListener(listener);
+
+         Thread botThread = new Thread(move);
+         botThread.setDaemon(false);
+         botThread.start();
          // bot.getMove(GRID, DEAD_PIECES);
       }
    }
@@ -537,7 +552,6 @@ public class Board {
             byte x = Byte.parseByte(move.substring(endFrom + 4, endFrom + 5));
             byte y = Byte.parseByte(move.substring(endFrom + 5, endFrom + 6));
             movePiece(piece, piece.getGridX(), piece.getGridY(), x, y, false);
-            nextTurn();
             break;
          case Constants.moveTypes.CASTLE_RIGHT:
             endFrom = (move.charAt(3) == '.') ? 3 : 2;
