@@ -554,13 +554,13 @@ public class Board {
             movePiece(piece, piece.getGridX(), piece.getGridY(), x, y, false);
             break;
          case Constants.moveTypes.CASTLE_RIGHT:
-            endFrom = (move.charAt(3) == '.') ? 3 : 2;
+            endFrom = (move.charAt(2) == '.') ? 2 : 3;
             id = (byte) Integer.parseInt(move.substring(1, endFrom));
             castle(GAME_PIECES[id], (byte) (id/Constants.pieceIDs.COLOR_DIVISOR), false);
             // castle right
             break;
          case Constants.moveTypes.CASTLE_LEFT:
-            endFrom = (move.charAt(3) == '.') ? 3 : 2;
+            endFrom = (move.charAt(2) == '.') ? 2 : 3;
             id = (byte) Integer.parseInt(move.substring(1, endFrom));
             castle(GAME_PIECES[id], (byte) (id/Constants.pieceIDs.COLOR_DIVISOR), true);
             // castle left

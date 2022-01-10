@@ -15,18 +15,13 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
 
 import com.google.auth.oauth2.GoogleCredentials;
-import com.google.cloud.storage.Acl.User;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthException;
-import com.google.firebase.auth.UserRecord;
 import com.google.firebase.database.DatabaseReference;
 
 /**

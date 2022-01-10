@@ -49,6 +49,7 @@ public class Bot {
         hasMoved[5] = App.GAME_PIECES[Constants.pieceIDs.WHITE_KING].hasMoved;
 
         // creating array containing passant data
+        // TODO if constants change there must be changed made here.
         int[] passant = new int[16];
         for (int i = 0; i < 8; i++) {
             // data for black pawns
@@ -151,9 +152,10 @@ public class Bot {
         if (!isNotUnderCheck(boardInfo, false)) {
             // System.out.println("Check for black Previous move leading to this one: " +
             // boardInfo.previousMove);
-            score += 50;
+            score += 50; 
             if(generateBoards(boardInfo, false).length == 0){
                 score += 1000;
+                return score;
                 //System.out.println("Checkmate for black detected");
             }
         } else if (!isNotUnderCheck(boardInfo, true)) {
@@ -163,6 +165,7 @@ public class Bot {
             if(generateBoards(boardInfo, true).length == 0){
                 //System.out.println("checkmate for white detected");
                 score -= 1000;
+                return score;
             }
         }
 
@@ -542,12 +545,12 @@ public class Bot {
 
         if (color) {
             teamRook = Constants.pieceIDs.BLACK_PROMOTED_ROOK;
-            beginTeamRange = -1;
-            endTeamRange = 16;
+            beginTeamRange = Constants.pieceIDs.BEGIN_BLACK_RANGE;
+            endTeamRange = Constants.pieceIDs.END_BLACK_RANGE;
         } else {
             teamRook = Constants.pieceIDs.WHITE_PROMOTED_ROOK;
-            beginTeamRange = 15;
-            endTeamRange = 32;
+            beginTeamRange = Constants.pieceIDs.BEGIN_WHITE_RANGE;
+            endTeamRange = Constants.pieceIDs.END_WHITE_RANGE;
         }
 
         boolean up = true, down = true, left = true, right = true;
@@ -783,12 +786,12 @@ public class Bot {
         BoardInfo newBoard;
 
         if (color) {
-            teamBeginRange = -1;
-            teamEndRange = 16;
+            teamBeginRange = Constants.pieceIDs.BEGIN_BLACK_RANGE;
+            teamEndRange = Constants.pieceIDs.END_BLACK_RANGE;
             promotedRook = Constants.pieceIDs.BLACK_PROMOTED_ROOK;
         } else {
-            teamBeginRange = 15;
-            teamEndRange = 32;
+            teamBeginRange = Constants.pieceIDs.BEGIN_WHITE_RANGE;
+            teamEndRange = Constants.pieceIDs.END_WHITE_RANGE;
             promotedRook = Constants.pieceIDs.WHITE_PROMOTED_ROOK;
         }
 
