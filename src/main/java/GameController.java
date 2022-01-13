@@ -243,8 +243,9 @@ public class GameController {
             public void handle(MouseEvent me) {
                try {
                   board.saveGame();
-               } catch (IOException e) {
-
+               } catch (IOException e) 
+               {
+                  e.printStackTrace();
                }
             }
          });

@@ -4,6 +4,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Properties;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +25,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
-
 /**
  * Board class, handles the interaction of pieces and displaying them.
  * 
@@ -68,6 +68,7 @@ public class Board {
 
    private final byte GAME_MODE;
 
+
    /**
     * Constructor for the Board class
     * 
@@ -82,6 +83,10 @@ public class Board {
       gp_DEAD_BLACK_CELLS = cells[1];
       gp_DEAD_WHITE_CELLS = cells[2];
       GAME_MODE = gm;
+
+      //Was thinking of adding sound effects - Akil
+      //https://mixkit.co/free-sound-effects/instrument/
+      //turnsfx = new Media(App.class.getClass().getResource("assets//turnsfx.wav"));
 
       int gameTime = 600000;
       Label blackLabel = GAME.getTimeReference(Constants.pieceIDs.BLACK);
@@ -120,6 +125,8 @@ public class Board {
          } catch (IOException e) {
             e.printStackTrace();
          }
+      } else if(GAME_MODE == Constants.boardData.MODE_PASS_N_PLAY){
+         App.setTranscriptPath(null);
       }
 
       SERVER_REF = App.getServerReference();
@@ -240,7 +247,8 @@ public class Board {
    private void parseTranscript() throws IOException {
       final String REG = "((?=[A-Z])|(?<=[A-Z]))|((?=[a-z])|(?<=[a-z]))";
 
-      FileReader fileReader = new FileReader(new File(Constants.boardData.PATH_TO_SAVED_GAME));
+      System.out.println(App.getTranscriptPath());
+      FileReader fileReader = new FileReader(new File(App.getTranscriptPath()));
 
       try (Scanner r = new Scanner(fileReader)) {
          String ts;
@@ -506,7 +514,7 @@ public class Board {
 
             @Override
             protected String call() throws Exception {
-               return bot.getMove(GRID, DEAD_PIECES);
+               return bot.getMove(GRID);
             }
 
          };
@@ -528,6 +536,7 @@ public class Board {
          botThread.start();
          // bot.getMove(GRID, DEAD_PIECES);
       }
+
    }
 
    private void playAi(String move) {
@@ -582,6 +591,8 @@ public class Board {
             enPassant(primaryPawn, enemyPawn);
             break;
          case Constants.moveTypes.PROMOTION:
+            endFrom = (move.charAt(2) == '.') ? 2 : 3;
+            promotePawn(GAME_PIECES[Byte.parseByte(move.substring(1,endFrom))],getBotPromotion(Byte.parseByte(move.substring(endFrom+1, endFrom+2))), false);
             break;
          case Constants.moveTypes.NO_MOVES:
             break;
@@ -604,6 +615,30 @@ public class Board {
       } else { // Mouse exited
          target.getStyleClass().remove("cell-hover");
       }
+   }
+
+
+   private String getBotPromotion(byte id){
+      switch(id){
+         case Constants.pieceIDs.BLACK_QUEENS_BISHOP:
+            return "BISHOP";
+         case Constants.pieceIDs.BLACK_QUEENS_KNIGHT:
+            return "KNIGHT";
+         case Constants.pieceIDs.BLACK_QUEEN:
+            return "QUEEN";
+         case Constants.pieceIDs.BLACK_PROMOTED_ROOK:
+            return "ROOK";
+         case Constants.pieceIDs.WHITE_QUEENS_BISHOP:
+            return "BISHOP";
+         case Constants.pieceIDs.WHITE_QUEENS_KNIGHT:
+            return "KNIGHT";
+         case Constants.pieceIDs.WHITE_QUEEN:
+            return "QUEEN";
+         default:
+            System.out.println("couldn't find case for getBotPromotion id: " + id);
+            return "QUEEN";
+      }
+      
    }
 
    /**
@@ -1037,7 +1072,7 @@ public class Board {
 
                @Override
                protected String call() throws Exception {
-                  return bot.getMove(GRID, DEAD_PIECES);
+                  return bot.getMove(GRID);
                }
 
             };
@@ -1075,7 +1110,16 @@ public class Board {
    public void saveGame() throws IOException {
       solidifyTranscript();
 
-      FileWriter myWriter = new FileWriter(Constants.boardData.PATH_TO_SAVED_GAME);
+
+      File transcriptFile;
+      if(App.getTranscriptPath() !=null){
+         transcriptFile = new File(App.getTranscriptPath());
+      } else {
+         Date date =  new Date(System.currentTimeMillis());
+         transcriptFile = new File(Constants.boardData.TRANSCRIPT_DIR_PATH + date.toString().replace(':', '-') + ".txt");
+         transcriptFile.createNewFile();
+      }
+      FileWriter myWriter = new FileWriter(transcriptFile);
       myWriter.write(App.getTranscript());
       myWriter.close();
 

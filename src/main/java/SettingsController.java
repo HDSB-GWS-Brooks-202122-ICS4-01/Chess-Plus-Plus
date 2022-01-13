@@ -38,7 +38,7 @@ public class SettingsController {
     Button mainMenuButton;
 
     /**
-     * Method for intializing the Settings scene. 
+     * FXML method for intializing the Settings scene. 
      * 
      */
     @FXML
@@ -78,11 +78,6 @@ public class SettingsController {
             }
         }
 
-        /**
-         * If you want to this
-         * Properties config = App.getConfig();
-         * Because the config file is needed in other areas too.
-         */
 
         Region[] elements = {gameTimeButton, mainMenuButton, diffButton};
 
@@ -125,7 +120,7 @@ public class SettingsController {
 
 
     /**
-     * Method for switching to the intro screen. 
+     * FXML method for switching to the intro screen. 
      */
     @FXML
     public void switchToIntro() {
@@ -223,6 +218,7 @@ public class SettingsController {
      */
     @FXML
     public void onInfinite() {
+        // TODO add this
 
     }
 

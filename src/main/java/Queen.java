@@ -11,6 +11,10 @@ import javafx.scene.image.ImageView;
  */
 public class Queen extends Piece {
 
+    /**
+     * Constructor for queen pieces.
+     * @param id The id to create the queen with. 
+     */
     public Queen(Byte id) {
         this.id = id;
         setType();

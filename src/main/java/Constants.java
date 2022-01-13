@@ -178,7 +178,7 @@ public class Constants {
 
                 };
 
-                public static final String PATH_TO_SAVED_GAME = "src\\main\\resources\\data\\transcripts\\savedGame.txt";
+                public static final String TRANSCRIPT_DIR_PATH = "src\\main\\resources\\data\\transcripts\\";
         }
 
         public static final class SpriteSheetDimensions {

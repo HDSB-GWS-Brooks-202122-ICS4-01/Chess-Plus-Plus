@@ -10,6 +10,10 @@ import javafx.scene.image.ImageView;
 public class Pawn extends Piece {
     int passant;
 
+    /**
+     * Constructor for pawns.
+     * @param id The id to create the pawn with.
+     */
     public Pawn(Byte id) {
         this.id = id;
         setType();
@@ -166,7 +170,7 @@ public class Pawn extends Piece {
                         byte[][] newBoardPositions = App.deepCopy(boardPositions);
                         newBoardPositions[gridX+1][gridY] = Constants.pieceIDs.EMPTY_CELL;
                         byte[] attackSquare = {(byte) (gridX+1), (byte) (gridY-1)};
-                        if(isNotUnderCheck(boardPositions, attackSquare, false)){
+                        if(isNotUnderCheck(newBoardPositions, attackSquare, false)){
                             return true;
                         }
             }

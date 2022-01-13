@@ -10,6 +10,10 @@ import javafx.scene.image.ImageView;
  */
 public class Bishop extends Piece{
 
+    /**
+     * Constructor for the bishop piece.
+     * @param id The id to create the bishop with.
+     */
     public Bishop(Byte id) {
         this.id = id;
         setType();

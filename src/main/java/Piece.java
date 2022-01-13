@@ -22,7 +22,7 @@ public abstract class Piece {
      * Method for getting the possible moves of this piece based on the positions of
      * the piece on the board.
      * 
-     * @param boardPositions
+     * @param boardPositions A 2d array containing the current positions on the board.
      * @return a 2d array containing all the possible moves based on this board.
      */
     public abstract byte[][] getPossibleMoves(byte[][] boardPositions);

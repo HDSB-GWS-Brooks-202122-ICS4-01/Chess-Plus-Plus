@@ -13,6 +13,10 @@ import javafx.scene.image.ImageView;
 public class King extends Piece{
 
 
+    /**
+     * Constructor for king pieces.
+     * @param id The id to set to create the king with. 
+     */
     public King(Byte id) {
         this.id = id;
         setType();

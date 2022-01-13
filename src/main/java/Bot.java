@@ -1,15 +1,23 @@
 import java.util.ArrayList;
 
+/**
+ * Class for the Bot/A.I.
+ * 
+ * @author Akil Pathiranage
+ * @version 1.0
+ */
 public class Bot {
-    public final BoardInteractions BI = new BoardInteractions();
     int depth;
     final boolean black;
 
     /**
-     * Constructor for the bot.
+     * Constructor for the bot. Currently, the bot will always be black. This was
+     * built with
+     * the idea that in the future the bot can open as well.
      * 
      * @param diff  The difficulty the bot is set to.
-     * @param black The color the bot is playing as.
+     * @param black The color the bot is playing as. True if the bot is black, false
+     *              if not.
      */
     public Bot(String diff, boolean black) {
         switch (diff) {
@@ -26,18 +34,23 @@ public class Bot {
                 depth = 4;
                 break;
         }
+
+        // Currently the bot has a fixed depth of 4 when it generates its moves. This is
+        // because
+        // optimization needs to be done.
         this.depth = 4;
         this.black = black;
     }
 
     /**
-     * Method for getting the move the bot wants to perform.
+     * Method for getting the move the bot wants to perform. This method is called
+     * by the board.
      * 
-     * @param boardPositions
-     * @param deadPiecesObjects
-     * @return
+     * @param boardPositions 2-Dimensional array of bytes representing the positions
+     *                       on the board.
+     * @return A string containing the move the bot wants to make.
      */
-    public String getMove(byte[][] boardPositions, ArrayList<Piece> deadPiecesObjects) {
+    public String getMove(byte[][] boardPositions) {
 
         // creating array containing hasmoved data
         boolean[] hasMoved = new boolean[6];
@@ -60,28 +73,37 @@ public class Bot {
             passant[i] = ((Pawn) App.GAME_PIECES[i + 16]).passant;
         }
 
+        // Creates the BoardInfo object that it will generate moves from.
         BoardInfo boardInfo = new BoardInfo(boardPositions, passant, hasMoved, App.MOVE_COUNT);
         boardInfo.setKingPos(true, App.GAME_PIECES[Constants.pieceIDs.BLACK_KING].gridX,
                 App.GAME_PIECES[Constants.pieceIDs.BLACK_KING].gridY);
         boardInfo.setKingPos(false, App.GAME_PIECES[Constants.pieceIDs.WHITE_KING].gridX,
                 App.GAME_PIECES[Constants.pieceIDs.WHITE_KING].gridY);
 
-
-        BoardInfo calculated = minimax(depth, black, boardInfo, -1000, 1000);
+        BoardInfo calculated = minimax(depth, black, boardInfo, -10000, 10000);
         return calculated.previousMove;
-        //return " R5f10.22";
     }
 
     /**
-     * Minimax algorithm used for the A.I. I learned the use of this algorithm from Sebsatian Lague.
-     * His video provided helpful pseudocode and explanations of the algorithm which I've implemented here. 
+     * Minimax algorithm used for the A.I. I learned the use of this algorithm from
+     * Sebsatian Lague.
+     * His video provided helpful pseudocode and explanations of the algorithm which
+     * I've implemented here.
      * https://youtu.be/l-hh51ncgDI
+     * 
+     * This algorithm works by generating all possible moves to a certain depth.
+     * Then recurring up the tree of
+     * moves to find the best possible move.
+     * The parameters alpha and beta are used in alpha beta pruning. Which allows for branches
+     * of the tree of moves to not be generated or evaluated at all, saving time. 
      * 
      * @param depth     The depth to continue the recursion to.
      * @param max       Variable for determining whether it is maximizing, or
      *                  minimizing, true if maximizing, false if minimizing,
      * @param boardInfo The board to generate from.
-     * @return The best board.
+     * @param alpha     Alpha value for pruning.
+     * @param beta      Beta value for pruning.
+     * @return The most favourable board.
      */
     private BoardInfo minimax(int depth, boolean max, BoardInfo boardInfo, int alpha, int beta) {
         BoardInfo lastChild = null;
@@ -100,23 +122,33 @@ public class Bot {
         int lastEval;
 
         if (max) {
-            lastEval = -1000;
-            
+            // maximizing player
+            lastEval = -10000;
+
             for (BoardInfo child : children) {
+                // get the evaluation for the child. Only boards at the final depth are
+                // evaluated, those evaluations recur up the tree.
                 child.evaluate = minimax(depth - 1, !max, child, alpha, beta).evaluate;
                 if (child.evaluate > lastEval) {
+                    // if this child is greater than the stored child, set the stored child equal to
+                    // this child.
                     lastEval = child.evaluate;
                     lastChild = child;
                 }
-                if(child.evaluate >= alpha){
+                if (child.evaluate >= alpha) {
+                    // if this child has a higher evaluation than the current alpha, this value
+                    // becomes the new alpha.
                     alpha = child.evaluate;
                 }
-                if(beta<= alpha){
+                if (beta <= alpha) {
+                    // if the beta value is ever less than or equal to the alpha value, break out
+                    // and return.
                     break;
                 }
             }
         } else {
-            lastEval = +1000;
+            // minimizing player
+            lastEval = +10000;
 
             for (BoardInfo child : children) {
 
@@ -125,10 +157,10 @@ public class Bot {
                     lastEval = child.evaluate;
                     lastChild = child;
                 }
-                if(child.evaluate <= beta){
+                if (child.evaluate <= beta) {
                     beta = child.evaluate;
                 }
-                if(beta<= alpha){
+                if (beta <= alpha) {
                     break;
                 }
             }
@@ -139,11 +171,13 @@ public class Bot {
     }
 
     /**
-     * Method for evaluating the value of the board. Evaluating a board means to
-     * apply a value for it,
-     * this is used in the minimax algorithm.
+     * Evaluation method. This method applies a score to each board. It works by
+     * giving the board an initial score of 0.
+     * Adding positive numbers for the maximizing player (black), and negative
+     * numbers for the minimizing player.
      * 
-     * @return an Integer represnting the score for this board.
+     * @param boardInfo The board to evaluate.
+     * @return An integer, representing the boards score.
      */
     public int evaluate(BoardInfo boardInfo) {
         // black is maximizing colors
@@ -152,23 +186,24 @@ public class Bot {
         if (!isNotUnderCheck(boardInfo, false)) {
             // System.out.println("Check for black Previous move leading to this one: " +
             // boardInfo.previousMove);
-            score += 50; 
-            if(generateBoards(boardInfo, false).length == 0){
+            score += 50;
+            if (generateBoards(boardInfo, false).length == 0) {
                 score += 1000;
                 return score;
-                //System.out.println("Checkmate for black detected");
+                // System.out.println("Checkmate for black detected");
             }
         } else if (!isNotUnderCheck(boardInfo, true)) {
             // System.out.println("Check for white Previous move leading to this one: " +
             // boardInfo.previousMove);
             score -= 50;
-            if(generateBoards(boardInfo, true).length == 0){
-                //System.out.println("checkmate for white detected");
+            if (generateBoards(boardInfo, true).length == 0) {
+                // System.out.println("checkmate for white detected");
                 score -= 1000;
                 return score;
             }
         }
 
+        // Iterates thrugh the whole board, adding a point for every team piece + the value of the team piece. 
         for (int x = 0; x < 8; x++) {
             for (int y = 0; y < 8; y++) {
                 byte id = boardInfo.board[x][y];
@@ -190,17 +225,14 @@ public class Bot {
     }
 
     /**
-     * Method for generating all the possible boards/outcomes from this board.
+     * Method for generating the possible boards from every move on this board.
      * 
-     * @param boardInfo The original board to generate from.
-     * @return An array of BoardInfo objects, representing all the possible moves
-     *         generated from the original board.
+     * @param boardInfo The board to generate from.
+     * @param color The color it is generating for, true if black, false if white.
+     * @return An array of BoardInfo objects that have been generated from the passed in board. 
      */
     private BoardInfo[] generateBoards(BoardInfo boardInfo, boolean color) {
-        // TODO Akil finish this
         ArrayList<BoardInfo> generatedBoards = new ArrayList<BoardInfo>();
-        // System.out.println("Color to generate for: " + ((color) ? "black" :
-        // "white"));
 
         byte colorId = (color) ? Constants.pieceIDs.BLACK : Constants.pieceIDs.WHITE;
         for (int y = 0; y < 8; y++) {
@@ -222,74 +254,47 @@ public class Bot {
                         || id == Constants.pieceIDs.WHITE_PROMOTED_ROOK) {
 
                     // if the piece it is generating for is a rook
-
-                    //long startTime = System.nanoTime();
                     generatedBoards = movesRook(generatedBoards, boardInfo, x, y, color, id);
-                    //System.out.println("Time for rook: " + Long.toString(System.nanoTime() - startTime));
-                    // System.out.println("Boards generated for rook " + id + ": " +
-                    // generatedBoards.size());
                 } else if (id == Constants.pieceIDs.BLACK_KINGS_BISHOP
                         || id == Constants.pieceIDs.BLACK_QUEENS_BISHOP
                         || id == Constants.pieceIDs.WHITE_QUEENS_BISHOP
                         || id == Constants.pieceIDs.WHITE_KINGS_BISHOP) {
 
                     // if the piece it is generating for is a bishop
-
-                    //long startTime = System.nanoTime();
                     generatedBoards = movesBishop(generatedBoards, boardInfo, x, y, color, id);
-                    //System.out.println("Time for bishop: " + Long.toString(System.nanoTime() - startTime));
-                    // System.out.println("Boards generated for bishop " + id + ": " +
-                    // generatedBoards.size());
 
                 } else if (id == Constants.pieceIDs.BLACK_QUEEN || id == Constants.pieceIDs.WHITE_QUEEN) {
                     // if the piece it is generating for is a queen
-                    //long startTime = System.nanoTime();
                     generatedBoards = movesRook(generatedBoards, boardInfo, x, y, color, id);
                     generatedBoards = movesBishop(generatedBoards, boardInfo, x, y, color, id);
-                    //System.out.println("Time for queen: " + Long.toString(System.nanoTime() - startTime));
-                    // System.out.println("Boards generated for queen " + id + ": " +
-                    // generatedBoards.size());
                 } else if (id == Constants.pieceIDs.BLACK_KINGS_KNIGHT
                         || id == Constants.pieceIDs.BLACK_QUEENS_KNIGHT
                         || id == Constants.pieceIDs.WHITE_QUEENS_KNIGHT
                         || id == Constants.pieceIDs.WHITE_KINGS_KNIGHT) {
                     // if the piece it is generating for is a knight
-                    //long startTime = System.nanoTime();
                     generatedBoards = movesKnight(generatedBoards, boardInfo, x, y, color, id);
-                    //System.out.println("Time for knight: " + Long.toString(System.nanoTime() - startTime));
-                    // System.out.println("Boards generated for kngiht " + id + ": " +
-                    // generatedBoards.size());
                 } else if (id == Constants.pieceIDs.BLACK_KING || id == Constants.pieceIDs.WHITE_KING) {
                     // if the piece it is generating for is a king
-                    //long startTime = System.nanoTime();
                     generatedBoards = movesKing(generatedBoards, boardInfo, x, y, color, id);
-                    //System.out.println("Time for king: " + Long.toString(System.nanoTime() - startTime));
-                    // System.out.println("Boards generated for king " + id + ": " +
-                    // generatedBoards.size());
                 } else {
                     // if the piece it is generating for is a pawn
-                    //long startTime = System.nanoTime();
                     generatedBoards = movesPawn(generatedBoards, boardInfo, x, y, color, id);
-                    //System.out.println("Time for pawn: " + Long.toString(System.nanoTime() - startTime));
-                    // System.out.println("Boards generated for pawn " + id + ": " +
-                    // generatedBoards.size());
                 }
 
             }
 
         }
-        //BoardInfo[] generatedBoardsArray = generatedBoards.toArray(new BoardInfo[generatedBoards.size()]);
 
+        //Sorts the boards in order based on the scoring value. 
+        //This improves the efficacy of alpha beta pruning.
         return sortBoards(generatedBoards.toArray(new BoardInfo[generatedBoards.size()]), color);
     }
 
     /**
-     * Method for determining if the king is under check.
-     * 
-     * @param boardInfo BoardInfo object containing the board data.
-     * @param color     Color of the piece, true means black, false means white.
-     * 
-     * @return true if the king isn't under check, false if it is.
+     * Method for checking if the king is under check. 
+     * @param boardInfo The board to check.
+     * @param color The color of the king to check. True if black, false if white. 
+     * @return A boolean variable, true if the king isn't under check, false if it is. 
      */
     boolean isNotUnderCheck(BoardInfo boardInfo, boolean color) {
         int x;
@@ -971,6 +976,18 @@ public class Bot {
         return boards;
     }
 
+
+    /**
+     * Method for generating the possible moves for a pawn. This includes moving forward once, twice, diagonal attacks and en passant. 
+     * 
+     * @param boards The ArrayList to add the newly generated boards to.
+     * @param initialBoard The initial board to generate from.
+     * @param x The x location of the pawn.
+     * @param y The y location of the pawn.
+     * @param color Represents the color of the pawn, true if black, false if not. 
+     * @param id The id of the pawn.
+     * @return An ArrayList of BoardInfo objects containing the newly generated boards. 
+     */
     private ArrayList<BoardInfo> movesPawn(ArrayList<BoardInfo> boards, BoardInfo initialBoard, int x, int y,
             boolean color, byte id) {
 
@@ -980,12 +997,14 @@ public class Bot {
         byte pawnFinalRank;
 
         // pawn ranges are for enemy pawns
-        byte startPawnRange;
-        byte endPawnRange;
+        byte startEnemyPawnRange;
+        byte endEnemyPawnRange;
 
         byte enemyPromotedRook;
         byte[] promotions = new byte[4];
         BoardInfo newBoard;
+
+        //initializing local variables that change based on what team you are on.
         if (color) {
             pawnDirection = 1;
             enemyBeginRange = Constants.pieceIDs.BEGIN_WHITE_RANGE;
@@ -995,14 +1014,14 @@ public class Bot {
             promotions[1] = Constants.pieceIDs.BLACK_PROMOTED_ROOK;
             promotions[2] = Constants.pieceIDs.BLACK_QUEENS_BISHOP;
             promotions[3] = Constants.pieceIDs.BLACK_QUEENS_KNIGHT;
-            startPawnRange = Constants.pieceIDs.BEGIN_WHITE_PAWNS;
-            endPawnRange = Constants.pieceIDs.END_WHITE_PAWNS;
+            startEnemyPawnRange = Constants.pieceIDs.BEGIN_WHITE_PAWNS;
+            endEnemyPawnRange = Constants.pieceIDs.END_WHITE_PAWNS;
             pawnFinalRank = 7;
 
         } else {
             pawnDirection = -1;
-            startPawnRange = Constants.pieceIDs.BEGIN_BLACK_PAWNS;
-            endPawnRange = Constants.pieceIDs.END_BLACK_PAWNS;
+            startEnemyPawnRange = Constants.pieceIDs.BEGIN_BLACK_PAWNS;
+            endEnemyPawnRange = Constants.pieceIDs.END_BLACK_PAWNS;
             enemyBeginRange = Constants.pieceIDs.BEGIN_BLACK_RANGE;
             enemyEndRange = Constants.pieceIDs.END_BLACK_RANGE;
             enemyPromotedRook = Constants.pieceIDs.BLACK_PROMOTED_ROOK;
@@ -1031,9 +1050,7 @@ public class Bot {
                             newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
                             if (isNotUnderCheck(newBoard, color)) {
                                 boards.add(newBoard);
-                                newBoard.setPreviousMove(Constants.moveTypes.PROMOTION + id + "f" + Integer.toString(x)
-                                        + Integer.toString(y) + "." + Integer.toString(x - 1)
-                                        + Integer.toString(y + pawnDirection * 1) + "." + promotion);
+                                newBoard.setPreviousMove(Constants.moveTypes.PROMOTION + id + "." + promotion);
                             }
                         }
                     } else {
@@ -1050,7 +1067,8 @@ public class Bot {
                 }
 
                 // passant left
-                if (initialBoard.board[x - 1][y] > startPawnRange && initialBoard.board[x - 1][y] < endPawnRange
+                //if the piece to the left is an enemy pawn and moves twice forward last move. 
+                if (initialBoard.board[x - 1][y] > startEnemyPawnRange && initialBoard.board[x - 1][y] < endEnemyPawnRange
                         && initialBoard.passant[getPassantIndex(initialBoard.board[x - 1][y])] == initialBoard.moveCount
                                 - 1) {
                     newBoard = initialBoard.copy();
@@ -1086,9 +1104,7 @@ public class Bot {
                             newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
                             if (isNotUnderCheck(newBoard, color)) {
                                 boards.add(newBoard);
-                                newBoard.setPreviousMove(Constants.moveTypes.PROMOTION + id + "f" + Integer.toString(x)
-                                        + Integer.toString(y) + "." + Integer.toString(x + 1)
-                                        + Integer.toString(y + pawnDirection * 1) + "." + promotion);
+                                newBoard.setPreviousMove(Constants.moveTypes.PROMOTION + id + "." + promotion);
                             }
                         }
                     } else {
@@ -1106,7 +1122,8 @@ public class Bot {
                 }
 
                 // passant right
-                if (initialBoard.board[x + 1][y] > startPawnRange && initialBoard.board[x + 1][y] < endPawnRange
+                //if the piece to the right is an enemy pawn and the enemy pawn moved forward twice last move.
+                if (initialBoard.board[x + 1][y] > startEnemyPawnRange && initialBoard.board[x + 1][y] < endEnemyPawnRange
                         && initialBoard.passant[getPassantIndex(initialBoard.board[x + 1][y])] == initialBoard.moveCount
                                 - 1) {
                     newBoard = initialBoard.copy();
@@ -1138,9 +1155,7 @@ public class Bot {
                         newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
                         if (isNotUnderCheck(newBoard, color)) {
                             boards.add(newBoard);
-                            newBoard.setPreviousMove(Constants.moveTypes.PROMOTION + id + "f" + Integer.toString(x)
-                                    + Integer.toString(y) + "." + Integer.toString(x)
-                                    + Integer.toString(y + pawnDirection * 1) + "." + promotion);
+                            newBoard.setPreviousMove(Constants.moveTypes.PROMOTION + id + "." + promotion);
                         }
                     }
                 } else {
@@ -1178,17 +1193,15 @@ public class Bot {
     }
 
     /**
-     * Method responsible for generating the moves from a king.
+     * Method for generating the moves for the king. Includes castling.
      * 
-     * @param boards       The ArrayList of BoardInfo objects to add to.
+     * @param boards The ArrayList of BoardInfo objects to add to.
      * @param initialBoard The initial board to generate from.
-     * @param x            The x location of the king.
-     * @param y            The y location of the king.
-     * @param color        The color of the king, true if the king is black, false
-     *                     if not.
-     * @param id           The id of the king.
-     * @return An ArrayList of BoardInfo objects containing the newly generated
-     *         moves.
+     * @param x The x location of the king.
+     * @param y The y location of the king. 
+     * @param color The color of the king, true if black, false if white.
+     * @param id The id of the king.
+     * @return An ArrayList of BoardInfo objects containing the newly generated boards.
      */
     private ArrayList<BoardInfo> movesKing(ArrayList<BoardInfo> boards, BoardInfo initialBoard, int x, int y,
             boolean color, byte id) {
@@ -1430,31 +1443,37 @@ public class Bot {
     }
 
     /**
-     * Sorting method used for the board generation. Alpha beta pruning is the most efficient when
-     * moves in the tree are sorted from best to worst. All boards have a sorting value, that they are sorted on to order
-     * the moves from best to worst. The sorting value is based on whether that move was a result of capturing a piece. If the 
-     * team is black, they want to have the highest sorting values first, if the team is white, they want the lowest sorting values first. 
+     * Sorting method used for the board generation. Alpha beta pruning is the most
+     * efficient when
+     * moves in the tree are sorted from best to worst. All boards have a sorting
+     * value, that they are sorted on to order
+     * the moves from best to worst. The sorting value is based on whether that move
+     * was a result of capturing a piece. If the
+     * team is black, they want to have the highest sorting values first, if the
+     * team is white, they want the lowest sorting values first.
+     * 
      * @param boards Array of BoardInfo objects to sort.
-     * @param color  Variable used to determine the color, true if black, false if not. 
-     * @return
+     * @param color  Variable used to determine the color, true if black, false if
+     *               not.
+     * @return An sorted array of BoardInfo objects.
      */
-    public BoardInfo[] sortBoards(BoardInfo[] boards, boolean color){
+    public BoardInfo[] sortBoards(BoardInfo[] boards, boolean color) {
         BoardInfo temp;
-        if(color){
-            for(int i = 0; i < boards.length; i++){
-                for (int j = 1; j < boards.length; j++){
-                    if(boards[j].sortingValue > boards[i].sortingValue){
-                        temp  = boards[i];
+        if (color) {
+            for (int i = 0; i < boards.length; i++) {
+                for (int j = 1; j < boards.length; j++) {
+                    if (boards[j].sortingValue > boards[i].sortingValue) {
+                        temp = boards[i];
                         boards[i] = boards[j];
                         boards[j] = temp;
                     }
                 }
             }
         } else {
-            for(int i = 0; i < boards.length; i++){
-                for (int j = 1; j < boards.length; j++){
-                    if(boards[j].sortingValue < boards[i].sortingValue){
-                        temp  = boards[i];
+            for (int i = 0; i < boards.length; i++) {
+                for (int j = 1; j < boards.length; j++) {
+                    if (boards[j].sortingValue < boards[i].sortingValue) {
+                        temp = boards[i];
                         boards[i] = boards[j];
                         boards[j] = temp;
                     }
@@ -1464,35 +1483,5 @@ public class Bot {
         return boards;
     }
 
-
-    /**
-     * Class for BoardInteractions.
-     * 
-     * @author Selim Abdelwahab
-     * @version 1.0
-     */
-    public class BoardInteractions {
-        private String rawAIMoves;
-        private Piece piece;
-        private byte[] move;
-
-        private boolean moveMade = false;
-
-        public BoardInteractions parseAiMove(String move) {
-            System.out.println("Move: " + move);
-            rawAIMoves = move;
-            moveMade = true;
-
-            return this;
-        }
-
-        public Piece getMovedPiece() {
-            return piece;
-        }
-
-        public byte[] getMove() {
-            return move;
-        }
-    }
-
+    
 }

@@ -41,6 +41,7 @@ public class App extends Application {
     public static int MOVE_COUNT = 1;
     public static Piece[] GAME_PIECES;
     private static String matchTranscript;
+    private static String transcriptPath;
 
     private static Map[] matchStats = null;
 
@@ -212,5 +213,13 @@ public class App extends Application {
 
     public static DatabaseReference getServerReference() {
         return serverReference;
+    }
+
+    public static void setTranscriptPath(String newPath) {
+        transcriptPath = newPath;
+    }
+
+    public static String getTranscriptPath(){
+        return transcriptPath;
     }
 }
