@@ -200,8 +200,6 @@ public class StartScreenController {
      */
     @FXML
     public void switchToResume() {
-        /**App.setGameMode(Constants.boardData.MODE_RESUME_GAME);
-        transition("game");*/
         transition("transcriptScreen");
     }
 

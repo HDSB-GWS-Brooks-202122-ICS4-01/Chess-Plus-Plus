@@ -32,6 +32,7 @@ public class Bishop extends Piece{
 
         this.sprite.setFitWidth(Constants.SpriteSheetDimensions.PIECE_FIT_WIDTH);
         this.sprite.setFitHeight(Constants.SpriteSheetDimensions.PIECE_FIT_HEIGHT);
+        this.teamPromotedRook = (this.color == Constants.pieceIDs.BLACK) ? Constants.pieceIDs.BLACK_PROMOTED_ROOK : Constants.pieceIDs.WHITE_PROMOTED_ROOK;
     }
 
     /**

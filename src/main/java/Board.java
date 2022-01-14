@@ -96,6 +96,7 @@ public class Board {
          FileReader r = new FileReader("src\\main\\resources\\data\\config.properties");
          config.load(r);
          r.close();
+
          if (config.getProperty("gametime").equals("10")) {
             gameTime = 600000;
             blackLabel.setText("10:00");
@@ -108,6 +109,10 @@ public class Board {
             gameTime = 1800000;
             blackLabel.setText("30:00");
             whiteLabel.setText("30:00");
+         } else if(config.getProperty("gametime").equals("infinite")){
+            gameTime = 1800000;
+            blackLabel.setText("BLACK");
+            whiteLabel.setText("WHITE");
          }
       } catch (Exception e) {
          e.printStackTrace();

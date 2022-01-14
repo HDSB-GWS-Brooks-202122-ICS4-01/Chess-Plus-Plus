@@ -17,6 +17,7 @@ public abstract class Piece {
     protected byte gridX;
     protected byte gridY;
     protected boolean hasMoved;
+    protected byte teamPromotedRook;
 
     /**
      * Method for getting the possible moves of this piece based on the positions of
@@ -217,6 +218,9 @@ public abstract class Piece {
      */
     private boolean checkPawnAttack(byte[][] boardPositions, byte[] pos) {
         if (color == Constants.pieceIDs.BLACK) {
+            //for black
+
+            //if the postion is within the range
             byte pieceToTheRight = (inBoardRange((byte) (pos[0] + 1), (byte) (pos[1] + 1)))
                     ? boardPositions[pos[0] + 1][pos[1] + 1]
                     : -1;
@@ -227,11 +231,15 @@ public abstract class Piece {
                     && pieceToTheRight < Constants.pieceIDs.END_WHITE_PAWNS)
                     || (pieceToTheLeft > Constants.pieceIDs.BEGIN_WHITE_PAWNS
                             && pieceToTheLeft < Constants.pieceIDs.END_WHITE_PAWNS)) {
-                return true;
+                                //if the piece is an enemy pawn
+                                return true;
             } else {
                 return false;
             }
         } else {
+            //for white
+
+            //if the position is within the board range
             byte pieceToTheRight = (inBoardRange((byte) (pos[0] + 1), (byte) (pos[1] - 1)))
                     ? boardPositions[pos[0] + 1][pos[1] - 1]
                     : -1;
@@ -242,7 +250,8 @@ public abstract class Piece {
                     && pieceToTheRight < Constants.pieceIDs.END_BLACK_PAWNS)
                     || (pieceToTheLeft > Constants.pieceIDs.BEGIN_BLACK_PAWNS
                             && pieceToTheLeft < Constants.pieceIDs.END_BLACK_PAWNS)) {
-                return true;
+                                //if the piece is an enemy pawn
+                                return true;
             } else {
                 return false;
             }
@@ -749,7 +758,12 @@ public abstract class Piece {
      */
     protected ArrayList<byte[]> upMoves(ArrayList<byte[]> possibleMoves, byte[][] boardPositions, byte[] currentLoc) {
         if (currentLoc[1] - 1 > -1) {
+            //if the location above this piece is within the board.
+
+            //array containing the location
             byte[] possibleMove = { currentLoc[0], (byte) (currentLoc[1] - 1) };
+
+            //the piece located directly above.
             byte upSquare = boardPositions[possibleMove[0]][possibleMove[1]];
 
             if (upSquare == Constants.pieceIDs.EMPTY_CELL) {
@@ -758,7 +772,7 @@ public abstract class Piece {
                 }
                 return upMoves(possibleMoves, boardPositions, possibleMove);
             } else {
-                if (upSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
+                if (upSquare / Constants.pieceIDs.COLOR_DIVISOR != color){
                     if(isNotUnderCheck(boardPositions, possibleMove,false)){
                         possibleMoves.add(possibleMove);
                     }
@@ -844,6 +858,7 @@ public abstract class Piece {
      * @return An array list of byte arrays containing all the added moves. 
      */
     protected ArrayList<byte[]> rightMoves(ArrayList<byte[]> possibleMoves, byte[][] boardPositions, byte[] currentLoc) {
+        //if the location to the right is in the range.
         if (currentLoc[0] + 1 < 8) {
             byte[] possibleMove = { (byte) (currentLoc[0] + 1), currentLoc[1]};
             byte upSquare = boardPositions[possibleMove[0]][possibleMove[1]];
