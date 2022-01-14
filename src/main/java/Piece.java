@@ -23,7 +23,8 @@ public abstract class Piece {
      * Method for getting the possible moves of this piece based on the positions of
      * the piece on the board.
      * 
-     * @param boardPositions A 2d array containing the current positions on the board.
+     * @param boardPositions A 2d array containing the current positions on the
+     *                       board.
      * @return a 2d array containing all the possible moves based on this board.
      */
     public abstract byte[][] getPossibleMoves(byte[][] boardPositions);
@@ -53,14 +54,17 @@ public abstract class Piece {
     }
 
     /**
-     * Method for getting if the king is not under check.
+     * Method for getting if the king is not under check. This takes in a possible
+     * move,
+     * and determines if this new board results in check.
      * 
      * @param boardPositions The positions of pieces on the board.
      * @param possibleMove   The move to check.
-     * @param isKing         if the move it is trying involves moving the king.
-     * @return
+     * @param isKing         Whether the piece moving is the king.
+     * @return True if the king isn't under check, false if it is.
      */
     public boolean isNotUnderCheck(byte[][] boardPositions, byte[] possibleMove, boolean isKing) {
+        // Deep copies postions
         byte[][] newBoardPositions = new byte[8][8];
         for (int x = 0; x < 8; x++) {
             for (int y = 0; y < 8; y++) {
@@ -70,6 +74,8 @@ public abstract class Piece {
 
         // System.out.println("Checking this move: " + Arrays.toString(possibleMove));
 
+        // If its the king moving, it needs to change where it gets the king position
+        // from.
         byte[] kingPos = new byte[2];
         if (isKing) {
             kingPos[0] = possibleMove[0];
@@ -218,9 +224,9 @@ public abstract class Piece {
      */
     private boolean checkPawnAttack(byte[][] boardPositions, byte[] pos) {
         if (color == Constants.pieceIDs.BLACK) {
-            //for black
+            // for black
 
-            //if the postion is within the range
+            // if the postion is within the range
             byte pieceToTheRight = (inBoardRange((byte) (pos[0] + 1), (byte) (pos[1] + 1)))
                     ? boardPositions[pos[0] + 1][pos[1] + 1]
                     : -1;
@@ -231,15 +237,15 @@ public abstract class Piece {
                     && pieceToTheRight < Constants.pieceIDs.END_WHITE_PAWNS)
                     || (pieceToTheLeft > Constants.pieceIDs.BEGIN_WHITE_PAWNS
                             && pieceToTheLeft < Constants.pieceIDs.END_WHITE_PAWNS)) {
-                                //if the piece is an enemy pawn
-                                return true;
+                // if the piece is an enemy pawn
+                return true;
             } else {
                 return false;
             }
         } else {
-            //for white
+            // for white
 
-            //if the position is within the board range
+            // if the position is within the board range
             byte pieceToTheRight = (inBoardRange((byte) (pos[0] + 1), (byte) (pos[1] - 1)))
                     ? boardPositions[pos[0] + 1][pos[1] - 1]
                     : -1;
@@ -250,8 +256,8 @@ public abstract class Piece {
                     && pieceToTheRight < Constants.pieceIDs.END_BLACK_PAWNS)
                     || (pieceToTheLeft > Constants.pieceIDs.BEGIN_BLACK_PAWNS
                             && pieceToTheLeft < Constants.pieceIDs.END_BLACK_PAWNS)) {
-                                //if the piece is an enemy pawn
-                                return true;
+                // if the piece is an enemy pawn
+                return true;
             } else {
                 return false;
             }
@@ -268,17 +274,26 @@ public abstract class Piece {
      * @return true if king is under check from this direction, false if not.
      */
     private boolean checkLeft(byte[][] boardPositions, byte[] pos) {
+        // iteration for pieces to the left.
         for (int i = pos[0] - 1; i > -1; i--) {
+            // the piece to the left
             byte pieceAtSquare = boardPositions[i][pos[1]];
-            //
-            if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
+
+            // if the piece to the left is an enemy piece
+            if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL
+                    && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
+
+                // if the color is black, else white
                 if (color == Constants.pieceIDs.BLACK) {
+
+                    // if the piece is a rook or promoted rook.
                     if (pieceAtSquare == Constants.pieceIDs.WHITE_KINGS_ROOK
                             || pieceAtSquare == Constants.pieceIDs.WHITE_QUEENS_ROOK
                             || pieceAtSquare == Constants.pieceIDs.WHITE_QUEEN
                             || pieceAtSquare == Constants.pieceIDs.WHITE_PROMOTED_ROOK) {
                         return true;
                     } else {
+                        // if its not return
                         return false;
                     }
                 } else {
@@ -286,18 +301,23 @@ public abstract class Piece {
                             || pieceAtSquare == Constants.pieceIDs.BLACK_QUEENS_ROOK
                             || pieceAtSquare == Constants.pieceIDs.BLACK_QUEEN
                             || pieceAtSquare == Constants.pieceIDs.BLACK_PROMOTED_ROOK) {
+
                         return true;
                     } else {
                         return false;
                     }
 
                 }
-            } else if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR == color) {
+            } else if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL
+                    && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR == color) {
+                // stops checking if the piece that is there is a teammate.
                 return false;
             } else {
+                // continues to the next iteration if there is nothing there.
                 continue;
             }
         }
+
         return false;
     }
 
@@ -310,10 +330,14 @@ public abstract class Piece {
      * @return true if king is under check from this direction, false if not.
      */
     private boolean checkRight(byte[][] boardPositions, byte[] pos) {
+        // iteration for pieces to the right
+        // horizontal checks and vertical checks all use the same logic, just different
+        // iteration
+
         for (int i = pos[0] + 1; i < 8; i++) {
             byte pieceAtSquare = boardPositions[i][pos[1]];
-            //
-            if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
+            if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL
+                    && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
                 if (color == Constants.pieceIDs.BLACK) {
                     if (pieceAtSquare == Constants.pieceIDs.WHITE_KINGS_ROOK
                             || pieceAtSquare == Constants.pieceIDs.WHITE_QUEENS_ROOK
@@ -334,7 +358,8 @@ public abstract class Piece {
                     }
 
                 }
-            } else if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR == color) {
+            } else if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL
+                    && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR == color) {
                 return false;
             } else {
                 continue;
@@ -352,9 +377,14 @@ public abstract class Piece {
      * @return true if king is under check from this direction, false if not.
      */
     private boolean checkUp(byte[][] boardPositions, byte[] pos) {
+        // iteration for going up
+        // origin of the grid is the top left corner
+
         for (int i = pos[1] - 1; i > -1; i--) {
             byte pieceAtSquare = boardPositions[pos[0]][i];
-            if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
+            if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL
+                    && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
+                // if the piece is an enemy piece
                 if (color == Constants.pieceIDs.BLACK) {
                     if (pieceAtSquare == Constants.pieceIDs.WHITE_KINGS_ROOK
                             || pieceAtSquare == Constants.pieceIDs.WHITE_QUEENS_ROOK
@@ -375,7 +405,8 @@ public abstract class Piece {
                     }
 
                 }
-            } else if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR == color) {
+            } else if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL
+                    && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR == color) {
                 return false;
             } else {
                 continue;
@@ -393,10 +424,13 @@ public abstract class Piece {
      * @return true if king is under check from this direction, false if not.
      */
     private boolean checkDown(byte[][] boardPositions, byte[] pos) {
+        // iteration for going down
         for (int i = pos[1] + 1; i < 8; i++) {
             byte pieceAtSquare = boardPositions[pos[0]][i];
-            //
-            if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
+
+            if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL
+                    && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
+                // if the piece at the square is an enemy piece
                 if (color == Constants.pieceIDs.BLACK) {
                     if (pieceAtSquare == Constants.pieceIDs.WHITE_KINGS_ROOK
                             || pieceAtSquare == Constants.pieceIDs.WHITE_QUEENS_ROOK
@@ -417,7 +451,8 @@ public abstract class Piece {
                     }
 
                 }
-            } else if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR == color) {
+            } else if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL
+                    && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR == color) {
                 return false;
             } else {
                 continue;
@@ -436,18 +471,23 @@ public abstract class Piece {
      */
     private boolean checkUpRightDiagonal(byte[][] boardPositions, byte[] pos) {
 
+        // iteration for checking the up right diagonal, requires two iterators.
         int j = pos[1] - 1;
         for (int i = pos[0] + 1; i < 8; i++) {
             if (j < 0) {
+                // if the y is out of range, break out from loop
                 break;
             }
             byte pieceAtSquare = boardPositions[i][j];
-            //
-            if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR == color) {
+
+            if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL
+                    && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
+                // if the piece at the square is an enemy piece
                 if (color == Constants.pieceIDs.BLACK) {
                     if (pieceAtSquare == Constants.pieceIDs.WHITE_KINGS_BISHOP
                             || pieceAtSquare == Constants.pieceIDs.WHITE_QUEENS_BISHOP
                             || pieceAtSquare == Constants.pieceIDs.WHITE_QUEEN) {
+                        // if the piece is a bishop or queen.
                         return true;
                     } else {
                         break;
@@ -462,7 +502,8 @@ public abstract class Piece {
                     }
 
                 }
-            } else if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR == color) {
+            } else if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL
+                    && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR == color) {
                 return false;
             } else {
                 j--;
@@ -481,13 +522,16 @@ public abstract class Piece {
      * @return true if king is under check from this direction, false if not.
      */
     private boolean checkUpLeftDiagonal(byte[][] boardPositions, byte[] pos) {
+        // iteration for checking the up left diagonal
+
         int j = pos[1] - 1;
         for (int i = pos[0] - 1; i > -1; i--) {
             if (j < 0) {
                 break;
             }
             byte pieceAtSquare = boardPositions[i][j];
-            if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
+            if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL
+                    && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
                 if (color == Constants.pieceIDs.BLACK) {
                     if (pieceAtSquare == Constants.pieceIDs.WHITE_KINGS_BISHOP
                             || pieceAtSquare == Constants.pieceIDs.WHITE_QUEENS_BISHOP
@@ -506,7 +550,8 @@ public abstract class Piece {
                     }
 
                 }
-            } else if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR == color) {
+            } else if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL
+                    && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR == color) {
                 return false;
             } else {
                 j--;
@@ -525,6 +570,7 @@ public abstract class Piece {
      * @return true if king is under check from this direction, false if not.
      */
     private boolean checkDownLeftDiagonal(byte[][] boardPositions, byte[] pos) {
+        // iteration for down left diagonal.
 
         int j = pos[1] + 1;
         for (int i = pos[0] - 1; i > -1; i--) {
@@ -532,7 +578,8 @@ public abstract class Piece {
                 break;
             }
             byte pieceAtSquare = boardPositions[i][j];
-            if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
+            if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL
+                    && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
                 if (color == Constants.pieceIDs.BLACK) {
                     if (pieceAtSquare == Constants.pieceIDs.WHITE_KINGS_BISHOP
                             || pieceAtSquare == Constants.pieceIDs.WHITE_QUEENS_BISHOP
@@ -551,7 +598,8 @@ public abstract class Piece {
                     }
 
                 }
-            } else if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR == color) {
+            } else if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL
+                    && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR == color) {
                 return false;
             } else {
                 j++;
@@ -570,13 +618,17 @@ public abstract class Piece {
      * @return true if king is under check from this direction, false if not.
      */
     private boolean checkDownRightDiagonal(byte[][] boardPositions, byte[] pos) {
+        // iteration for the down right diagonal.
         int j = pos[1] + 1;
         for (int i = pos[0] + 1; i < 8; i++) {
             if (j > 7) {
                 break;
             }
             byte pieceAtSquare = boardPositions[i][j];
-            if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
+
+            if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL
+                    && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
+
                 if (color == Constants.pieceIDs.BLACK) {
                     if (pieceAtSquare == Constants.pieceIDs.WHITE_KINGS_BISHOP
                             || pieceAtSquare == Constants.pieceIDs.WHITE_QUEENS_BISHOP
@@ -586,6 +638,7 @@ public abstract class Piece {
                         break;
                     }
                 } else {
+
                     if (pieceAtSquare == Constants.pieceIDs.BLACK_KINGS_BISHOP
                             || pieceAtSquare == Constants.pieceIDs.BLACK_QUEENS_BISHOP
                             || pieceAtSquare == Constants.pieceIDs.BLACK_QUEEN) {
@@ -595,7 +648,8 @@ public abstract class Piece {
                     }
 
                 }
-            } else if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR == color) {
+            } else if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL
+                    && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR == color) {
                 return false;
             } else {
                 j++;
@@ -605,175 +659,194 @@ public abstract class Piece {
         return false;
     }
 
-     /**
-     * Recursive method for getting the possible moves for a queen diagonally up and to the right. Adds to an arraylist of moves
-     * and returns the arraylist when it has added all possible moves in this direction. 
+    /**
+     * Recursive method for getting the possible moves for a queen diagonally up and
+     * to the right. Adds to an arraylist of moves
+     * and returns the arraylist when it has added all possible moves in this
+     * direction.
      * 
-     * @param possibleMoves Array list of byte arrays to add to.
+     * @param possibleMoves  Array list of byte arrays to add to.
      * @param boardPositions Current positions of the whole board.
-     * @param currentLoc Positions to check from.
-     * @return An array list of byte arrays containing all the added moves. 
+     * @param currentLoc     Positions to check from.
+     * @return An array list of byte arrays containing all the added moves.
      */
-    protected ArrayList<byte[]> upRightDiagonalMoves(ArrayList<byte[]> possibleMoves, byte[][] boardPositions, byte[] currentLoc){
-        if(currentLoc[0]+1 < 8 && currentLoc[1] -1 > -1){
-            byte upRightSquare = boardPositions[currentLoc[0]+1][currentLoc[1]-1];
-            byte[] possibleMove = {(byte) (currentLoc[0]+1), (byte) (currentLoc[1] -1)};
+    protected ArrayList<byte[]> upRightDiagonalMoves(ArrayList<byte[]> possibleMoves, byte[][] boardPositions,
+            byte[] currentLoc) {
 
-            if(upRightSquare == Constants.pieceIDs.EMPTY_CELL){
-                //if the square one up and to the right is empty, add that square and repeat process for  that square
-                if(isNotUnderCheck(boardPositions, possibleMove,false )){
+        if (currentLoc[0] + 1 < 8 && currentLoc[1] - 1 > -1) {
+            //if the current location is within the board range. 
+
+
+            byte upRightSquare = boardPositions[currentLoc[0] + 1][currentLoc[1] - 1];
+            byte[] possibleMove = { (byte) (currentLoc[0] + 1), (byte) (currentLoc[1] - 1) };
+
+            if (upRightSquare == Constants.pieceIDs.EMPTY_CELL) {
+                // if the square one up and to the right is empty, add that square and repeat
+                // process for that square
+                if (isNotUnderCheck(boardPositions, possibleMove, false)) {
                     possibleMoves.add(possibleMove);
                 }
                 return upRightDiagonalMoves(possibleMoves, boardPositions, possibleMove);
             } else {
-                if(upRightSquare/Constants.pieceIDs.COLOR_DIVISOR != color){
-                    if(isNotUnderCheck(boardPositions, possibleMove,false )){
+                if (upRightSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
+                    if (isNotUnderCheck(boardPositions, possibleMove, false)) {
                         possibleMoves.add(possibleMove);
                     }
                 }
                 return possibleMoves;
             }
 
-        } else{
+        } else {
             return possibleMoves;
         }
 
     }
 
     /**
-     * Recursive method for getting the possible moves for a queen diagonally up and to the left. Adds to an arraylist of moves
-     * and returns the arraylist when it has added all possible moves in this direction. 
+     * Recursive method for getting the possible moves for a queen diagonally up and
+     * to the left. Adds to an arraylist of moves
+     * and returns the arraylist when it has added all possible moves in this
+     * direction.
      * 
-     * @param possibleMoves Array list of byte arrays to add to.
+     * @param possibleMoves  Array list of byte arrays to add to.
      * @param boardPositions Current positions of the whole board.
-     * @param currentLoc Positions to check from.
-     * @return An array list of byte arrays containing all the added moves. 
+     * @param currentLoc     Positions to check from.
+     * @return An array list of byte arrays containing all the added moves.
      */
-    protected ArrayList<byte[]> upLeftDiagonalMoves(ArrayList<byte[]> possibleMoves,  byte[][] boardPositions, byte[] currentLoc){
-        if(currentLoc[0]-1 > -1 && currentLoc[1] -1 > -1){
-            byte upRightSquare = boardPositions[currentLoc[0]-1][currentLoc[1]-1];
-            byte[] possibleMove = {(byte) (currentLoc[0]-1), (byte) (currentLoc[1] -1)};
+    protected ArrayList<byte[]> upLeftDiagonalMoves(ArrayList<byte[]> possibleMoves, byte[][] boardPositions,
+            byte[] currentLoc) {
+        if (currentLoc[0] - 1 > -1 && currentLoc[1] - 1 > -1) {
+            byte upRightSquare = boardPositions[currentLoc[0] - 1][currentLoc[1] - 1];
+            byte[] possibleMove = { (byte) (currentLoc[0] - 1), (byte) (currentLoc[1] - 1) };
 
-            if(upRightSquare == Constants.pieceIDs.EMPTY_CELL){
-                //if the square one up and to the right is empty, add that square and repeat process for  that square
-                if(isNotUnderCheck(boardPositions, possibleMove, false)){
+            if (upRightSquare == Constants.pieceIDs.EMPTY_CELL) {
+                // if the square one up and to the right is empty, add that square and repeat
+                // process for that square
+                if (isNotUnderCheck(boardPositions, possibleMove, false)) {
                     possibleMoves.add(possibleMove);
                 }
                 return upLeftDiagonalMoves(possibleMoves, boardPositions, possibleMove);
             } else {
-                if(upRightSquare/Constants.pieceIDs.COLOR_DIVISOR != color){
-                    if(isNotUnderCheck(boardPositions, possibleMove, false)){
+                if (upRightSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
+                    if (isNotUnderCheck(boardPositions, possibleMove, false)) {
                         possibleMoves.add(possibleMove);
                     }
                 }
                 return possibleMoves;
             }
 
-        } else{
+        } else {
             return possibleMoves;
         }
     }
 
-
     /**
-     * Recursive method for getting the possible moves for a queen diagonally down and to the right. Adds to an arraylist of moves
-     * and returns the arraylist when it has added all possible moves in this direction. 
+     * Recursive method for getting the possible moves for a queen diagonally down
+     * and to the right. Adds to an arraylist of moves
+     * and returns the arraylist when it has added all possible moves in this
+     * direction.
      * 
-     * @param possibleMoves Array list of byte arrays to add to.
+     * @param possibleMoves  Array list of byte arrays to add to.
      * @param boardPositions Current positions of the whole board.
-     * @param currentLoc Positions to check from.
-     * @return An array list of byte arrays containing all the added moves. 
+     * @param currentLoc     Positions to check from.
+     * @return An array list of byte arrays containing all the added moves.
      */
-    protected ArrayList<byte[]> downRightDiagonalMoves(ArrayList<byte[]> possibleMoves,  byte[][] boardPositions, byte[] currentLoc){
-        if(currentLoc[0]+1 < 8 && currentLoc[1] +1 < 8){
-            byte upRightSquare = boardPositions[currentLoc[0]+1][currentLoc[1]+1];
-            byte[] possibleMove = {(byte) (currentLoc[0]+1), (byte) (currentLoc[1] +1)};
+    protected ArrayList<byte[]> downRightDiagonalMoves(ArrayList<byte[]> possibleMoves, byte[][] boardPositions,
+            byte[] currentLoc) {
+        if (currentLoc[0] + 1 < 8 && currentLoc[1] + 1 < 8) {
+            byte upRightSquare = boardPositions[currentLoc[0] + 1][currentLoc[1] + 1];
+            byte[] possibleMove = { (byte) (currentLoc[0] + 1), (byte) (currentLoc[1] + 1) };
 
-            if(upRightSquare == Constants.pieceIDs.EMPTY_CELL){
-                //if the square one up and to the right is empty, add that square and repeat process for  that square
-                if(isNotUnderCheck(boardPositions, possibleMove, false)){
+            if (upRightSquare == Constants.pieceIDs.EMPTY_CELL) {
+                // if the square one up and to the right is empty, add that square and repeat
+                // process for that square
+                if (isNotUnderCheck(boardPositions, possibleMove, false)) {
                     possibleMoves.add(possibleMove);
                 }
                 return downRightDiagonalMoves(possibleMoves, boardPositions, possibleMove);
             } else {
-                if(upRightSquare/Constants.pieceIDs.COLOR_DIVISOR != color){
-                    if(isNotUnderCheck(boardPositions, possibleMove, false)){
+                if (upRightSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
+                    if (isNotUnderCheck(boardPositions, possibleMove, false)) {
                         possibleMoves.add(possibleMove);
                     }
                 }
                 return possibleMoves;
             }
 
-        } else{
+        } else {
             return possibleMoves;
         }
-        
 
     }
 
     /**
-     * Recursive method for getting the possible moves for a queen diagonally down and to the left. Adds to an arraylist of moves
-     * and returns the arraylist when it has added all possible moves in this direction. 
+     * Recursive method for getting the possible moves for a queen diagonally down
+     * and to the left. Adds to an arraylist of moves
+     * and returns the arraylist when it has added all possible moves in this
+     * direction.
      * 
-     * @param possibleMoves Array list of byte arrays to add to.
+     * @param possibleMoves  Array list of byte arrays to add to.
      * @param boardPositions Current positions of the whole board.
-     * @param currentLoc Positions to check from.
-     * @return An array list of byte arrays containing all the added moves. 
+     * @param currentLoc     Positions to check from.
+     * @return An array list of byte arrays containing all the added moves.
      */
-    protected ArrayList<byte[]> downLeftDiagonalMoves(ArrayList<byte[]> possibleMoves,  byte[][] boardPositions, byte[] currentLoc){
-        if(currentLoc[0]-1 > -1 && currentLoc[1] +1 < 8){
-            byte upRightSquare = boardPositions[currentLoc[0]-1][currentLoc[1]+1];
-            byte[] possibleMove = {(byte) (currentLoc[0]-1), (byte) (currentLoc[1] +1)};
+    protected ArrayList<byte[]> downLeftDiagonalMoves(ArrayList<byte[]> possibleMoves, byte[][] boardPositions,
+            byte[] currentLoc) {
+        if (currentLoc[0] - 1 > -1 && currentLoc[1] + 1 < 8) {
+            byte upRightSquare = boardPositions[currentLoc[0] - 1][currentLoc[1] + 1];
+            byte[] possibleMove = { (byte) (currentLoc[0] - 1), (byte) (currentLoc[1] + 1) };
 
-            if(upRightSquare == Constants.pieceIDs.EMPTY_CELL){
-                //if the square one up and to the right is empty, add that square and repeat process for  that square
-                if(isNotUnderCheck(boardPositions, possibleMove, false)){
+            if (upRightSquare == Constants.pieceIDs.EMPTY_CELL) {
+                // if the square one up and to the right is empty, add that square and repeat
+                // process for that square
+                if (isNotUnderCheck(boardPositions, possibleMove, false)) {
                     possibleMoves.add(possibleMove);
                 }
                 return downLeftDiagonalMoves(possibleMoves, boardPositions, possibleMove);
             } else {
-                if(upRightSquare/Constants.pieceIDs.COLOR_DIVISOR != color){
-                    if(isNotUnderCheck(boardPositions, possibleMove, false)){
+                if (upRightSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
+                    if (isNotUnderCheck(boardPositions, possibleMove, false)) {
                         possibleMoves.add(possibleMove);
                     }
                 }
                 return possibleMoves;
             }
 
-        } else{
+        } else {
             return possibleMoves;
         }
 
     }
 
-
     /**
-     * Recursive method for getting the possible moves for a queen moving up. Adds to an arraylist of moves
-     * and returns the arraylist when it has added all possible moves in this direction. 
+     * Recursive method for getting the possible moves for a queen moving up. Adds
+     * to an arraylist of moves
+     * and returns the arraylist when it has added all possible moves in this
+     * direction.
      * 
-     * @param possibleMoves Array list of byte arrays to add to.
+     * @param possibleMoves  Array list of byte arrays to add to.
      * @param boardPositions Current positions of the whole board.
-     * @param currentLoc Positions to check from.
-     * @return An array list of byte arrays containing all the added moves. 
+     * @param currentLoc     Positions to check from.
+     * @return An array list of byte arrays containing all the added moves.
      */
     protected ArrayList<byte[]> upMoves(ArrayList<byte[]> possibleMoves, byte[][] boardPositions, byte[] currentLoc) {
         if (currentLoc[1] - 1 > -1) {
-            //if the location above this piece is within the board.
+            // if the location above this piece is within the board.
 
-            //array containing the location
+            // array containing the location
             byte[] possibleMove = { currentLoc[0], (byte) (currentLoc[1] - 1) };
 
-            //the piece located directly above.
+            // the piece located directly above.
             byte upSquare = boardPositions[possibleMove[0]][possibleMove[1]];
 
             if (upSquare == Constants.pieceIDs.EMPTY_CELL) {
-                if(isNotUnderCheck(boardPositions, possibleMove,false)){
+                if (isNotUnderCheck(boardPositions, possibleMove, false)) {
                     possibleMoves.add(possibleMove);
                 }
                 return upMoves(possibleMoves, boardPositions, possibleMove);
             } else {
-                if (upSquare / Constants.pieceIDs.COLOR_DIVISOR != color){
-                    if(isNotUnderCheck(boardPositions, possibleMove,false)){
+                if (upSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
+                    if (isNotUnderCheck(boardPositions, possibleMove, false)) {
                         possibleMoves.add(possibleMove);
                     }
                 }
@@ -785,13 +858,15 @@ public abstract class Piece {
     }
 
     /**
-     * Recursive method for getting the possible moves for a queen moving down. Adds to an arraylist of moves
-     * and returns the arraylist when it has added all possible moves in this direction. 
+     * Recursive method for getting the possible moves for a queen moving down. Adds
+     * to an arraylist of moves
+     * and returns the arraylist when it has added all possible moves in this
+     * direction.
      * 
-     * @param possibleMoves Array list of byte arrays to add to.
+     * @param possibleMoves  Array list of byte arrays to add to.
      * @param boardPositions Current positions of the whole board.
-     * @param currentLoc Positions to check from.
-     * @return An array list of byte arrays containing all the added moves. 
+     * @param currentLoc     Positions to check from.
+     * @return An array list of byte arrays containing all the added moves.
      */
     protected ArrayList<byte[]> downMoves(ArrayList<byte[]> possibleMoves, byte[][] boardPositions, byte[] currentLoc) {
         if (currentLoc[1] + 1 < 8) {
@@ -799,13 +874,13 @@ public abstract class Piece {
             byte upSquare = boardPositions[possibleMove[0]][possibleMove[1]];
 
             if (upSquare == Constants.pieceIDs.EMPTY_CELL) {
-                if(isNotUnderCheck(boardPositions, possibleMove,false)){
+                if (isNotUnderCheck(boardPositions, possibleMove, false)) {
                     possibleMoves.add(possibleMove);
                 }
                 return downMoves(possibleMoves, boardPositions, possibleMove);
             } else {
                 if (upSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
-                    if(isNotUnderCheck(boardPositions, possibleMove,false)){
+                    if (isNotUnderCheck(boardPositions, possibleMove, false)) {
                         possibleMoves.add(possibleMove);
                     }
                 }
@@ -817,27 +892,29 @@ public abstract class Piece {
     }
 
     /**
-     * Recursive method for getting the possible moves for a queen moving left. Adds to an arraylist of moves
-     * and returns the arraylist when it has added all possible moves in this direction. 
+     * Recursive method for getting the possible moves for a queen moving left. Adds
+     * to an arraylist of moves
+     * and returns the arraylist when it has added all possible moves in this
+     * direction.
      * 
-     * @param possibleMoves Array list of byte arrays to add to.
+     * @param possibleMoves  Array list of byte arrays to add to.
      * @param boardPositions Current positions of the whole board.
-     * @param currentLoc Positions to check from.
-     * @return An array list of byte arrays containing all the added moves. 
+     * @param currentLoc     Positions to check from.
+     * @return An array list of byte arrays containing all the added moves.
      */
     protected ArrayList<byte[]> leftMoves(ArrayList<byte[]> possibleMoves, byte[][] boardPositions, byte[] currentLoc) {
         if (currentLoc[0] - 1 > -1) {
-            byte[] possibleMove = { (byte) (currentLoc[0] - 1), currentLoc[1]};
+            byte[] possibleMove = { (byte) (currentLoc[0] - 1), currentLoc[1] };
             byte upSquare = boardPositions[possibleMove[0]][possibleMove[1]];
 
             if (upSquare == Constants.pieceIDs.EMPTY_CELL) {
-                if(isNotUnderCheck(boardPositions, possibleMove,false)){
+                if (isNotUnderCheck(boardPositions, possibleMove, false)) {
                     possibleMoves.add(possibleMove);
                 }
                 return leftMoves(possibleMoves, boardPositions, possibleMove);
             } else {
                 if (upSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
-                    if(isNotUnderCheck(boardPositions, possibleMove,false)){
+                    if (isNotUnderCheck(boardPositions, possibleMove, false)) {
                         possibleMoves.add(possibleMove);
                     }
                 }
@@ -849,28 +926,31 @@ public abstract class Piece {
     }
 
     /**
-     * Recursive method for getting the possible moves for a queen moving right. Adds to an arraylist of moves
-     * and returns the arraylist when it has added all possible moves in this direction. 
+     * Recursive method for getting the possible moves for a queen moving right.
+     * Adds to an arraylist of moves
+     * and returns the arraylist when it has added all possible moves in this
+     * direction.
      * 
-     * @param possibleMoves Array list of byte arrays to add to.
+     * @param possibleMoves  Array list of byte arrays to add to.
      * @param boardPositions Current positions of the whole board.
-     * @param currentLoc Positions to check from.
-     * @return An array list of byte arrays containing all the added moves. 
+     * @param currentLoc     Positions to check from.
+     * @return An array list of byte arrays containing all the added moves.
      */
-    protected ArrayList<byte[]> rightMoves(ArrayList<byte[]> possibleMoves, byte[][] boardPositions, byte[] currentLoc) {
-        //if the location to the right is in the range.
+    protected ArrayList<byte[]> rightMoves(ArrayList<byte[]> possibleMoves, byte[][] boardPositions,
+            byte[] currentLoc) {
+        // if the location to the right is in the range.
         if (currentLoc[0] + 1 < 8) {
-            byte[] possibleMove = { (byte) (currentLoc[0] + 1), currentLoc[1]};
+            byte[] possibleMove = { (byte) (currentLoc[0] + 1), currentLoc[1] };
             byte upSquare = boardPositions[possibleMove[0]][possibleMove[1]];
 
             if (upSquare == Constants.pieceIDs.EMPTY_CELL) {
-                if(isNotUnderCheck(boardPositions, possibleMove,false)){
+                if (isNotUnderCheck(boardPositions, possibleMove, false)) {
                     possibleMoves.add(possibleMove);
                 }
                 return rightMoves(possibleMoves, boardPositions, possibleMove);
             } else {
                 if (upSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
-                    if(isNotUnderCheck(boardPositions, possibleMove,false)){
+                    if (isNotUnderCheck(boardPositions, possibleMove, false)) {
                         possibleMoves.add(possibleMove);
                     }
                 }
@@ -880,8 +960,6 @@ public abstract class Piece {
             return possibleMoves;
         }
     }
-
-
 
     /**
      * Checks to see if this position is in the board.

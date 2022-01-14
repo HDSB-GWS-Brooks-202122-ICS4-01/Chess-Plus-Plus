@@ -48,7 +48,7 @@ public class OnlineBoard {
 
    private final StackPane[][] CELLS = new StackPane[8][8];
 
-   private final Piece[] GAME_PIECES = new Piece[32];
+   private final Piece[] GAME_PIECES = new Piece[34];
    private final ArrayList<Piece> LIVE_PIECES = new ArrayList<Piece>();
    private final ArrayList<Piece> DEAD_PIECES = new ArrayList<Piece>();
 
