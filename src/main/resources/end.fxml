@@ -62,9 +62,9 @@
                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                        <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                            <children>
-                              <Label text="Black wins by checkmate!">
+                              <Label fx:id="lbl_winnerMsg" alignment="CENTER" maxWidth="1000.0" nodeOrientation="LEFT_TO_RIGHT" text="Black wins by checkmate!" wrapText="true">
                                  <font>
                                     <Font name="Bank Gothic Light BT" size="70.0" />
                                  </font>
@@ -206,29 +206,12 @@
                         <GridPane>
                           <columnConstraints>
                               <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" maxWidth="1.7976931348623157E308" />
-                              <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" maxWidth="1.7976931348623157E308" />
                           </columnConstraints>
                           <rowConstraints>
                             <RowConstraints minHeight="100.0" vgrow="ALWAYS" />
                             <RowConstraints fillHeight="false" minHeight="100.0" vgrow="NEVER" />
                           </rowConstraints>
                            <children>
-                              <Button fx:id="btn_replay" maxWidth="1.7976931348623157E308" minWidth="500.0" mnemonicParsing="false" onAction="#replayMatch" styleClass="btn-submit" text="Replay" GridPane.columnIndex="1">
-                                 <font>
-                                    <Font name="Times New Roman Bold" size="35.0" />
-                                 </font>
-                                 <GridPane.margin>
-                                    <Insets left="15.0" />
-                                 </GridPane.margin>
-                              </Button>
-                              <Button fx:id="btn_matchmake" maxWidth="1.7976931348623157E308" minWidth="500.0" mnemonicParsing="false" styleClass="btn-submit" text="Matchmake" GridPane.rowIndex="1">
-                                 <font>
-                                    <Font name="Times New Roman Bold" size="35.0" />
-                                 </font>
-                                 <GridPane.margin>
-                                    <Insets right="15.0" />
-                                 </GridPane.margin>
-                              </Button>
                               <Button fx:id="btn_home" maxWidth="1.7976931348623157E308" minWidth="500.0" mnemonicParsing="false" onAction="#goToHome" styleClass="btn-submit" text="Home">
                                  <font>
                                     <Font name="Times New Roman Bold" size="35.0" />
@@ -237,7 +220,7 @@
                                     <Insets right="15.0" />
                                  </GridPane.margin>
                               </Button>
-                              <Button fx:id="btn_downloadTranscript" contentDisplay="CENTER" maxWidth="1.7976931348623157E308" minWidth="500.0" mnemonicParsing="false" onAction="#downloadGameTranscript" styleClass="btn-submit" text="Download Transcript" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                              <Button fx:id="btn_downloadTranscript" contentDisplay="CENTER" maxWidth="1.7976931348623157E308" minWidth="500.0" mnemonicParsing="false" onAction="#downloadGameTranscript" styleClass="btn-submit" text="Download Transcript" GridPane.rowIndex="1">
                                  <font>
                                     <Font name="Times New Roman Bold" size="35.0" />
                                  </font>
