@@ -30,7 +30,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
 /**
- * SignIn class, stores the users login information.
+ * Profile controller, displays user data
  * 
  * @author Selim Abdelwahab
  * @version 1.0

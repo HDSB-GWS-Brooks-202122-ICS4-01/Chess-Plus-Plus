@@ -73,7 +73,6 @@ public class EndController {
       SUBMIT_BUTTONS = new Button[] { btn_home, btn_downloadTranscript };
 
       for (Button btn : SUBMIT_BUTTONS) {
-         String defaultStyle = btn.getStyle();
          btn.setBackground(new Background(new BackgroundFill(Color.web("#FC4700"), null, null)));
          btn.setOnMouseEntered(new EventHandler<MouseEvent>() {
             public void handle(MouseEvent me) {
@@ -106,8 +105,6 @@ public class EndController {
                st.setToX(1);
                st.setToY(1);
 
-               Timeline ft = new Timeline(new KeyFrame(Duration.millis(100),
-                     new KeyValue(btn.styleProperty(), defaultStyle)));
 
                RegionFillTransition bft = new RegionFillTransition(btn, Color.web("#AE4619"), Color.web("#FC4700"),
                      Duration.millis(100));
@@ -120,7 +117,7 @@ public class EndController {
          });
       }
 
-      Map[] stats = App.getMatchStats();
+      Map<String, Integer>[] stats = App.getMatchStats();
 
       // Set labels
       if (stats != null) {
@@ -185,9 +182,12 @@ public class EndController {
 
                String statsPush = "wins=" + wins + "\nlosses=" + losses + "\nplayTime=0\nscore=" + score;
 
+               System.out.println(statsPush);
+
                FileWriter writer = new FileWriter(new File(Constants.Online.PATH_TO_STATS));
                // write data
                writer.write(statsPush);
+               writer.close();
 
                // Push data to server
                bucket.create("profiles/" + UID + "/stats.txt",

@@ -140,6 +140,8 @@ public class SignIn {
       String email = tf_email.getText();
 
       // Try signing in user
+
+      
       try {
          UserRecord userRecord = FirebaseAuth.getInstance().getUserByEmail(email);
 

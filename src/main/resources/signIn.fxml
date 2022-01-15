@@ -86,7 +86,7 @@
                   <Cursor fx:constant="HAND" />
                </cursor>
             </Button>
-            <Label fx:id="lbl_output" layoutX="156.0" layoutY="660.0" textFill="WHITE">
+            <Label fx:id="lbl_output" layoutX="125.0" layoutY="750.0" textFill="WHITE">
                <font>
                   <Font name="Algerian" size="24.0" />
                </font>

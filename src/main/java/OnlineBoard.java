@@ -2,6 +2,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Properties;
+import java.util.concurrent.Executor;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,7 +24,8 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 
 /**
- * OnlineBoard class, handles the interaction of pieces and displaying for the online mode.
+ * OnlineBoard class, handles the interaction of pieces and displaying for the
+ * online mode.
  * 
  * @author Selim Abdelwahab
  * @version 1.0
@@ -47,7 +49,7 @@ public class OnlineBoard {
    private final StackPane[][] CELLS = new StackPane[8][8];
 
    // List of game pieces
-   private final Piece[] GAME_PIECES = new Piece[32];
+   private final Piece[] GAME_PIECES = new Piece[34];
    private final ArrayList<Piece> LIVE_PIECES = new ArrayList<Piece>();
    private final ArrayList<Piece> DEAD_PIECES = new ArrayList<Piece>();
 
@@ -110,8 +112,10 @@ public class OnlineBoard {
          e.printStackTrace();
       }
 
-      TIMERS[Constants.pieceIDs.WHITE] = new PlayerTimer(whiteLabel, GAME.getHiddenTimeReference(Constants.pieceIDs.WHITE), gameTime, false, true, this);
-      TIMERS[Constants.pieceIDs.BLACK] = new PlayerTimer(blackLabel, GAME.getHiddenTimeReference(Constants.pieceIDs.BLACK), gameTime, false, true, this);
+      TIMERS[Constants.pieceIDs.WHITE] = new PlayerTimer(whiteLabel,
+            GAME.getHiddenTimeReference(Constants.pieceIDs.WHITE), gameTime, false, true, this);
+      TIMERS[Constants.pieceIDs.BLACK] = new PlayerTimer(blackLabel,
+            GAME.getHiddenTimeReference(Constants.pieceIDs.BLACK), gameTime, false, true, this);
 
       setupBoard();
 
@@ -266,11 +270,6 @@ public class OnlineBoard {
 
                // update the winner and win message
                SERVER_REF.child("winner").setValueAsync(Byte.toString(winner));
-               if (winner == color)
-                  SERVER_REF.child("winMsg").setValueAsync("Won by opponent running their timer down!");
-               else {
-                  SERVER_REF.child("winMsg").setValueAsync("Lost! Your timer ran out.");
-               }
 
                // Let the users know the game has concluded.
                SERVER_REF.child("gameover").setValueAsync(true);
@@ -306,21 +305,23 @@ public class OnlineBoard {
                   String key = snapshot.getKey();
                   Object value = snapshot.getValue();
 
-                  switch (key) {
-                     case "winner":
-                        App.setWinner(Byte.parseByte((String) value));
-                        break;
-                     case "winMsg":
-                        App.setWinMsg((String) value);
-                        break;
-                     case "gameover":
-                        if ((Boolean) value)
-                           try {
-                              gameover();
-                           } catch (IOException e) {
-                           }
-                        break;
+                  if (key.equalsIgnoreCase("winner")) {
+                     App.setWinner(Byte.parseByte((String) value));
+
+                     if (color == Byte.parseByte((String) value)) {
+                        App.setWinMsg("You won!");
+                     } else {
+                        App.setWinMsg("You lost!");
+                     }
+                  } else if (key.equalsIgnoreCase("gameover")) {
+                     if ((Boolean) value) {
+                        try {
+                           gameover();
+                        } catch (IOException e) {
+                        }
+                     }
                   }
+
                }
             });
          }
@@ -680,12 +681,12 @@ public class OnlineBoard {
 
       sp_selected = null;
       boolean checkmate = true;
-      winner = getTurn();
+      winner = color;
 
       STATS[getTurn()].replace("total_moves", (int) STATS[getTurn()].get("total_moves") + 1);
 
       for (Piece p : LIVE_PIECES) {
-         if (p.getColor() != getTurn())
+         if (p.getColor() == color)
             continue;
 
          if (p.getPossibleMoves(GRID).length > 0)
@@ -694,22 +695,29 @@ public class OnlineBoard {
 
       // Check mate
       if (checkmate) {
-         try {
-            SERVER_REF.child("winner").setValueAsync(Byte.toString(winner));
-            if (winner == color)
-               SERVER_REF.child("winMsg").setValueAsync("You won by checkmate!");
-            else {
-               SERVER_REF.child("winMsg").setValueAsync("You lost to a checkmate!");
+         SERVER_REF.child("winner").setValueAsync(Byte.toString(winner)).addListener(new Runnable() {
+
+            @Override
+            public void run() {
+               SERVER_REF.child("gameover").setValueAsync(true);
+               try {
+                  gameover();
+               } catch (IOException e) {
+               }
+
             }
 
-            SERVER_REF.child("gameOver").setValueAsync(true);
-            gameover();
-         } catch (IOException e) {
-            e.printStackTrace();
-         }
+         }, new Executor() {
+
+            @Override
+            public void execute(Runnable command) {
+               command.run();
+            }
+
+         });
       }
 
-      // Won't update the data if the user is promoting a pawn 
+      // Won't update the data if the user is promoting a pawn
       if (!promotingPawn) {
          pushToServer();
       }
@@ -720,10 +728,38 @@ public class OnlineBoard {
     */
    private void pushToServer() {
       matchTranscriptIdx = MATCH_TRANSCRIPT.size();
-      SERVER_REF.child("matchTranscript").setValueAsync(MATCH_TRANSCRIPT);
 
-      SERVER_REF.child("USER " + config.getProperty("UID")).child("turn").setValueAsync(false);
-      SERVER_REF.child(opponentRef).child("turn").setValueAsync(true);
+      SERVER_REF.child("matchTranscript").setValueAsync(MATCH_TRANSCRIPT).addListener(new Runnable() {
+
+         @Override
+         public void run() {
+            SERVER_REF.child("USER " + config.getProperty("UID")).child("turn").setValueAsync(false)
+                  .addListener(new Runnable() {
+
+                     @Override
+                     public void run() {
+                        SERVER_REF.child(opponentRef).child("turn").setValueAsync(true);
+                     }
+
+                  }, new Executor() {
+
+                     @Override
+                     public void execute(Runnable command) {
+                        command.run();
+                     }
+
+                  });
+            ;
+         }
+
+      }, new Executor() {
+
+         @Override
+         public void execute(Runnable command) {
+            command.run();
+         }
+      });
+
    }
 
    /**

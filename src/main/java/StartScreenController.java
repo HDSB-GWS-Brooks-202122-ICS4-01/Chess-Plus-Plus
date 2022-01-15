@@ -1,9 +1,6 @@
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.ObjectInputFilter.Config;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
