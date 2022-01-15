@@ -25,6 +25,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
+
 /**
  * Board class, handles the interaction of pieces and displaying them.
  * 
@@ -34,7 +35,7 @@ import javafx.scene.layout.StackPane;
 public class Board {
    Properties config = new Properties();
 
-   private static final ArrayList<String> MATCH_TRANSCRIPT = new ArrayList<String>();
+   private final ArrayList<String> MATCH_TRANSCRIPT = new ArrayList<String>();
    private final GameController GAME;
    private final GridPane gp_CHESS_BOARD;
    private final GridPane gp_DEAD_WHITE_CELLS;
@@ -68,7 +69,6 @@ public class Board {
 
    private final byte GAME_MODE;
 
-
    /**
     * Constructor for the Board class
     * 
@@ -84,9 +84,9 @@ public class Board {
       gp_DEAD_WHITE_CELLS = cells[2];
       GAME_MODE = gm;
 
-      //Was thinking of adding sound effects - Akil
-      //https://mixkit.co/free-sound-effects/instrument/
-      //turnsfx = new Media(App.class.getClass().getResource("assets//turnsfx.wav"));
+      // Was thinking of adding sound effects - Akil
+      // https://mixkit.co/free-sound-effects/instrument/
+      // turnsfx = new Media(App.class.getClass().getResource("assets//turnsfx.wav"));
 
       int gameTime = 600000;
       Label blackLabel = GAME.getTimeReference(Constants.pieceIDs.BLACK);
@@ -125,8 +125,9 @@ public class Board {
          } catch (IOException e) {
             e.printStackTrace();
          }
-      } else if(GAME_MODE == Constants.boardData.MODE_PASS_N_PLAY){
+      } else if (GAME_MODE == Constants.boardData.MODE_PASS_N_PLAY) {
          App.setTranscriptPath(null);
+         App.setTranscript("");
       }
 
       SERVER_REF = App.getServerReference();
@@ -249,7 +250,6 @@ public class Board {
 
       System.out.println(App.getTranscriptPath());
       FileReader fileReader = new FileReader(new File(App.getTranscriptPath()));
-
       try (Scanner r = new Scanner(fileReader)) {
          String ts;
 
@@ -539,22 +539,24 @@ public class Board {
 
    }
 
+   /**
+    * Method for playing the move the bot wants to make.
+    * @param move A string representing the bots move. 
+    */
    private void playAi(String move) {
-      // TODO Need way of fetching promoted piece data
-      System.out.println("Move: " + move);
       int endFrom;
       byte id;
       int enemyX;
       int enemyY;
       Pawn primaryPawn;
       Pawn enemyPawn;
-      
+
       switch (move.substring(0, 1)) {
          case Constants.moveTypes.REGULAR:
             System.out.println("Plays regular  move");
             endFrom = (move.charAt(3) == 'f') ? 3 : 2;
-            int fromX = Integer.parseInt(move.substring(endFrom+1, endFrom+2));
-            int fromY = Integer.parseInt(move.substring(endFrom+2, endFrom+3));
+            int fromX = Integer.parseInt(move.substring(endFrom + 1, endFrom + 2));
+            int fromY = Integer.parseInt(move.substring(endFrom + 2, endFrom + 3));
             Piece piece = getPieceOnGrid(fromX, fromY);
             System.out.println("Piece id: " + piece.getId());
             piece.hasMoved = true;
@@ -565,34 +567,35 @@ public class Board {
          case Constants.moveTypes.CASTLE_RIGHT:
             endFrom = (move.charAt(2) == '.') ? 2 : 3;
             id = (byte) Integer.parseInt(move.substring(1, endFrom));
-            castle(GAME_PIECES[id], (byte) (id/Constants.pieceIDs.COLOR_DIVISOR), false);
+            castle(GAME_PIECES[id], (byte) (id / Constants.pieceIDs.COLOR_DIVISOR), false);
             // castle right
             break;
          case Constants.moveTypes.CASTLE_LEFT:
             endFrom = (move.charAt(2) == '.') ? 2 : 3;
             id = (byte) Integer.parseInt(move.substring(1, endFrom));
-            castle(GAME_PIECES[id], (byte) (id/Constants.pieceIDs.COLOR_DIVISOR), true);
+            castle(GAME_PIECES[id], (byte) (id / Constants.pieceIDs.COLOR_DIVISOR), true);
             // castle left
             break;
          case Constants.moveTypes.PASSANT_RIGHT:
             endFrom = (move.charAt(3) == 'f') ? 3 : 2;
             primaryPawn = (Pawn) GAME_PIECES[Byte.parseByte(move.substring(1, endFrom))];
-            enemyX = Integer.parseInt(move.substring(endFrom+4, endFrom+5));
-            enemyY = Integer.parseInt(move.substring(endFrom+4, endFrom+5));
-            enemyPawn = (Pawn) getPieceOnGrid(enemyX,enemyY);
+            enemyX = Integer.parseInt(move.substring(endFrom + 4, endFrom + 5));
+            enemyY = Integer.parseInt(move.substring(endFrom + 4, endFrom + 5));
+            enemyPawn = (Pawn) getPieceOnGrid(enemyX, enemyY);
             enPassant(primaryPawn, enemyPawn);
             break;
          case Constants.moveTypes.PASSANT_LEFT:
             endFrom = (move.charAt(3) == 'f') ? 3 : 2;
             primaryPawn = (Pawn) GAME_PIECES[Byte.parseByte(move.substring(1, endFrom))];
-            enemyX = Integer.parseInt(move.substring(endFrom+4, endFrom+5));
-            enemyY = Integer.parseInt(move.substring(endFrom+4, endFrom+5));
-            enemyPawn = (Pawn) getPieceOnGrid(enemyX,enemyY);
+            enemyX = Integer.parseInt(move.substring(endFrom + 4, endFrom + 5));
+            enemyY = Integer.parseInt(move.substring(endFrom + 4, endFrom + 5));
+            enemyPawn = (Pawn) getPieceOnGrid(enemyX, enemyY);
             enPassant(primaryPawn, enemyPawn);
             break;
          case Constants.moveTypes.PROMOTION:
             endFrom = (move.charAt(2) == '.') ? 2 : 3;
-            promotePawn(GAME_PIECES[Byte.parseByte(move.substring(1,endFrom))],getBotPromotion(Byte.parseByte(move.substring(endFrom+1, endFrom+2))), false);
+            promotePawn(GAME_PIECES[Byte.parseByte(move.substring(1, endFrom))],
+                  getBotPromotion(Byte.parseByte(move.substring(endFrom + 1, endFrom + 2))), false);
             break;
          case Constants.moveTypes.NO_MOVES:
             break;
@@ -617,9 +620,16 @@ public class Board {
       }
    }
 
-
-   private String getBotPromotion(byte id){
-      switch(id){
+   /**
+    * Method for getting the promotion a bot wants to do. The bot passes the id of
+    * the piece it wants to promote to and the value returned from this method is
+    * sent into the method for pawn promotion.
+    * 
+    * @param id The id of the piece to promote to.
+    * @return A string representing the promotion.
+    */
+   private String getBotPromotion(byte id) {
+      switch (id) {
          case Constants.pieceIDs.BLACK_QUEENS_BISHOP:
             return "BISHOP";
          case Constants.pieceIDs.BLACK_QUEENS_KNIGHT:
@@ -634,11 +644,13 @@ public class Board {
             return "KNIGHT";
          case Constants.pieceIDs.WHITE_QUEEN:
             return "QUEEN";
+         case Constants.pieceIDs.WHITE_PROMOTED_ROOK:
+            return "ROOK";
          default:
             System.out.println("couldn't find case for getBotPromotion id: " + id);
             return "QUEEN";
       }
-      
+
    }
 
    /**
@@ -672,36 +684,35 @@ public class Board {
             && piece.getId() < Constants.pieceIDs.END_BLACK_PAWNS)
             || (piece.getId() > Constants.pieceIDs.BEGIN_WHITE_PAWNS
                   && piece.getId() < Constants.pieceIDs.END_WHITE_PAWNS)) {
-                     //logic for en passant
+         // logic for en passant
 
-                     //if the piece is a pawn
-                     pawn = (Pawn) piece;
+         // if the piece is a pawn
+         pawn = (Pawn) piece;
 
-                     // gets the id of the piece to the right and left
-                     // makes sure it can check to the left and can check to the right
-                     byte pawnLeft = (pawn.gridX - 1 > -1) ? GRID[piece.gridX - 1][piece.gridY] : -1;
-                     byte pawnRight = (pawn.gridX + 1 < 8) ? GRID[piece.gridX + 1][piece.gridY] : -1;
+         // gets the id of the piece to the right and left
+         // makes sure it can check to the left and can check to the right
+         byte pawnLeft = (pawn.gridX - 1 > -1) ? GRID[piece.gridX - 1][piece.gridY] : -1;
+         byte pawnRight = (pawn.gridX + 1 < 8) ? GRID[piece.gridX + 1][piece.gridY] : -1;
 
-                     int pawnDirection = (pawn.getColor() == Constants.pieceIDs.BLACK) ? 1 : -1;
+         int pawnDirection = (pawn.getColor() == Constants.pieceIDs.BLACK) ? 1 : -1;
 
-                     if(pawn.canPassantRight(pawnRight, GRID)){
-                        StackPane s_rightPawn = CELLS[pawn.gridX + 1][pawn.gridY + 1*pawnDirection];
-                        s_rightPawn.getStyleClass().add("cell-enemy");
-                        setPassantMoveMouseClicked(s_rightPawn, pawn, (Pawn) GAME_PIECES[pawnRight]);
-                        POSSIBLE_MOVES.add(s_rightPawn);
-                     }
+         if (pawn.canPassantRight(pawnRight, GRID)) {
+            StackPane s_rightPawn = CELLS[pawn.gridX + 1][pawn.gridY + 1 * pawnDirection];
+            s_rightPawn.getStyleClass().add("cell-enemy");
+            setPassantMoveMouseClicked(s_rightPawn, pawn, (Pawn) GAME_PIECES[pawnRight]);
+            POSSIBLE_MOVES.add(s_rightPawn);
+         }
 
-                     if (pawn.canPassantLeft(pawnLeft, GRID)) {
-                        StackPane s_leftPawn = CELLS[pawn.gridX - 1][pawn.gridY + 1*pawnDirection];
-                        s_leftPawn.getStyleClass().add("cell-enemy");
-                        setPassantMoveMouseClicked(s_leftPawn, pawn, (Pawn) GAME_PIECES[pawnLeft]);
-                        POSSIBLE_MOVES.add(s_leftPawn);
+         if (pawn.canPassantLeft(pawnLeft, GRID)) {
+            StackPane s_leftPawn = CELLS[pawn.gridX - 1][pawn.gridY + 1 * pawnDirection];
+            s_leftPawn.getStyleClass().add("cell-enemy");
+            setPassantMoveMouseClicked(s_leftPawn, pawn, (Pawn) GAME_PIECES[pawnLeft]);
+            POSSIBLE_MOVES.add(s_leftPawn);
 
-                     }
+         }
 
       }
 
-      System.out.println(Arrays.toString(moves));
       // Loop through the moves
       for (int i = 0; i < moves.length; i++) {
          final byte x = moves[i][0];
@@ -877,16 +888,12 @@ public class Board {
    }
 
    /**
+    * Sets the mouse clicked handler for a castle move.
     * 
-    * This method serves the same purpose as the setPossibleMoveMouseClicked()
-    * method does, except it is
-    * attached to castling moves. Castling moves require multiple pieces to be
-    * removed so this method needed to be created.
-    * 
-    * @param sp    StackPane of the king.
-    * @param piece King object.
-    * @param color Color/team value.
-    * @param left  If true, castling to the left of the screen, false if not.
+    * @param sp    Stackpane of where the king will be.
+    * @param piece The king to move.
+    * @param color True if the color of the king is black, false if not.
+    * @param left  True if its castling to the left, false if not.
     */
    private void setCastleMoveMouseClicked(StackPane sp, Piece piece, byte color, boolean left) {
       sp.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -899,14 +906,11 @@ public class Board {
    }
 
    /**
-    * This method serves the same purpose as setPossibleMoveMouseClicked, except it
-    * is only made for
-    * en passant moves from pawns. This is because in en passant, a pawn moves to
-    * the square behind the other pawn and the other pawn still gets deleted.
+    * Sets the mouse clicked handler for an en passant move.
     * 
-    * @param sp          StackPane of the primary pawn.
-    * @param primaryPawn Pawn object of the primary pawn.
-    * @param enemyPawn   Pawn object of the enemy pawn.
+    * @param sp          The stack pane for where the primary pawn will end up at.
+    * @param primaryPawn The primary, attacking pawn.
+    * @param enemyPawn   The enemy pawn.
     */
    private void setPassantMoveMouseClicked(StackPane sp, Pawn primaryPawn, Pawn enemyPawn) {
       sp.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -919,44 +923,55 @@ public class Board {
 
    }
 
-
-   public void castle(Piece piece, byte color, boolean left){
+   /**
+    * Method for castling a piece on the board.
+    * 
+    * @param piece The king to castle.
+    * @param color Color of the piece, true if black, if white.
+    * @param left  True if it is castling to the left, false if not.
+    */
+   public void castle(Piece piece, byte color, boolean left) {
       piece.hasMoved = true;
-            if (left) {
-               movePiece(piece, piece.getGridX(), piece.getGridY(), (byte) (piece.getGridX() - 2), piece.getGridY(),
-                     false);
-               if (color == Constants.pieceIDs.BLACK) {
-                  Piece rook = GAME_PIECES[Constants.pieceIDs.BLACK_QUEENS_ROOK];
-                  rook.hasMoved = true;
-                  movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX() + 1), piece.getGridY(),
-                        false);
-               } else {
-                  Piece rook = GAME_PIECES[Constants.pieceIDs.WHITE_QUEENS_ROOK];
-                  rook.hasMoved = true;
-                  movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX() + 1), piece.getGridY(),
-                        false);
-               }
-            } else {
-               movePiece(piece, piece.getGridX(), piece.getGridY(), (byte) (piece.getGridX() + 2), piece.getGridY(),
-                     false);
-               if (color == Constants.pieceIDs.BLACK) {
-                  Piece rook = GAME_PIECES[Constants.pieceIDs.BLACK_KINGS_ROOK];
-                  rook.hasMoved = true;
-                  movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX() - 1), piece.getGridY(),
-                        false);
-               } else {
-                  Piece rook = GAME_PIECES[Constants.pieceIDs.WHITE_KINGS_ROOK];
-                  rook.hasMoved = true;
-                  movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX() - 1), piece.getGridY(),
-                        false);
-               }
-            }
-            nextTurn();
-      
+      if (left) {
+         movePiece(piece, piece.getGridX(), piece.getGridY(), (byte) (piece.getGridX() - 2), piece.getGridY(),
+               false);
+         if (color == Constants.pieceIDs.BLACK) {
+            Piece rook = GAME_PIECES[Constants.pieceIDs.BLACK_QUEENS_ROOK];
+            rook.hasMoved = true;
+            movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX() + 1), piece.getGridY(),
+                  false);
+         } else {
+            Piece rook = GAME_PIECES[Constants.pieceIDs.WHITE_QUEENS_ROOK];
+            rook.hasMoved = true;
+            movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX() + 1), piece.getGridY(),
+                  false);
+         }
+      } else {
+         movePiece(piece, piece.getGridX(), piece.getGridY(), (byte) (piece.getGridX() + 2), piece.getGridY(),
+               false);
+         if (color == Constants.pieceIDs.BLACK) {
+            Piece rook = GAME_PIECES[Constants.pieceIDs.BLACK_KINGS_ROOK];
+            rook.hasMoved = true;
+            movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX() - 1), piece.getGridY(),
+                  false);
+         } else {
+            Piece rook = GAME_PIECES[Constants.pieceIDs.WHITE_KINGS_ROOK];
+            rook.hasMoved = true;
+            movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX() - 1), piece.getGridY(),
+                  false);
+         }
+      }
+      nextTurn();
 
    }
 
-   public void enPassant(Pawn primaryPawn, Pawn enemyPawn){
+   /**
+    * Method for doing an enPassant on the board.
+    * 
+    * @param primaryPawn The attacking pawn.
+    * @param enemyPawn   The enemy pawn to attack.
+    */
+   public void enPassant(Pawn primaryPawn, Pawn enemyPawn) {
       // Moves the primary pawn to its new spot.
       if (primaryPawn.getColor() == Constants.pieceIDs.BLACK) {
          if (enemyPawn.getGridX() < primaryPawn.getGridX()) {
@@ -1110,13 +1125,13 @@ public class Board {
    public void saveGame() throws IOException {
       solidifyTranscript();
 
-
       File transcriptFile;
-      if(App.getTranscriptPath() !=null){
+      if (App.getTranscriptPath() != null) {
          transcriptFile = new File(App.getTranscriptPath());
       } else {
-         Date date =  new Date(System.currentTimeMillis());
-         transcriptFile = new File(Constants.boardData.TRANSCRIPT_DIR_PATH + date.toString().replace(':', '-') + ".txt");
+         Date date = new Date(System.currentTimeMillis());
+         transcriptFile = new File(
+               Constants.boardData.TRANSCRIPT_DIR_PATH + date.toString().replace(':', '-') + ".txt");
          transcriptFile.createNewFile();
       }
       FileWriter myWriter = new FileWriter(transcriptFile);

@@ -190,16 +190,7 @@ public class Constants {
                 public static final double PIECE_FIT_HEIGHT = 80;
 
                 public static final double WHITE_PIECE_Y = 0;
-
-                // public static final double BLACK_PIECE_Y = 800;
                 public static final double BLACK_PIECE_Y = 200;
-
-                // public static final double KING_X = 0;
-                // public static final double QUEEN_X = 800;
-                // public static final double BISHOP_X = 1600;
-                // public static final double KNIGHT_X = 2400;
-                // public static final double ROOK_X = 3200;
-                // public static final double PAWN_X= 4000;
 
                 public static final double KING_X = 0;
                 public static final double QUEEN_X = 200;

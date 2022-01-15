@@ -166,7 +166,6 @@ public class StartScreenController {
         });
         tt.play();
         mainPane.setOnMouseEntered(null);
-
     }
 
     /**
