@@ -185,7 +185,7 @@ public class Bot {
         if (!isNotUnderCheck(boardInfo, false)) {
             // System.out.println("Check for black Previous move leading to this one: " +
             // boardInfo.previousMove);
-            score += 50;
+            score += 20;
             if (generateBoards(boardInfo, false).length == 0) {
                 score += 1000;
                 return score;
@@ -194,7 +194,7 @@ public class Bot {
         } else if (!isNotUnderCheck(boardInfo, true)) {
             // System.out.println("Check for white Previous move leading to this one: " +
             // boardInfo.previousMove);
-            score -= 50;
+            score -= 20;
             if (generateBoards(boardInfo, true).length == 0) {
                 // System.out.println("checkmate for white detected");
                 score -= 1000;
