@@ -684,7 +684,7 @@ public class Board {
       Pawn enemyPawn;
 
       //The string is constructed using constants.
-      //For regular moves, the string will go in the form of
+      //The string formats are as follows.
       //R{pieceToMove}f{fromx,fromy}.{toX,toY}
 
       //For castling moves it is either
@@ -693,6 +693,9 @@ public class Board {
       //For passant it is either
       //e{id}f{fromX,fromY}.{enemyX,enemyY}
       //E{id}f{fromX,fromY}.{enemyX,enemyY}
+
+      //for promotion it is 
+      //P{id}.{promoteToPieceId}
 
       
       switch (move.substring(0, 1)) {
@@ -746,6 +749,7 @@ public class Board {
          default:
             return;
       }
+      nextTurn();
    }
 
    /**

@@ -35,10 +35,10 @@ public class Bot {
                 break;
         }
 
-        // Currently the bot has a fixed depth of 4 when it generates its moves. This is
-        // because
-        // optimization needs to be done.
-        this.depth = 4;
+        //This number changes the depth the ai generates to.
+        //Intially, it was developed for a depth of 4 but because of optimizations I've made
+        // you can play a better game with a 30 minute timer on a depth of 5
+        this.depth = 5;
         this.black = black;
     }
 
@@ -206,8 +206,7 @@ public class Bot {
         for (int x = 0; x < 8; x++) {
             for (int y = 0; y < 8; y++) {
                 byte id = boardInfo.board[x][y];
-                boolean color = ((id / Constants.pieceIDs.COLOR_DIVISOR == Constants.pieceIDs.BLACK)
-                        || id == Constants.pieceIDs.BLACK_PROMOTED_ROOK);
+                boolean color = (id / Constants.pieceIDs.COLOR_DIVISOR == Constants.pieceIDs.BLACK);
                 if (id == Constants.pieceIDs.EMPTY_CELL) {
                     continue;
                 }
@@ -237,9 +236,7 @@ public class Bot {
         for (int y = 0; y < 8; y++) {
             for (int x = 0; x < 8; x++) {
                 byte id = boardInfo.board[x][y];
-                if (id == Constants.pieceIDs.EMPTY_CELL || id / Constants.pieceIDs.COLOR_DIVISOR != colorId
-                        || (color && id == Constants.pieceIDs.WHITE_PROMOTED_ROOK)
-                        || (!color && id == Constants.pieceIDs.BLACK_PROMOTED_ROOK)) {
+                if (id == Constants.pieceIDs.EMPTY_CELL || id / Constants.pieceIDs.COLOR_DIVISOR != colorId) {
                     // move onto next iteration if the id is an empty cell oh a piece that is not on
                     // this team.
                     continue;
@@ -309,6 +306,9 @@ public class Bot {
         byte beginPawnRange;
         byte endPawnRange;
         byte pawnDirection;
+
+
+        //stores the enemy pieces locally so it knows what to check against. 
         if (color) {
             x = boardInfo.blackKingX;
             y = boardInfo.blackKingY;
@@ -542,17 +542,14 @@ public class Bot {
      */
     private ArrayList<BoardInfo> movesRook(ArrayList<BoardInfo> boards, BoardInfo initialBoard, int x, int y,
             boolean color, byte id) {
-        byte teamRook;
         byte beginTeamRange;
         byte endTeamRange;
         BoardInfo newBoard;
 
         if (color) {
-            teamRook = Constants.pieceIDs.BLACK_PROMOTED_ROOK;
             beginTeamRange = Constants.pieceIDs.BEGIN_BLACK_RANGE;
             endTeamRange = Constants.pieceIDs.END_BLACK_RANGE;
         } else {
-            teamRook = Constants.pieceIDs.WHITE_PROMOTED_ROOK;
             beginTeamRange = Constants.pieceIDs.BEGIN_WHITE_RANGE;
             endTeamRange = Constants.pieceIDs.END_WHITE_RANGE;
         }
@@ -568,8 +565,7 @@ public class Bot {
             // up check
             if (u > -1 && up) {
                 // if there is a teammate piece at this location.
-                if ((initialBoard.board[x][u] > beginTeamRange && initialBoard.board[x][u] < endTeamRange)
-                        || initialBoard.board[x][u] == teamRook) {
+                if (initialBoard.board[x][u] > beginTeamRange && initialBoard.board[x][u] < endTeamRange) {
                     up = false;
                 } else if (initialBoard.board[x][u] != Constants.pieceIDs.EMPTY_CELL) {
                     // if there is an enemy piece at this location.
@@ -612,8 +608,8 @@ public class Bot {
 
             // down check
             if (d < 8 && down) {
-                if ((initialBoard.board[x][d] > beginTeamRange && initialBoard.board[x][d] < endTeamRange)
-                        || initialBoard.board[x][d] == teamRook) {
+                //if there is a teammate at this location
+                if (initialBoard.board[x][d] > beginTeamRange && initialBoard.board[x][d] < endTeamRange) {
                     down = false;
                 } else if (initialBoard.board[x][d] != Constants.pieceIDs.EMPTY_CELL) {
                     // if there is an enemy piece at this location.
@@ -657,8 +653,7 @@ public class Bot {
             // left check
             if (l > -1 && left) {
                 // if there is a teammate piece at this location.
-                if ((initialBoard.board[l][y] > beginTeamRange && initialBoard.board[l][y] < endTeamRange)
-                        || initialBoard.board[l][y] == teamRook) {
+                if (initialBoard.board[l][y] > beginTeamRange && initialBoard.board[l][y] < endTeamRange) {
                     left = false;
                 } else if (initialBoard.board[l][y] != Constants.pieceIDs.EMPTY_CELL) {
                     // if there is an enemy piece at this location.
@@ -702,8 +697,7 @@ public class Bot {
             // right check
             if (r < 8 && right) {
                 // if there is a teammate piece at this location.
-                if ((initialBoard.board[r][y] > beginTeamRange && initialBoard.board[r][y] < endTeamRange)
-                        || initialBoard.board[r][y] == teamRook) {
+                if (initialBoard.board[r][y] > beginTeamRange && initialBoard.board[r][y] < endTeamRange) {
                     right = false;
                 } else if (initialBoard.board[r][y] != Constants.pieceIDs.EMPTY_CELL) {
                     // if there is an enemy piece at this location.
@@ -785,18 +779,15 @@ public class Bot {
 
         byte teamBeginRange;
         byte teamEndRange;
-        byte promotedRook;
 
         BoardInfo newBoard;
 
         if (color) {
             teamBeginRange = Constants.pieceIDs.BEGIN_BLACK_RANGE;
             teamEndRange = Constants.pieceIDs.END_BLACK_RANGE;
-            promotedRook = Constants.pieceIDs.BLACK_PROMOTED_ROOK;
         } else {
             teamBeginRange = Constants.pieceIDs.BEGIN_WHITE_RANGE;
             teamEndRange = Constants.pieceIDs.END_WHITE_RANGE;
-            promotedRook = Constants.pieceIDs.WHITE_PROMOTED_ROOK;
         }
 
         byte u = (byte) (y - 1);
@@ -810,8 +801,7 @@ public class Bot {
             // upright moves
             if (u > -1 && r < 8 && upRight) {
                 // if the piece is on this team
-                if ((initialBoard.board[r][u] > teamBeginRange && initialBoard.board[r][u] < teamEndRange)
-                        || initialBoard.board[r][u] == promotedRook) {
+                if (initialBoard.board[r][u] > teamBeginRange && initialBoard.board[r][u] < teamEndRange) {
                     upRight = false;
                 } else if (initialBoard.board[r][u] != Constants.pieceIDs.EMPTY_CELL) {
                     // if the piece is an enemy piece
@@ -846,8 +836,7 @@ public class Bot {
             // upleft moves
             if (u > -1 && l > -1 && upLeft) {
                 // if the piece is on this team
-                if ((initialBoard.board[l][u] > teamBeginRange && initialBoard.board[l][u] < teamEndRange)
-                        || initialBoard.board[l][u] == promotedRook) {
+                if (initialBoard.board[l][u] > teamBeginRange && initialBoard.board[l][u] < teamEndRange) {
                     upLeft = false;
                 } else if (initialBoard.board[l][u] != Constants.pieceIDs.EMPTY_CELL) {
                     // if the piece is an enemy piece
@@ -882,8 +871,7 @@ public class Bot {
             // downRight moves
             if (d < 8 && r < 8 && downRight) {
                 // if the piece is on this team
-                if ((initialBoard.board[r][d] > teamBeginRange && initialBoard.board[r][d] < teamEndRange)
-                        || initialBoard.board[r][d] == promotedRook) {
+                if (initialBoard.board[r][d] > teamBeginRange && initialBoard.board[r][d] < teamEndRange) {
                     downRight = false;
                 } else if (initialBoard.board[r][d] != Constants.pieceIDs.EMPTY_CELL) {
                     // if the piece is an enemy piece
@@ -918,8 +906,7 @@ public class Bot {
             // downLeft moves
             if (l > -1 && d < 8 && downLeft) {
                 // if the piece is on this team
-                if ((initialBoard.board[l][d] > teamBeginRange && initialBoard.board[l][d] < teamEndRange)
-                        || initialBoard.board[l][d] == promotedRook) {
+                if (initialBoard.board[l][d] > teamBeginRange && initialBoard.board[l][d] < teamEndRange) {
                     downLeft = false;
                 } else if (initialBoard.board[l][d] != Constants.pieceIDs.EMPTY_CELL) {
                     // if the piece is an enemy piece
@@ -999,7 +986,6 @@ public class Bot {
         byte startEnemyPawnRange;
         byte endEnemyPawnRange;
 
-        byte enemyPromotedRook;
         byte[] promotions = new byte[4];
         BoardInfo newBoard;
 
@@ -1008,7 +994,6 @@ public class Bot {
             pawnDirection = 1;
             enemyBeginRange = Constants.pieceIDs.BEGIN_WHITE_RANGE;
             enemyEndRange = Constants.pieceIDs.END_WHITE_RANGE;
-            enemyPromotedRook = Constants.pieceIDs.WHITE_PROMOTED_ROOK;
             promotions[0] = Constants.pieceIDs.BLACK_QUEEN;
             promotions[1] = Constants.pieceIDs.BLACK_PROMOTED_ROOK;
             promotions[2] = Constants.pieceIDs.BLACK_QUEENS_BISHOP;
@@ -1023,7 +1008,6 @@ public class Bot {
             endEnemyPawnRange = Constants.pieceIDs.END_BLACK_PAWNS;
             enemyBeginRange = Constants.pieceIDs.BEGIN_BLACK_RANGE;
             enemyEndRange = Constants.pieceIDs.END_BLACK_RANGE;
-            enemyPromotedRook = Constants.pieceIDs.BLACK_PROMOTED_ROOK;
             promotions[0] = Constants.pieceIDs.WHITE_QUEEN;
             promotions[1] = Constants.pieceIDs.WHITE_PROMOTED_ROOK;
             promotions[2] = Constants.pieceIDs.WHITE_QUEENS_BISHOP;
@@ -1033,11 +1017,11 @@ public class Bot {
 
         // if the y is in the board
         if (y + pawnDirection * 1 > -1 && y + pawnDirection * 1 < 8) {
+
             if (x - 1 > -1) {
                 // if it can attack left
-                if ((initialBoard.board[x - 1][y + pawnDirection * 1] > enemyBeginRange
-                        && initialBoard.board[x - 1][y + pawnDirection * 1] < enemyEndRange)
-                        || initialBoard.board[x - 1][y + pawnDirection * 1] == enemyPromotedRook) {
+                if (initialBoard.board[x - 1][y + pawnDirection * 1] > enemyBeginRange
+                        && initialBoard.board[x - 1][y + pawnDirection * 1] < enemyEndRange) {
                     // if piece in the square is an enemy piece.
 
                     // if this move is a promotion move
@@ -1066,12 +1050,13 @@ public class Bot {
                 }
 
                 // passant left
-                //if the piece to the left is an enemy pawn and moves twice forward last move. 
+                //if the piece to the left is an enemy pawn and moved twice forward for its last move. 
                 if (initialBoard.board[x - 1][y] > startEnemyPawnRange && initialBoard.board[x - 1][y] < endEnemyPawnRange
                         && initialBoard.passant[getPassantIndex(initialBoard.board[x - 1][y])] == initialBoard.moveCount
                                 - 1) {
                     newBoard = initialBoard.copy();
                     newBoard.moveCount++;
+
                     // clears the postion of the pawn attacking and the piece that it attacks
                     newBoard.board[x - 1][y] = Constants.pieceIDs.EMPTY_CELL;
                     newBoard.board[x - 1][y + 1 * pawnDirection] = id;
@@ -1088,9 +1073,8 @@ public class Bot {
 
             if (x + 1 < 8) {
                 // if it can attack right
-                if ((initialBoard.board[x + 1][y + pawnDirection * 1] > enemyBeginRange
-                        && initialBoard.board[x + 1][y + pawnDirection * 1] < enemyEndRange)
-                        || initialBoard.board[x + 1][y + pawnDirection * 1] == enemyPromotedRook) {
+                if (initialBoard.board[x + 1][y + pawnDirection * 1] > enemyBeginRange
+                        && initialBoard.board[x + 1][y + pawnDirection * 1] < enemyEndRange) {
 
                     // if piece in the square is an enemy piece.
 
@@ -1219,31 +1203,27 @@ public class Bot {
         };
         byte queensRook;
         byte kingsRook;
-        byte teamPromotedRook;
         byte teamBeginRange;
         byte teamEndRange;
 
         if (color) {
             queensRook = Constants.pieceIDs.BLACK_QUEENS_ROOK;
             kingsRook = Constants.pieceIDs.BLACK_KINGS_ROOK;
-            teamPromotedRook = Constants.pieceIDs.BLACK_PROMOTED_ROOK;
             teamBeginRange = Constants.pieceIDs.BEGIN_BLACK_RANGE;
             teamEndRange = Constants.pieceIDs.END_BLACK_RANGE;
         } else {
             queensRook = Constants.pieceIDs.WHITE_QUEENS_ROOK;
             kingsRook = Constants.pieceIDs.WHITE_KINGS_ROOK;
-            teamPromotedRook = Constants.pieceIDs.WHITE_PROMOTED_ROOK;
             teamBeginRange = Constants.pieceIDs.BEGIN_WHITE_RANGE;
             teamEndRange = Constants.pieceIDs.END_WHITE_RANGE;
         }
 
         for (int[] move : kingPossibleMoves) {
             if (move[0] > -1 && move[0] < 8 && move[1] > -1 && move[1] < 8
-                    && (!((initialBoard.board[move[0]][move[1]] > teamBeginRange
-                            && initialBoard.board[move[0]][move[1]] < teamEndRange)
-                            || initialBoard.board[move[0]][move[1]] == teamPromotedRook))) {
+                    && (!(initialBoard.board[move[0]][move[1]] > teamBeginRange
+                            && initialBoard.board[move[0]][move[1]] < teamEndRange))) {
                 // if the move is inside the board
-                // if the piece is not a team
+                // if the piece is not a team piece
                 newBoard = initialBoard.copy();
                 newBoard.moveCount++;
 
@@ -1358,24 +1338,20 @@ public class Bot {
         };
         byte teamBeginRange;
         byte teamEndRange;
-        byte teamRook;
         if (color) {
             teamBeginRange = Constants.pieceIDs.BEGIN_BLACK_RANGE;
             teamEndRange = Constants.pieceIDs.END_BLACK_RANGE;
-            teamRook = Constants.pieceIDs.BLACK_PROMOTED_ROOK;
 
         } else {
             teamBeginRange = Constants.pieceIDs.BEGIN_WHITE_RANGE;
             teamEndRange = Constants.pieceIDs.END_WHITE_RANGE;
-            teamRook = Constants.pieceIDs.WHITE_PROMOTED_ROOK;
         }
 
         for (int[] move : possibleMoves) {
             if (move[0] > -1 && move[0] < 8 && move[1] > -1 && move[1] < 8) {
-                if (!((initialBoard.board[move[0]][move[1]] > teamBeginRange
-                        && initialBoard.board[move[0]][move[1]] < teamEndRange)
-                        || initialBoard.board[move[0]][move[1]] == teamRook)) {
-                    // if the piece is not a white piece
+                if (!(initialBoard.board[move[0]][move[1]] > teamBeginRange
+                        && initialBoard.board[move[0]][move[1]] < teamEndRange)) {
+                    // if the piece is not a teammate iece.
                     BoardInfo newBoard = initialBoard.copy();
                     newBoard.moveCount++;
                     newBoard.moveCount++;

@@ -38,7 +38,6 @@ public class BoardInfo {
     }
     
     
-    
 
     /**
      * Method that moves a piece from one place to another. If the piece it is moving
@@ -51,7 +50,7 @@ public class BoardInfo {
      */
     public void movePiece(byte id, int fromX, int fromY, int toX, int toY){
         if(board[toX][toY] != Constants.pieceIDs.EMPTY_CELL){
-            sortingValue = Constants.ScoringIDs.scoringMap[board[toX][toY]];
+            sortingValue = Constants.ScoringIDs.scoringMap[board[toX][toY]]*-1;
             board[toX][toY] = id;
             board[fromX][fromY] = Constants.pieceIDs.EMPTY_CELL;
         } else {
