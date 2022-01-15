@@ -76,6 +76,7 @@ public class TranscriptController {
                 hover.stop();
                 exit.play();
             });
+            element.setStyle("-fx-cursor: HAND;");
         }
 
         deleteButton.setDisable(true);
@@ -115,7 +116,7 @@ public class TranscriptController {
             choice.setPrefHeight(100);
             choice.setBackground(new Background(new BackgroundFill(Color.web("#621B00"), null, null)));
             choice.setFont(Font.font("System", FontWeight.BOLD, 36));
-            choice.setStyle("-fx-alignment: CENTER");
+            choice.setStyle("-fx-alignment: CENTER; -fx-cursor: HAND;");
             choice.setTextAlignment(TextAlignment.CENTER);
             choice.setTextFill(Color.WHITE);
 

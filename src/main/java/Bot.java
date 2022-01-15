@@ -62,15 +62,14 @@ public class Bot {
         hasMoved[5] = App.GAME_PIECES[Constants.pieceIDs.WHITE_KING].hasMoved;
 
         // creating array containing passant data
-        // TODO if constants change there must be changed made here.
         int[] passant = new int[16];
-        for (int i = 0; i < 8; i++) {
+        for (int i = Constants.pieceIDs.BLACK_PAWN_ZERO; i < Constants.pieceIDs.END_BLACK_PAWNS; i++) {
             // data for black pawns
-            passant[i] = ((Pawn) App.GAME_PIECES[i + 8]).passant;
+            passant[i-9] = ((Pawn) App.GAME_PIECES[i]).passant;
         }
-        for (int i = 8; i < 16; i++) {
+        for (int i = Constants.pieceIDs.WHITE_PAWN_ZERO; i < Constants.pieceIDs.END_WHITE_PAWNS; i++) {
             // data for white pawns
-            passant[i] = ((Pawn) App.GAME_PIECES[i + 16]).passant;
+            passant[i-26] = ((Pawn) App.GAME_PIECES[i]).passant;
         }
 
         // Creates the BoardInfo object that it will generate moves from.
@@ -1407,8 +1406,8 @@ public class Bot {
         // index is from 8-15
 
         // TODO if you change the constatns these need to be changed.
-        byte index = (id / Constants.pieceIDs.COLOR_DIVISOR == Constants.pieceIDs.BLACK) ? (byte) (id - 8)
-                : (byte) (id - 24 + 8);
+        byte index = (id / Constants.pieceIDs.COLOR_DIVISOR == Constants.pieceIDs.BLACK) ? (byte) (id - 9)
+                : (byte) (id - 26 + 8);
         // System.out.println("Pawn index for id: " + id + ", is " + index);
         return index;
     }

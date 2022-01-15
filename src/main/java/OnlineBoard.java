@@ -23,7 +23,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 
 /**
- * Board class, handles the interaction of pieces and displaying for the online mode.
+ * OnlineBoard class, handles the interaction of pieces and displaying for the online mode.
  * 
  * @author Selim Abdelwahab
  * @version 1.0

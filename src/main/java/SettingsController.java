@@ -2,6 +2,7 @@ import javafx.animation.FadeTransition;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuButton;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
@@ -105,6 +106,9 @@ public class SettingsController {
                 hoverEffect.stop();
                 exitEffect.play();
             });
+
+            //diffButton.setDisable(true);
+            diffButton.setTooltip(new Tooltip("Feature coming soon!"));
 
             FadeTransition introTransition = new FadeTransition(Duration.millis(1000), element);
             introTransition.setFromValue(0);

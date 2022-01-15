@@ -17,60 +17,59 @@ public class Constants {
                 public static final byte BLACK_QUEENS_KNIGHT = 5;
                 public static final byte BLACK_KINGS_ROOK = 6;
                 public static final byte BLACK_QUEENS_ROOK = 7;
-                public static final byte BLACK_PAWN_ZERO = 8;
-                public static final byte BLACK_PAWN_ONE = 9;
-                public static final byte BLACK_PAWN_TWO = 10;
-                public static final byte BLACK_PAWN_THREE = 11;
-                public static final byte BLACK_PAWN_FOUR = 12;
-                public static final byte BLACK_PAWN_FIVE = 13;
-                public static final byte BLACK_PAWN_SIX = 14;
-                public static final byte BLACK_PAWN_SEVEN = 15;
+                public static final byte BLACK_PROMOTED_ROOK = 8;
+                public static final byte BLACK_PAWN_ZERO = 9;
+                public static final byte BLACK_PAWN_ONE = 10;
+                public static final byte BLACK_PAWN_TWO = 11;
+                public static final byte BLACK_PAWN_THREE = 12;
+                public static final byte BLACK_PAWN_FOUR = 13;
+                public static final byte BLACK_PAWN_FIVE = 14;
+                public static final byte BLACK_PAWN_SIX = 15;
+                public static final byte BLACK_PAWN_SEVEN = 16;
 
-                public static final byte WHITE_KING = 16;
-                public static final byte WHITE_QUEEN = 17;
-                public static final byte WHITE_KINGS_BISHOP = 18;
-                public static final byte WHITE_QUEENS_BISHOP = 19;
-                public static final byte WHITE_KINGS_KNIGHT = 20;
-                public static final byte WHITE_QUEENS_KNIGHT = 21;
-                public static final byte WHITE_KINGS_ROOK = 22;
-                public static final byte WHITE_QUEENS_ROOK = 23;
-                public static final byte WHITE_PAWN_ZERO = 24;
-                public static final byte WHITE_PAWN_ONE = 25;
-                public static final byte WHITE_PAWN_TWO = 26;
-                public static final byte WHITE_PAWN_THREE = 27;
-                public static final byte WHITE_PAWN_FOUR = 28;
-                public static final byte WHITE_PAWN_FIVE = 29;
-                public static final byte WHITE_PAWN_SIX = 30;
-                public static final byte WHITE_PAWN_SEVEN = 31;
+                public static final byte WHITE_KING = 17;
+                public static final byte WHITE_QUEEN = 18;
+                public static final byte WHITE_KINGS_BISHOP = 19;
+                public static final byte WHITE_QUEENS_BISHOP = 20;
+                public static final byte WHITE_KINGS_KNIGHT = 21;
+                public static final byte WHITE_QUEENS_KNIGHT = 22;
+                public static final byte WHITE_KINGS_ROOK = 23;
+                public static final byte WHITE_QUEENS_ROOK = 24;
+                public static final byte WHITE_PROMOTED_ROOK = 25;
+                public static final byte WHITE_PAWN_ZERO = 26;
+                public static final byte WHITE_PAWN_ONE = 27;
+                public static final byte WHITE_PAWN_TWO = 28;
+                public static final byte WHITE_PAWN_THREE = 29;
+                public static final byte WHITE_PAWN_FOUR = 30;
+                public static final byte WHITE_PAWN_FIVE = 31;
+                public static final byte WHITE_PAWN_SIX = 32;
+                public static final byte WHITE_PAWN_SEVEN = 33;
 
                 // Any promoted rooks will not fall into a general colour check, they must be
                 // checked for individually.
                 // They will not return their color wheny you divide by 16, for example
                 // BLACK_PROMOTED_ROOK/16 == BLACK will return false.
-                public static final byte BLACK_PROMOTED_ROOK = 32;
-                public static final byte WHITE_PROMOTED_ROOK = 33;
 
 
                 //ranges for each teams pawns.
-                public static final byte BEGIN_WHITE_PAWNS = 23;
-                public static final byte END_WHITE_PAWNS = 32;
-                public static final byte BEGIN_BLACK_PAWNS = 7;
-                public static final byte END_BLACK_PAWNS = 16;
+                public static final byte BEGIN_WHITE_PAWNS = 25;
+                public static final byte END_WHITE_PAWNS = 34;
+                public static final byte BEGIN_BLACK_PAWNS = 8;
+                public static final byte END_BLACK_PAWNS = 17;
 
                 //ranges for each team
                 public static final byte BEGIN_BLACK_RANGE = -1;
-                public static final byte END_BLACK_RANGE = 16;
-                public static final byte BEGIN_WHITE_RANGE = 23;
-                public static final byte END_WHITE_RANGE = 32;
+                public static final byte END_BLACK_RANGE = 17;
+                public static final byte BEGIN_WHITE_RANGE = 16;
+                public static final byte END_WHITE_RANGE = 34;
 
                 //number used to get the color of an id.
-                public static final int COLOR_DIVISOR = 16;
+                public static final int COLOR_DIVISOR = 17;
 
         }
 
         public static class ScoringIDs {
-                public static final int[] scoringMap = { 0, 8, 4, 4, 5, 5, 4, 4, 1, 1, 1, 1, 1, 1, 1, 1, 0, -8, -4, -4,
-                                -5, -5, -4, -4, -1, -1, -1, -1, -1, -1, -1, -1, 4, -4 };
+                public static final int[] scoringMap = { 0, 8, 4, 4, 5, 5, 4, 4, 4, 1, 1, 1, 1, 1, 1, 1, 1, 0, -8, -4, -4, -5, -5, -4, -4, -4, -1, -1, -1, -1, -1, -1, -1, -1 };
         }
 
         public static class pieceType {
@@ -140,7 +139,7 @@ public class Constants {
                 // first index represents the id, second index has the position
                 public static final byte[][] INITIAL_POSITIONS = {
 
-                                // White positions
+                                //black positions
                                 { 3, 0 },
                                 { 4, 0 },
                                 { 2, 0 },
@@ -149,6 +148,7 @@ public class Constants {
                                 { 6, 0 },
                                 { 0, 0 },
                                 { 7, 0 },
+                                {-1,-1},//promoted rook
                                 { 0, 1 },
                                 { 1, 1 },
                                 { 2, 1 },
@@ -158,7 +158,7 @@ public class Constants {
                                 { 6, 1 },
                                 { 7, 1 },
 
-                                // Black positions
+                                // white positions
                                 { 3, 7 },
                                 { 4, 7 },
                                 { 2, 7 },
@@ -167,6 +167,7 @@ public class Constants {
                                 { 6, 7 },
                                 { 0, 7 },
                                 { 7, 7 },
+                                {-1,-1},//promoted rook
                                 { 0, 6 },
                                 { 1, 6 },
                                 { 2, 6 },
@@ -189,16 +190,7 @@ public class Constants {
                 public static final double PIECE_FIT_HEIGHT = 80;
 
                 public static final double WHITE_PIECE_Y = 0;
-
-                // public static final double BLACK_PIECE_Y = 800;
                 public static final double BLACK_PIECE_Y = 200;
-
-                // public static final double KING_X = 0;
-                // public static final double QUEEN_X = 800;
-                // public static final double BISHOP_X = 1600;
-                // public static final double KNIGHT_X = 2400;
-                // public static final double ROOK_X = 3200;
-                // public static final double PAWN_X= 4000;
 
                 public static final double KING_X = 0;
                 public static final double QUEEN_X = 200;

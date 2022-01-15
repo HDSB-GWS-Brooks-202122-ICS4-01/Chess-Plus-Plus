@@ -169,7 +169,6 @@ public class StartScreenController {
         });
         tt.play();
         mainPane.setOnMouseEntered(null);
-
     }
 
     /**
@@ -209,10 +208,6 @@ public class StartScreenController {
      */
     @FXML
     public void switchToResume() {
-        /**
-         * App.setGameMode(Constants.boardData.MODE_RESUME_GAME);
-         * transition("game");
-         */
         transition("transcriptScreen");
     }
 

@@ -29,7 +29,7 @@ import javafx.scene.layout.StackPane;
 public class Board {
    Properties config = App.getConfig();
 
-   private static final ArrayList<String> MATCH_TRANSCRIPT = new ArrayList<String>();
+   private final ArrayList<String> MATCH_TRANSCRIPT = new ArrayList<String>();
    private final GameController GAME;
    private final GridPane gp_CHESS_BOARD;
    private final GridPane gp_DEAD_WHITE_CELLS;
@@ -43,7 +43,7 @@ public class Board {
 
    private final StackPane[][] CELLS = new StackPane[8][8];
 
-   private final Piece[] GAME_PIECES = new Piece[32];
+   private final Piece[] GAME_PIECES = new Piece[34];
    private final ArrayList<Piece> LIVE_PIECES = new ArrayList<Piece>();
    private final ArrayList<Piece> DEAD_PIECES = new ArrayList<Piece>();
 
@@ -672,79 +672,67 @@ public class Board {
    }
 
    /**
-    * This method will play the AI's move
-    * @param move String object containing the AI's choosen move
+    * Method for playing the move the bot wants to make.
+    * @param move A string representing the bots move. 
     */
    private void playAi(String move) {
-      // TODO Need way of fetching promoted piece data
-      System.out.println("Move: " + move);
+      int endFrom;
+      byte id;
+      int enemyX;
+      int enemyY;
+      Pawn primaryPawn;
+      Pawn enemyPawn;
 
-      if (move.length() > 0) {
-         int endFrom;
-         byte id;
-         int enemyX;
-         int enemyY;
-         Pawn primaryPawn;
-         Pawn enemyPawn;
-
-         switch (move.substring(0, 1)) {
-            case Constants.moveTypes.REGULAR:
-               System.out.println("Plays regular  move");
-               endFrom = (move.charAt(3) == 'f') ? 3 : 2;
-               int fromX = Integer.parseInt(move.substring(endFrom + 1, endFrom + 2));
-               int fromY = Integer.parseInt(move.substring(endFrom + 2, endFrom + 3));
-               Piece piece = getPieceOnGrid(fromX, fromY);
-               System.out.println("Piece id: " + piece.getId());
-               piece.hasMoved = true;
-               byte x = Byte.parseByte(move.substring(endFrom + 4, endFrom + 5));
-               byte y = Byte.parseByte(move.substring(endFrom + 5, endFrom + 6));
-               movePiece(piece, piece.getGridX(), piece.getGridY(), x, y, false);
-               break;
-            case Constants.moveTypes.CASTLE_RIGHT:
-               endFrom = (move.charAt(2) == '.') ? 2 : 3;
-               id = (byte) Integer.parseInt(move.substring(1, endFrom));
-               castle(GAME_PIECES[id], (byte) (id / Constants.pieceIDs.COLOR_DIVISOR), false);
-               // castle right
-               break;
-            case Constants.moveTypes.CASTLE_LEFT:
-               endFrom = (move.charAt(2) == '.') ? 2 : 3;
-               id = (byte) Integer.parseInt(move.substring(1, endFrom));
-               castle(GAME_PIECES[id], (byte) (id / Constants.pieceIDs.COLOR_DIVISOR), true);
-               // castle left
-               break;
-            case Constants.moveTypes.PASSANT_RIGHT:
-               endFrom = (move.charAt(3) == 'f') ? 3 : 2;
-               primaryPawn = (Pawn) GAME_PIECES[Byte.parseByte(move.substring(1, endFrom))];
-               enemyX = Integer.parseInt(move.substring(endFrom + 4, endFrom + 5));
-               enemyY = Integer.parseInt(move.substring(endFrom + 4, endFrom + 5));
-               enemyPawn = (Pawn) getPieceOnGrid(enemyX, enemyY);
-               enPassant(primaryPawn, enemyPawn);
-               break;
-            case Constants.moveTypes.PASSANT_LEFT:
-               endFrom = (move.charAt(3) == 'f') ? 3 : 2;
-               primaryPawn = (Pawn) GAME_PIECES[Byte.parseByte(move.substring(1, endFrom))];
-               enemyX = Integer.parseInt(move.substring(endFrom + 4, endFrom + 5));
-               enemyY = Integer.parseInt(move.substring(endFrom + 4, endFrom + 5));
-               enemyPawn = (Pawn) getPieceOnGrid(enemyX, enemyY);
-               enPassant(primaryPawn, enemyPawn);
-               break;
-            case Constants.moveTypes.PROMOTION:
-               endFrom = (move.charAt(2) == '.') ? 2 : 3;
-               promotePawn(GAME_PIECES[Byte.parseByte(move.substring(1, endFrom))],
-                     getBotPromotion(Byte.parseByte(move.substring(endFrom + 1, endFrom + 2))), false);
-               break;
-            case Constants.moveTypes.NO_MOVES:
-               break;
-            default:
-               return;
-         }
-         nextTurn();
-      } else {
-         winner = Constants.pieceIDs.WHITE;
-         try {
-            gameover(true);
-         } catch (IOException e) {
-         }
+      switch (move.substring(0, 1)) {
+         case Constants.moveTypes.REGULAR:
+            System.out.println("Plays regular  move");
+            endFrom = (move.charAt(3) == 'f') ? 3 : 2;
+            int fromX = Integer.parseInt(move.substring(endFrom + 1, endFrom + 2));
+            int fromY = Integer.parseInt(move.substring(endFrom + 2, endFrom + 3));
+            Piece piece = getPieceOnGrid(fromX, fromY);
+            System.out.println("Piece id: " + piece.getId());
+            piece.hasMoved = true;
+            byte x = Byte.parseByte(move.substring(endFrom + 4, endFrom + 5));
+            byte y = Byte.parseByte(move.substring(endFrom + 5, endFrom + 6));
+            movePiece(piece, piece.getGridX(), piece.getGridY(), x, y, false);
+            break;
+         case Constants.moveTypes.CASTLE_RIGHT:
+            endFrom = (move.charAt(2) == '.') ? 2 : 3;
+            id = (byte) Integer.parseInt(move.substring(1, endFrom));
+            castle(GAME_PIECES[id], (byte) (id / Constants.pieceIDs.COLOR_DIVISOR), false);
+            // castle right
+            break;
+         case Constants.moveTypes.CASTLE_LEFT:
+            endFrom = (move.charAt(2) == '.') ? 2 : 3;
+            id = (byte) Integer.parseInt(move.substring(1, endFrom));
+            castle(GAME_PIECES[id], (byte) (id / Constants.pieceIDs.COLOR_DIVISOR), true);
+            // castle left
+            break;
+         case Constants.moveTypes.PASSANT_RIGHT:
+            endFrom = (move.charAt(3) == 'f') ? 3 : 2;
+            primaryPawn = (Pawn) GAME_PIECES[Byte.parseByte(move.substring(1, endFrom))];
+            enemyX = Integer.parseInt(move.substring(endFrom + 4, endFrom + 5));
+            enemyY = Integer.parseInt(move.substring(endFrom + 4, endFrom + 5));
+            enemyPawn = (Pawn) getPieceOnGrid(enemyX, enemyY);
+            enPassant(primaryPawn, enemyPawn);
+            break;
+         case Constants.moveTypes.PASSANT_LEFT:
+            endFrom = (move.charAt(3) == 'f') ? 3 : 2;
+            primaryPawn = (Pawn) GAME_PIECES[Byte.parseByte(move.substring(1, endFrom))];
+            enemyX = Integer.parseInt(move.substring(endFrom + 4, endFrom + 5));
+            enemyY = Integer.parseInt(move.substring(endFrom + 4, endFrom + 5));
+            enemyPawn = (Pawn) getPieceOnGrid(enemyX, enemyY);
+            enPassant(primaryPawn, enemyPawn);
+            break;
+         case Constants.moveTypes.PROMOTION:
+            endFrom = (move.charAt(2) == '.') ? 2 : 3;
+            promotePawn(GAME_PIECES[Byte.parseByte(move.substring(1, endFrom))],
+                  getBotPromotion(Byte.parseByte(move.substring(endFrom + 1, endFrom + 2))), false);
+            break;
+         case Constants.moveTypes.NO_MOVES:
+            break;
+         default:
+            return;
       }
    }
 
@@ -764,10 +752,12 @@ public class Board {
    }
 
    /**
-    * This method will return the promotion id of a bot
+    * Method for getting the promotion a bot wants to do. The bot passes the id of
+    * the piece it wants to promote to and the value returned from this method is
+    * sent into the method for pawn promotion.
     * 
-    * @param id byte value of id wanted
-    * @return String of chosen piece
+    * @param id The id of the piece to promote to.
+    * @return A string representing the promotion.
     */
    private String getBotPromotion(byte id) {
       switch (id) {
@@ -785,6 +775,8 @@ public class Board {
             return "KNIGHT";
          case Constants.pieceIDs.WHITE_QUEEN:
             return "QUEEN";
+         case Constants.pieceIDs.WHITE_PROMOTED_ROOK:
+            return "ROOK";
          default:
             System.out.println("couldn't find case for getBotPromotion id: " + id);
             return "QUEEN";
@@ -1018,16 +1010,12 @@ public class Board {
    }
 
    /**
+    * Sets the mouse clicked handler for a castle move.
     * 
-    * This method serves the same purpose as the setPossibleMoveMouseClicked()
-    * method does, except it is
-    * attached to castling moves. Castling moves require multiple pieces to be
-    * removed so this method needed to be created.
-    * 
-    * @param sp    StackPane of the king.
-    * @param piece King object.
-    * @param color Color/team value.
-    * @param left  If true, castling to the left of the screen, false if not.
+    * @param sp    Stackpane of where the king will be.
+    * @param piece The king to move.
+    * @param color True if the color of the king is black, false if not.
+    * @param left  True if its castling to the left, false if not.
     */
    private void setCastleMoveMouseClicked(StackPane sp, Piece piece, byte color, boolean left) {
       sp.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -1040,14 +1028,11 @@ public class Board {
    }
 
    /**
-    * This method serves the same purpose as setPossibleMoveMouseClicked, except it
-    * is only made for
-    * en passant moves from pawns. This is because in en passant, a pawn moves to
-    * the square behind the other pawn and the other pawn still gets deleted.
+    * Sets the mouse clicked handler for an en passant move.
     * 
-    * @param sp          StackPane of the primary pawn.
-    * @param primaryPawn Pawn object of the primary pawn.
-    * @param enemyPawn   Pawn object of the enemy pawn.
+    * @param sp          The stack pane for where the primary pawn will end up at.
+    * @param primaryPawn The primary, attacking pawn.
+    * @param enemyPawn   The enemy pawn.
     */
    private void setPassantMoveMouseClicked(StackPane sp, Pawn primaryPawn, Pawn enemyPawn) {
       sp.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -1060,6 +1045,13 @@ public class Board {
 
    }
 
+   /**
+    * Method for castling a piece on the board.
+    * 
+    * @param piece The king to castle.
+    * @param color Color of the piece, true if black, if white.
+    * @param left  True if it is castling to the left, false if not.
+    */
    public void castle(Piece piece, byte color, boolean left) {
       piece.hasMoved = true;
       if (left) {
@@ -1095,6 +1087,12 @@ public class Board {
 
    }
 
+   /**
+    * Method for doing an enPassant on the board.
+    * 
+    * @param primaryPawn The attacking pawn.
+    * @param enemyPawn   The enemy pawn to attack.
+    */
    public void enPassant(Pawn primaryPawn, Pawn enemyPawn) {
       // Moves the primary pawn to its new spot.
       if (primaryPawn.getColor() == Constants.pieceIDs.BLACK) {
@@ -1260,6 +1258,8 @@ public class Board {
     * @throws IOException this will throw an exception if the path file isn't file.
     */
    public void saveGame() throws IOException {
+      solidifyTranscript();
+
       File transcriptFile;
       if (App.getTranscriptPath() != null) {
          transcriptFile = new File(App.getTranscriptPath());
