@@ -327,5 +327,7 @@
                </children></Pane>
          </children>
       </VBox>
+      <Label fx:id="lbl_hbTimer" text="Label" visible="false" />
+      <Label fx:id="lbl_hwTimer" text="Label" visible="false" />
    </children>
 </StackPane>

@@ -3,28 +3,23 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Properties;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.core.view.Change;
-
-import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.event.EventHandler;
-import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
+
 /**
  * Board class, handles the interaction of pieces and displaying them.
  * 
@@ -32,7 +27,7 @@ import javafx.scene.layout.StackPane;
  * @version 1.0
  */
 public class Board {
-   Properties config = new Properties();
+   Properties config = App.getConfig();
 
    private static final ArrayList<String> MATCH_TRANSCRIPT = new ArrayList<String>();
    private final GameController GAME;
@@ -59,15 +54,14 @@ public class Board {
 
    private final PlayerTimer[] TIMERS = new PlayerTimer[2];
 
-   private final Map[] STATS = new Map[] { new HashMap<String, Integer>(), new HashMap<String, Integer>(),
+   private final Map<String, Integer>[] STATS = new Map[] { new HashMap<String, Integer>(),
+         new HashMap<String, Integer>(),
          new HashMap<String, String>() };
    private byte winner;
 
    private final Bot bot = new Bot(App.getDiff(), true);
-   private final DatabaseReference SERVER_REF;
 
-   private final byte GAME_MODE;
-
+   private byte gameMode;
 
    /**
     * Constructor for the Board class
@@ -82,54 +76,96 @@ public class Board {
       gp_CHESS_BOARD = cells[0];
       gp_DEAD_BLACK_CELLS = cells[1];
       gp_DEAD_WHITE_CELLS = cells[2];
-      GAME_MODE = gm;
+      gameMode = gm;
 
-      //Was thinking of adding sound effects - Akil
-      //https://mixkit.co/free-sound-effects/instrument/
-      //turnsfx = new Media(App.class.getClass().getResource("assets//turnsfx.wav"));
+      // Was thinking of adding sound effects - Akil
+      // https://mixkit.co/free-sound-effects/instrument/
+      // turnsfx = new Media(App.class.getClass().getResource("assets//turnsfx.wav"));
 
       int gameTime = 600000;
       Label blackLabel = GAME.getTimeReference(Constants.pieceIDs.BLACK);
       Label whiteLabel = GAME.getTimeReference(Constants.pieceIDs.WHITE);
 
-      try {
-         FileReader r = new FileReader("src\\main\\resources\\data\\config.properties");
-         config.load(r);
-         r.close();
-         if (config.getProperty("gametime").equals("10")) {
-            gameTime = 600000;
-            blackLabel.setText("10:00");
-            whiteLabel.setText("10:00");
-         } else if (config.getProperty("gametime").equals("3")) {
-            gameTime = 180000;
-            blackLabel.setText("3:00");
-            whiteLabel.setText("3:00");
-         } else if (config.getProperty("gametime").equals("30")) {
-            gameTime = 1800000;
-            blackLabel.setText("30:00");
-            whiteLabel.setText("30:00");
-         }
-      } catch (Exception e) {
-         e.printStackTrace();
+      if (config.getProperty("gametime").equals("10")) {
+         gameTime = 600000;
+         blackLabel.setText("10:00");
+         whiteLabel.setText("10:00");
+      } else if (config.getProperty("gametime").equals("3")) {
+         gameTime = 180000;
+         blackLabel.setText("3:00");
+         whiteLabel.setText("3:00");
+      } else if (config.getProperty("gametime").equals("30")) {
+         gameTime = 1800000;
+         blackLabel.setText("30:00");
+         whiteLabel.setText("30:00");
       }
-      System.out.println(gameTime);
 
-      TIMERS[Constants.pieceIDs.WHITE] = new PlayerTimer(whiteLabel, gameTime, true);
-      TIMERS[Constants.pieceIDs.BLACK] = new PlayerTimer(blackLabel, gameTime, false);
+      TIMERS[Constants.pieceIDs.WHITE] = new PlayerTimer(whiteLabel, GAME.getHiddenTimeReference(Constants.pieceIDs.WHITE), gameTime, true, false, null);
+      TIMERS[Constants.pieceIDs.BLACK] = new PlayerTimer(blackLabel, GAME.getHiddenTimeReference(Constants.pieceIDs.WHITE), gameTime, false, false, null);
 
       setupBoard();
 
-      if (GAME_MODE == Constants.boardData.MODE_RESUME_GAME) {
+      if (gameMode == Constants.boardData.MODE_RESUME_GAME) {
          try {
             parseTranscript();
          } catch (IOException e) {
             e.printStackTrace();
          }
-      } else if(GAME_MODE == Constants.boardData.MODE_PASS_N_PLAY){
-         App.setTranscriptPath(null);
+      } else {
+         MATCH_TRANSCRIPT.add("GM" + gameMode);
+         if (gameMode == Constants.boardData.MODE_PASS_N_PLAY) {
+            App.setTranscriptPath(null);
+         }
       }
 
-      SERVER_REF = App.getServerReference();
+      GAME.getHiddenTimeReference(Constants.pieceIDs.WHITE).textProperty().addListener(new ChangeListener<String>() {
+
+         @Override
+         /**
+          * This method is called when the invisible text is changed.
+          * 
+          * @param observable ObservableValue object
+          * @param oldValue   String object
+          * @param newValue   String object
+          */
+         public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+            // True if the duratio is less than 0
+            if (Long.parseLong(newValue) <= 0) {
+               System.out.println(true);
+               winner = Constants.pieceIDs.BLACK;
+
+               try {
+                  gameover(false);
+               } catch (IOException e) {
+                  e.printStackTrace();
+               }
+            }
+         }
+      });
+
+      GAME.getHiddenTimeReference(Constants.pieceIDs.BLACK).textProperty().addListener(new ChangeListener<String>() {
+
+         @Override
+         /**
+          * This method is called when the invisible text is changed.
+          * 
+          * @param observable ObservableValue object
+          * @param oldValue   String object
+          * @param newValue   String object
+          */
+         public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+            // True if the duratio is less than 0
+            if (Long.parseLong(newValue) <= 0) {
+               winner = Constants.pieceIDs.WHITE;
+
+               try {
+                  gameover(false);
+               } catch (IOException e) {
+               }
+            }
+         }
+      });
+
    }
 
    /**
@@ -167,10 +203,10 @@ public class Board {
                }
 
                // Checks to see if interaction is allowed
-               if (GAME_MODE == Constants.boardData.MODE_PASS_N_PLAY) {
+               if (gameMode == Constants.boardData.MODE_PASS_N_PLAY) {
                   if ((getAllowInteract(sp, x, y) || isPossibleMove))
                      highlightMouseCellHover(true, sp);
-               } else if (GAME_MODE == Constants.boardData.MODE_AI && turn == Constants.pieceIDs.WHITE) {
+               } else if (gameMode == Constants.boardData.MODE_AI && turn == Constants.pieceIDs.WHITE) {
                   if (getAllowInteract(sp, x, y) || isPossibleMove) {
                      highlightMouseCellHover(true, sp);
                   }
@@ -245,10 +281,13 @@ public class Board {
     * @throws IOException May throw an exception if the file location is not found.
     */
    private void parseTranscript() throws IOException {
+      System.out.println("Parsing script");
       final String REG = "((?=[A-Z])|(?<=[A-Z]))|((?=[a-z])|(?<=[a-z]))";
 
       System.out.println(App.getTranscriptPath());
       FileReader fileReader = new FileReader(new File(App.getTranscriptPath()));
+
+      byte parseTurn = Constants.pieceIDs.WHITE;
 
       try (Scanner r = new Scanner(fileReader)) {
          String ts;
@@ -256,30 +295,31 @@ public class Board {
          while (r.hasNextLine()) {
             ts = r.nextLine();
 
-            if (ts.contains("TW")) { // White timer
+            if (ts.contains("GM")) {
+               MATCH_TRANSCRIPT.add(ts);
+
+               ts = ts.substring(2, ts.length());
+               gameMode = Byte.parseByte(ts);
+            } else if (ts.contains("TW")) { // White timer
                TIMERS[Constants.pieceIDs.WHITE].setTime(Long.parseLong(ts.substring(2, ts.length())));
             } else if (ts.contains("TB")) { // Black timer
                TIMERS[Constants.pieceIDs.BLACK].setTime(Long.parseLong(ts.substring(2, ts.length())));
             } else if (ts.contains("PP")) { // Pawn promotion
                MATCH_TRANSCRIPT.add(ts);
 
-               System.out.println(ts);
                ts = ts.substring(2, ts.length());
-               System.out.println(ts);
 
                String[] ids = ts.split("-");
-               System.out.println("ID 0: " + ids[0]);
-               System.out.println("ID 1: " + ids[1]);
 
                Piece from = getPieceOnGrid(Byte.parseByte(ids[0]));
 
                promotePawn(from, ids[1], true);
             } else {
+               parseTurn++;
                MATCH_TRANSCRIPT.add(ts);
                App.MOVE_COUNT++;
 
                String[] data = ts.split(REG);
-               System.out.println(Arrays.toString(data));
 
                Piece piece = getPieceOnGrid(Byte.parseByte(data[0].trim()));
 
@@ -294,10 +334,16 @@ public class Board {
                if (x > 0 && x < 8 && y > 0 && y < 8) {
                   App.MOVE_COUNT++;
                   movePiece(piece, piece.getGridX(), piece.getGridY(), x, y, true);
-                  System.out.println(203902903);
                }
             }
          }
+
+         if (parseTurn % 2 == 0)
+            turn = Constants.pieceIDs.BLACK;
+         else
+            turn = Constants.pieceIDs.WHITE;
+
+         refreshBoard();
       } catch (Exception e) {
          e.printStackTrace();
 
@@ -308,14 +354,87 @@ public class Board {
    }
 
    /**
-    * This method is called when the match concludes.
+    * This method is called if parsing a transcript to re-initialize events for
+    * stackpanes.
     */
-   private void gameover() throws IOException {
-      App.setMatchStats(solidifyTranscript());
+   private void refreshBoard() {
+      // Loop through chess board nodes to find find stackpanes.
+      for (int x = 0; x < CELLS.length; x++) {
+         for (int y = 0; y < CELLS[0].length; y++) {
+            final int X = x;
+            final int Y = y;
 
-      GAME.gameOver(winner);
+            StackPane sp = CELLS[x][y];
+
+            // Add event handler for when the mouse enters.
+            sp.setOnMouseEntered(new EventHandler<MouseEvent>() {
+               public void handle(MouseEvent me) {
+                  boolean isPossibleMove = false;
+
+                  // Check to see if the current stack pane appears in POSSIBLE_MOVES
+                  for (StackPane pm : POSSIBLE_MOVES) {
+                     if (pm == sp) {
+                        isPossibleMove = true;
+                        break;
+                     }
+                  }
+
+                  if ((getAllowInteract(sp, X, Y) || isPossibleMove))
+                     highlightMouseCellHover(true, sp);
+               }
+            });
+
+            // Add event handler for when the mouse exits.
+            sp.setOnMouseExited(new EventHandler<MouseEvent>() {
+               public void handle(MouseEvent me) {
+                  highlightMouseCellHover(false, sp);
+               }
+            });
+
+            // Add event handler for when the mouse is clicked.
+            setDefaultMouseClicked(sp, (byte) x, (byte) y);
+         }
+      }
    }
 
+   /**
+    * This method is called when the match concludes.
+    */
+   private void gameover(boolean checkMate) throws IOException {
+      solidifyTranscript();
+      App.setMatchStats(STATS);
+      App.setWinner(winner);
+
+      if (checkMate) {
+         if (gameMode == Constants.boardData.MODE_AI) {
+            if (winner == Constants.pieceIDs.WHITE) {
+               App.setWinMsg("You won by checkmate!");
+            } else {
+               App.setWinMsg("You lost by checkmate.");
+            }
+         } else {
+            App.setWinMsg(App.getWinnerColor() + " won by checkmate!");
+         }
+      } else {
+         if (gameMode == Constants.boardData.MODE_AI) {
+            if (winner == Constants.pieceIDs.WHITE) {
+               App.setWinMsg("You won because opponent ran out of time!");
+            } else {
+               App.setWinMsg("You lost because your timer ran out.");
+            }
+         } else {
+            App.setWinMsg(App.getWinnerColor() + " won because opponent's timer ran out!");
+         }
+      }
+      GAME.gameOver();
+   }
+
+   /**
+    * This method will return the index of the board in the x direction
+    * 
+    * @param value String Object
+    * @return byte value
+    */
    private byte getBoardX(String value) {
       String[] xPos = Constants.boardData.X_ID;
       for (byte i = 0; i < xPos.length; i++) {
@@ -326,6 +445,12 @@ public class Board {
       return -1;
    }
 
+   /**
+    * This method will return the in the y direction
+    * 
+    * @param value String Object
+    * @return byte value
+    */
    private byte getBoardY(String value) {
       String[] yPos = Constants.boardData.Y_ID;
       for (byte i = 0; i < yPos.length; i++) {
@@ -360,7 +485,11 @@ public class Board {
          for (Piece livePiece : LIVE_PIECES) {
             // Check to see if the coordinates match.
             if (livePiece.getGridX() == x && livePiece.getGridY() == y) {
-               return livePiece.getColor() == turn;
+               if (gameMode == Constants.boardData.MODE_PASS_N_PLAY)
+                  return livePiece.getColor() == turn;
+               else {
+                  return livePiece.getColor() == Constants.pieceIDs.WHITE && livePiece.getColor() == turn;
+               }
             }
          }
 
@@ -368,6 +497,7 @@ public class Board {
       }
 
       return false;
+
    }
 
    /**
@@ -499,7 +629,9 @@ public class Board {
 
       if (inCheck) {
          try {
-            gameover();
+
+            gameover(true);
+
          } catch (IOException e) {
             e.printStackTrace();
          }
@@ -507,7 +639,7 @@ public class Board {
 
       System.out.println("Next turn: " + turn);
 
-      if (GAME_MODE == Constants.boardData.MODE_AI && turn == Constants.pieceIDs.BLACK) {
+      if (gameMode == Constants.boardData.MODE_AI && turn == Constants.pieceIDs.BLACK) {
          // Bot.BoardInteractions bi = bot.BI.parseAiMove(bot.getMove(GRID,
          // DEAD_PIECES));
          Task<String> move = new Task<String>() {
@@ -539,67 +671,81 @@ public class Board {
 
    }
 
+   /**
+    * This method will play the AI's move
+    * @param move String object containing the AI's choosen move
+    */
    private void playAi(String move) {
       // TODO Need way of fetching promoted piece data
       System.out.println("Move: " + move);
-      int endFrom;
-      byte id;
-      int enemyX;
-      int enemyY;
-      Pawn primaryPawn;
-      Pawn enemyPawn;
-      
-      switch (move.substring(0, 1)) {
-         case Constants.moveTypes.REGULAR:
-            System.out.println("Plays regular  move");
-            endFrom = (move.charAt(3) == 'f') ? 3 : 2;
-            int fromX = Integer.parseInt(move.substring(endFrom+1, endFrom+2));
-            int fromY = Integer.parseInt(move.substring(endFrom+2, endFrom+3));
-            Piece piece = getPieceOnGrid(fromX, fromY);
-            System.out.println("Piece id: " + piece.getId());
-            piece.hasMoved = true;
-            byte x = Byte.parseByte(move.substring(endFrom + 4, endFrom + 5));
-            byte y = Byte.parseByte(move.substring(endFrom + 5, endFrom + 6));
-            movePiece(piece, piece.getGridX(), piece.getGridY(), x, y, false);
-            break;
-         case Constants.moveTypes.CASTLE_RIGHT:
-            endFrom = (move.charAt(2) == '.') ? 2 : 3;
-            id = (byte) Integer.parseInt(move.substring(1, endFrom));
-            castle(GAME_PIECES[id], (byte) (id/Constants.pieceIDs.COLOR_DIVISOR), false);
-            // castle right
-            break;
-         case Constants.moveTypes.CASTLE_LEFT:
-            endFrom = (move.charAt(2) == '.') ? 2 : 3;
-            id = (byte) Integer.parseInt(move.substring(1, endFrom));
-            castle(GAME_PIECES[id], (byte) (id/Constants.pieceIDs.COLOR_DIVISOR), true);
-            // castle left
-            break;
-         case Constants.moveTypes.PASSANT_RIGHT:
-            endFrom = (move.charAt(3) == 'f') ? 3 : 2;
-            primaryPawn = (Pawn) GAME_PIECES[Byte.parseByte(move.substring(1, endFrom))];
-            enemyX = Integer.parseInt(move.substring(endFrom+4, endFrom+5));
-            enemyY = Integer.parseInt(move.substring(endFrom+4, endFrom+5));
-            enemyPawn = (Pawn) getPieceOnGrid(enemyX,enemyY);
-            enPassant(primaryPawn, enemyPawn);
-            break;
-         case Constants.moveTypes.PASSANT_LEFT:
-            endFrom = (move.charAt(3) == 'f') ? 3 : 2;
-            primaryPawn = (Pawn) GAME_PIECES[Byte.parseByte(move.substring(1, endFrom))];
-            enemyX = Integer.parseInt(move.substring(endFrom+4, endFrom+5));
-            enemyY = Integer.parseInt(move.substring(endFrom+4, endFrom+5));
-            enemyPawn = (Pawn) getPieceOnGrid(enemyX,enemyY);
-            enPassant(primaryPawn, enemyPawn);
-            break;
-         case Constants.moveTypes.PROMOTION:
-            endFrom = (move.charAt(2) == '.') ? 2 : 3;
-            promotePawn(GAME_PIECES[Byte.parseByte(move.substring(1,endFrom))],getBotPromotion(Byte.parseByte(move.substring(endFrom+1, endFrom+2))), false);
-            break;
-         case Constants.moveTypes.NO_MOVES:
-            break;
-         default:
-            return;
+
+      if (move.length() > 0) {
+         int endFrom;
+         byte id;
+         int enemyX;
+         int enemyY;
+         Pawn primaryPawn;
+         Pawn enemyPawn;
+
+         switch (move.substring(0, 1)) {
+            case Constants.moveTypes.REGULAR:
+               System.out.println("Plays regular  move");
+               endFrom = (move.charAt(3) == 'f') ? 3 : 2;
+               int fromX = Integer.parseInt(move.substring(endFrom + 1, endFrom + 2));
+               int fromY = Integer.parseInt(move.substring(endFrom + 2, endFrom + 3));
+               Piece piece = getPieceOnGrid(fromX, fromY);
+               System.out.println("Piece id: " + piece.getId());
+               piece.hasMoved = true;
+               byte x = Byte.parseByte(move.substring(endFrom + 4, endFrom + 5));
+               byte y = Byte.parseByte(move.substring(endFrom + 5, endFrom + 6));
+               movePiece(piece, piece.getGridX(), piece.getGridY(), x, y, false);
+               break;
+            case Constants.moveTypes.CASTLE_RIGHT:
+               endFrom = (move.charAt(2) == '.') ? 2 : 3;
+               id = (byte) Integer.parseInt(move.substring(1, endFrom));
+               castle(GAME_PIECES[id], (byte) (id / Constants.pieceIDs.COLOR_DIVISOR), false);
+               // castle right
+               break;
+            case Constants.moveTypes.CASTLE_LEFT:
+               endFrom = (move.charAt(2) == '.') ? 2 : 3;
+               id = (byte) Integer.parseInt(move.substring(1, endFrom));
+               castle(GAME_PIECES[id], (byte) (id / Constants.pieceIDs.COLOR_DIVISOR), true);
+               // castle left
+               break;
+            case Constants.moveTypes.PASSANT_RIGHT:
+               endFrom = (move.charAt(3) == 'f') ? 3 : 2;
+               primaryPawn = (Pawn) GAME_PIECES[Byte.parseByte(move.substring(1, endFrom))];
+               enemyX = Integer.parseInt(move.substring(endFrom + 4, endFrom + 5));
+               enemyY = Integer.parseInt(move.substring(endFrom + 4, endFrom + 5));
+               enemyPawn = (Pawn) getPieceOnGrid(enemyX, enemyY);
+               enPassant(primaryPawn, enemyPawn);
+               break;
+            case Constants.moveTypes.PASSANT_LEFT:
+               endFrom = (move.charAt(3) == 'f') ? 3 : 2;
+               primaryPawn = (Pawn) GAME_PIECES[Byte.parseByte(move.substring(1, endFrom))];
+               enemyX = Integer.parseInt(move.substring(endFrom + 4, endFrom + 5));
+               enemyY = Integer.parseInt(move.substring(endFrom + 4, endFrom + 5));
+               enemyPawn = (Pawn) getPieceOnGrid(enemyX, enemyY);
+               enPassant(primaryPawn, enemyPawn);
+               break;
+            case Constants.moveTypes.PROMOTION:
+               endFrom = (move.charAt(2) == '.') ? 2 : 3;
+               promotePawn(GAME_PIECES[Byte.parseByte(move.substring(1, endFrom))],
+                     getBotPromotion(Byte.parseByte(move.substring(endFrom + 1, endFrom + 2))), false);
+               break;
+            case Constants.moveTypes.NO_MOVES:
+               break;
+            default:
+               return;
+         }
+         nextTurn();
+      } else {
+         winner = Constants.pieceIDs.WHITE;
+         try {
+            gameover(true);
+         } catch (IOException e) {
+         }
       }
-      nextTurn();
    }
 
    /**
@@ -617,9 +763,14 @@ public class Board {
       }
    }
 
-
-   private String getBotPromotion(byte id){
-      switch(id){
+   /**
+    * This method will return the promotion id of a bot
+    * 
+    * @param id byte value of id wanted
+    * @return String of chosen piece
+    */
+   private String getBotPromotion(byte id) {
+      switch (id) {
          case Constants.pieceIDs.BLACK_QUEENS_BISHOP:
             return "BISHOP";
          case Constants.pieceIDs.BLACK_QUEENS_KNIGHT:
@@ -638,7 +789,7 @@ public class Board {
             System.out.println("couldn't find case for getBotPromotion id: " + id);
             return "QUEEN";
       }
-      
+
    }
 
    /**
@@ -672,36 +823,35 @@ public class Board {
             && piece.getId() < Constants.pieceIDs.END_BLACK_PAWNS)
             || (piece.getId() > Constants.pieceIDs.BEGIN_WHITE_PAWNS
                   && piece.getId() < Constants.pieceIDs.END_WHITE_PAWNS)) {
-                     //logic for en passant
+         // logic for en passant
 
-                     //if the piece is a pawn
-                     pawn = (Pawn) piece;
+         // if the piece is a pawn
+         pawn = (Pawn) piece;
 
-                     // gets the id of the piece to the right and left
-                     // makes sure it can check to the left and can check to the right
-                     byte pawnLeft = (pawn.gridX - 1 > -1) ? GRID[piece.gridX - 1][piece.gridY] : -1;
-                     byte pawnRight = (pawn.gridX + 1 < 8) ? GRID[piece.gridX + 1][piece.gridY] : -1;
+         // gets the id of the piece to the right and left
+         // makes sure it can check to the left and can check to the right
+         byte pawnLeft = (pawn.gridX - 1 > -1) ? GRID[piece.gridX - 1][piece.gridY] : -1;
+         byte pawnRight = (pawn.gridX + 1 < 8) ? GRID[piece.gridX + 1][piece.gridY] : -1;
 
-                     int pawnDirection = (pawn.getColor() == Constants.pieceIDs.BLACK) ? 1 : -1;
+         int pawnDirection = (pawn.getColor() == Constants.pieceIDs.BLACK) ? 1 : -1;
 
-                     if(pawn.canPassantRight(pawnRight, GRID)){
-                        StackPane s_rightPawn = CELLS[pawn.gridX + 1][pawn.gridY + 1*pawnDirection];
-                        s_rightPawn.getStyleClass().add("cell-enemy");
-                        setPassantMoveMouseClicked(s_rightPawn, pawn, (Pawn) GAME_PIECES[pawnRight]);
-                        POSSIBLE_MOVES.add(s_rightPawn);
-                     }
+         if (pawn.canPassantRight(pawnRight, GRID)) {
+            StackPane s_rightPawn = CELLS[pawn.gridX + 1][pawn.gridY + 1 * pawnDirection];
+            s_rightPawn.getStyleClass().add("cell-enemy");
+            setPassantMoveMouseClicked(s_rightPawn, pawn, (Pawn) GAME_PIECES[pawnRight]);
+            POSSIBLE_MOVES.add(s_rightPawn);
+         }
 
-                     if (pawn.canPassantLeft(pawnLeft, GRID)) {
-                        StackPane s_leftPawn = CELLS[pawn.gridX - 1][pawn.gridY + 1*pawnDirection];
-                        s_leftPawn.getStyleClass().add("cell-enemy");
-                        setPassantMoveMouseClicked(s_leftPawn, pawn, (Pawn) GAME_PIECES[pawnLeft]);
-                        POSSIBLE_MOVES.add(s_leftPawn);
+         if (pawn.canPassantLeft(pawnLeft, GRID)) {
+            StackPane s_leftPawn = CELLS[pawn.gridX - 1][pawn.gridY + 1 * pawnDirection];
+            s_leftPawn.getStyleClass().add("cell-enemy");
+            setPassantMoveMouseClicked(s_leftPawn, pawn, (Pawn) GAME_PIECES[pawnLeft]);
+            POSSIBLE_MOVES.add(s_leftPawn);
 
-                     }
+         }
 
       }
 
-      System.out.println(Arrays.toString(moves));
       // Loop through the moves
       for (int i = 0; i < moves.length; i++) {
          final byte x = moves[i][0];
@@ -782,16 +932,7 @@ public class Board {
 
       String moveTranscript = piece.getId() + Constants.boardData.X_ID[toX] + Constants.boardData.Y_ID[toY];
 
-      // if (piece.getColor() == Constants.pieceIDs.BLACK)
-      // BLACK_TRANSCRIPT.add(moveTranscript);
-      // else
-      // WHITE_TRANSCRIPT.add(moveTranscript);
-
       MATCH_TRANSCRIPT.add(moveTranscript);
-
-      // System.out.println(BLACK_TRANSCRIPT.toString());
-      // System.out.println("\n-------------------------------\n");
-      // System.out.println(WHITE_TRANSCRIPT.toString());
 
       if (piece.getType() == Constants.pieceType.PAWN && (piece.getGridY() == 0 || piece.getGridY() == 7)
             && !parsingTranscript) {
@@ -919,44 +1060,42 @@ public class Board {
 
    }
 
-
-   public void castle(Piece piece, byte color, boolean left){
+   public void castle(Piece piece, byte color, boolean left) {
       piece.hasMoved = true;
-            if (left) {
-               movePiece(piece, piece.getGridX(), piece.getGridY(), (byte) (piece.getGridX() - 2), piece.getGridY(),
-                     false);
-               if (color == Constants.pieceIDs.BLACK) {
-                  Piece rook = GAME_PIECES[Constants.pieceIDs.BLACK_QUEENS_ROOK];
-                  rook.hasMoved = true;
-                  movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX() + 1), piece.getGridY(),
-                        false);
-               } else {
-                  Piece rook = GAME_PIECES[Constants.pieceIDs.WHITE_QUEENS_ROOK];
-                  rook.hasMoved = true;
-                  movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX() + 1), piece.getGridY(),
-                        false);
-               }
-            } else {
-               movePiece(piece, piece.getGridX(), piece.getGridY(), (byte) (piece.getGridX() + 2), piece.getGridY(),
-                     false);
-               if (color == Constants.pieceIDs.BLACK) {
-                  Piece rook = GAME_PIECES[Constants.pieceIDs.BLACK_KINGS_ROOK];
-                  rook.hasMoved = true;
-                  movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX() - 1), piece.getGridY(),
-                        false);
-               } else {
-                  Piece rook = GAME_PIECES[Constants.pieceIDs.WHITE_KINGS_ROOK];
-                  rook.hasMoved = true;
-                  movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX() - 1), piece.getGridY(),
-                        false);
-               }
-            }
-            nextTurn();
-      
+      if (left) {
+         movePiece(piece, piece.getGridX(), piece.getGridY(), (byte) (piece.getGridX() - 2), piece.getGridY(),
+               false);
+         if (color == Constants.pieceIDs.BLACK) {
+            Piece rook = GAME_PIECES[Constants.pieceIDs.BLACK_QUEENS_ROOK];
+            rook.hasMoved = true;
+            movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX() + 1), piece.getGridY(),
+                  false);
+         } else {
+            Piece rook = GAME_PIECES[Constants.pieceIDs.WHITE_QUEENS_ROOK];
+            rook.hasMoved = true;
+            movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX() + 1), piece.getGridY(),
+                  false);
+         }
+      } else {
+         movePiece(piece, piece.getGridX(), piece.getGridY(), (byte) (piece.getGridX() + 2), piece.getGridY(),
+               false);
+         if (color == Constants.pieceIDs.BLACK) {
+            Piece rook = GAME_PIECES[Constants.pieceIDs.BLACK_KINGS_ROOK];
+            rook.hasMoved = true;
+            movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX() - 1), piece.getGridY(),
+                  false);
+         } else {
+            Piece rook = GAME_PIECES[Constants.pieceIDs.WHITE_KINGS_ROOK];
+            rook.hasMoved = true;
+            movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX() - 1), piece.getGridY(),
+                  false);
+         }
+      }
+      nextTurn();
 
    }
 
-   public void enPassant(Pawn primaryPawn, Pawn enemyPawn){
+   public void enPassant(Pawn primaryPawn, Pawn enemyPawn) {
       // Moves the primary pawn to its new spot.
       if (primaryPawn.getColor() == Constants.pieceIDs.BLACK) {
          if (enemyPawn.getGridX() < primaryPawn.getGridX()) {
@@ -1065,6 +1204,11 @@ public class Board {
       LIVE_PIECES.set(LIVE_PIECES.indexOf(piece), newPiece);
    }
 
+   /**
+    * This method takes a developers request and executes an action
+    * 
+    * @param request byte value representing the request.
+    */
    public void devRequest(byte request) {
       switch (request) {
          case Constants.Dev.GET_AI_MOVES:
@@ -1092,41 +1236,52 @@ public class Board {
             Thread botThread = new Thread(move);
             botThread.setDaemon(false);
             botThread.start();
-            // Bot.BoardInteractions bi = bot.BI.parseAiMove(bot.getMove(GRID,
-            // DEAD_PIECES));
-            // System.out.println(Arrays.toString(bi.getMove()));
             break;
       }
    }
 
+   /**
+    * This method will pause the game
+    */
    public void pauseGame() {
       TIMERS[turn].pauseTimer();
    }
 
+   /**
+    * This method resumes the game
+    */
    public void resumeGame() {
       TIMERS[turn].playTimer();
    }
 
+   /**
+    * This method will save the game to a file
+    * 
+    * @throws IOException this will throw an exception if the path file isn't file.
+    */
    public void saveGame() throws IOException {
-      solidifyTranscript();
-
-
       File transcriptFile;
-      if(App.getTranscriptPath() !=null){
+      if (App.getTranscriptPath() != null) {
          transcriptFile = new File(App.getTranscriptPath());
       } else {
-         Date date =  new Date(System.currentTimeMillis());
-         transcriptFile = new File(Constants.boardData.TRANSCRIPT_DIR_PATH + date.toString().replace(':', '-') + ".txt");
+         Date date = new Date(System.currentTimeMillis());
+         transcriptFile = new File(
+               Constants.boardData.TRANSCRIPT_DIR_PATH + date.toString().replace(':', '-') + ".txt");
          transcriptFile.createNewFile();
       }
       FileWriter myWriter = new FileWriter(transcriptFile);
-      myWriter.write(App.getTranscript());
+      System.out.println(App.getTranscript());
+      myWriter.write(solidifyTranscript());
       myWriter.close();
 
       GAME.transitionToHome();
    }
 
-   private Map[] solidifyTranscript() {
+   /**
+    * This method will complete the match transcript and return a raw String
+    * @return  String object
+    */
+   private String solidifyTranscript() {
       TIMERS[Constants.pieceIDs.WHITE].pauseTimer();
       TIMERS[Constants.pieceIDs.BLACK].pauseTimer();
 
@@ -1145,6 +1300,6 @@ public class Board {
       STATS[Constants.pieceIDs.WHITE].replace("remaining_time", (int) TIMERS[Constants.pieceIDs.WHITE].getTimeMillis());
       STATS[Constants.pieceIDs.BLACK].replace("remaining_time", (int) TIMERS[Constants.pieceIDs.BLACK].getTimeMillis());
 
-      return STATS;
+      return ms;
    }
 }

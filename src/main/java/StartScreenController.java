@@ -1,6 +1,9 @@
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputFilter.Config;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
@@ -175,6 +178,9 @@ public class StartScreenController {
     @FXML
     public void switchToGame() {
         App.setGameMode(Constants.boardData.MODE_PASS_N_PLAY);
+        App.setTranscript("");
+        App.setTranscriptPath(null);
+
         transition("game");
     }
 
@@ -192,6 +198,9 @@ public class StartScreenController {
     @FXML
     public void switchToAi() {
         App.setGameMode(Constants.boardData.MODE_AI);
+        App.setTranscript("");
+        App.setTranscriptPath(null);
+
         transition("game");
     }
 
@@ -200,85 +209,137 @@ public class StartScreenController {
      */
     @FXML
     public void switchToResume() {
-        /**App.setGameMode(Constants.boardData.MODE_RESUME_GAME);
-        transition("game");*/
+        /**
+         * App.setGameMode(Constants.boardData.MODE_RESUME_GAME);
+         * transition("game");
+         */
         transition("transcriptScreen");
     }
 
     @FXML
+    /**
+     * This method will matchmake with another opponent
+     */
     public void matchmake() {
         DatabaseReference ref = FirebaseDatabase.getInstance()
                 .getReference("servers");
 
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
+            /**
+             * This method is called when a data object is changed
+             * 
+             * @param dataSnapshot DataSnapshot object
+             */
             public void onDataChange(DataSnapshot dataSnapshot) {
-                boolean foundServer = false;
-
                 if (dataSnapshot.getChildrenCount() == 1) {
                     DatabaseReference newRef = ref.push();
 
                     DatabaseReference user1 = newRef.child("USER " + config.getProperty("UID"));
-                    user1.child("turn").setValueAsync("true");
+                    user1.child("turn").setValueAsync(true);
                     user1.child("timer").setValueAsync(600000);
-                    user1.child("color").setValueAsync(Constants.pieceIDs.WHITE);
+                    user1.child("color").setValueAsync(Byte.toString(Constants.pieceIDs.WHITE));
+                    App.setOnlineColor(Constants.pieceIDs.WHITE);
 
                     newRef.child("matchBegun").setValueAsync(false);
-                    newRef.child("move").setValueAsync("");
+                    newRef.child("winner").setValueAsync(-1);
+                    newRef.child("winMsg").setValueAsync("");
+                    newRef.child("gameover").setValueAsync(false);
 
+                    ArrayList<String> matchTranscript = new ArrayList<>();
+                    matchTranscript.add(" ");
+
+                    try {
+                        newRef.child("matchTranscript").setValueAsync(matchTranscript);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     newRef.addChildEventListener(new ChildEventListener() {
 
+                        /**
+                         * This method will be called when a child is added
+                         * 
+                         * @param snapshot          DataSnapshot object
+                         * @param previousChildName String object
+                         */
                         @Override
                         public void onChildAdded(DataSnapshot snapshot, String previousChildName) {
                             String key = snapshot.getKey();
 
                             if (key.contains("USER") && !key.contains(config.getProperty("UID"))) {
+                                App.setOpponentRefId(key);
                                 App.setServerReference(newRef);
                                 App.setGameMode(Constants.boardData.MODE_ONLINE);
                                 transition("game");
-
-                                newRef.child("matchBegun").setValueAsync(true);
                             }
                         }
 
                         @Override
+                        /**
+                         * Not used
+                         */
                         public void onChildChanged(DataSnapshot snapshot, String previousChildName) {
 
                         }
 
                         @Override
+                        /**
+                         * Not used
+                         */
                         public void onChildRemoved(DataSnapshot snapshot) {
 
                         }
 
                         @Override
+                        /**
+                         * Not used
+                         */
                         public void onChildMoved(DataSnapshot snapshot, String previousChildName) {
 
                         }
 
                         @Override
+                        /**
+                         * Not used
+                         */
                         public void onCancelled(DatabaseError error) {
 
                         }
 
                     });
-                }
+                } else {
+                    for (DataSnapshot server : dataSnapshot.getChildren()) {
+                        boolean matchBegun = (Boolean) server.child("matchBegun").getValue();
 
-                for (DataSnapshot server : dataSnapshot.getChildren()) {
-                    boolean matchBegun = (Boolean) server.child("matchBegun").getValue();
+                        for (DataSnapshot child : server.getChildren()) {
+                            String key = (String) child.getKey();
+                            if (key.contains("USER")) {
+                                if (key.contains(config.getProperty("UID"))) {
+                                    ref.child(server.getKey()).setValueAsync(null);
 
-                    if (matchBegun)
-                        continue;
+                                    matchmake();
+                                    return;
+                                } else {
+                                    App.setOpponentRefId(key);
+                                }
+                            }
+                        }
 
-                    DatabaseReference user2 = server.getRef().child("USER " + config.getProperty("UID"));
+                        if (matchBegun)
+                            continue;
 
-                    user2.child("turn").setValueAsync("false");
-                    user2.child("timer").setValueAsync(600000);
-                    user2.child("color").setValueAsync(Constants.pieceIDs.BLACK);
+                        DatabaseReference user2 = server.getRef().child("USER " + config.getProperty("UID"));
 
-                    App.setServerReference(server.getRef());
-                    App.setGameMode(Constants.boardData.MODE_ONLINE);
-                    transition("game");
+                        user2.child("turn").setValueAsync(false);
+                        user2.child("timer").setValueAsync(600000);
+                        user2.child("color").setValueAsync(Byte.toString(Constants.pieceIDs.BLACK));
+                        App.setOnlineColor(Constants.pieceIDs.BLACK);
+
+                        App.setServerReference(server.getRef());
+                        App.setGameMode(Constants.boardData.MODE_ONLINE);
+                        transition("game");
+                    }
                 }
             }
 
@@ -318,6 +379,12 @@ public class StartScreenController {
     }
 
     @FXML
+    /**
+     * This method will transition to the signIn screen
+     * 
+     * @throws IOException Will throw an exception if the signIn scene
+     *                     can't be found.
+     */
     private void switchToSignIn() throws IOException {
         Parent signInScene = App.loadFXML("signIn");
 
@@ -344,6 +411,12 @@ public class StartScreenController {
     }
 
     @FXML
+    /**
+     * This method will transition to the register screen
+     * 
+     * @throws IOException Will throw an exception if the signIn or register scene
+     *                     can't be found.
+     */
     private void switchToRegister() throws IOException {
         Parent signInScene = App.loadFXML("signIn"),
                 registerScene = App.loadFXML("register");
@@ -376,6 +449,12 @@ public class StartScreenController {
     }
 
     @FXML
+    /**
+     * This method will signout the user and refresh the scene
+     * 
+     * @throws IOException Will throw an IOException if the startScreen can't be
+     *                     located
+     */
     private void signOut() throws IOException {
         config.setProperty("UID", "null");
         config.setProperty(Constants.Online.CONFIG_SIGNED_IN, "f");
@@ -385,6 +464,12 @@ public class StartScreenController {
     }
 
     @FXML
+    /**
+     * This method will transition to the profile page
+     * 
+     * @throws IOException Will throw an IOException if the profile scene can't be
+     *                     located
+     */
     private void switchToProfile() throws IOException {
         Parent profileScene = App.loadFXML("profile");
 

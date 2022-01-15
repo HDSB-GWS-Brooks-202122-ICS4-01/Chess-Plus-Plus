@@ -36,7 +36,7 @@ public class SignIn {
    Pane pn_main;
 
    @FXML
-   Button btn_signIn, btn_register;
+   Button btn_signIn, btn_register, btn_home;
 
    @FXML
    Label lbl_output;
@@ -50,8 +50,11 @@ public class SignIn {
    Timeline lbl_outputClearAni;
 
    @FXML
+   /**
+    * This method will initialize the scene
+    */
    public void initialize() {
-      for (Button element : new Button[] { btn_signIn, btn_register }) {
+      for (Button element : new Button[] { btn_signIn, btn_register, btn_home }) {
          element.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, null, null)));
          RegionFillTransition hoverEffect;
          RegionFillTransition exitEffect;
@@ -62,11 +65,17 @@ public class SignIn {
 
             exitEffect = new RegionFillTransition(element, Color.web("#0077C6"),
                   Color.TRANSPARENT, Duration.millis(200));
-         } else {
+         } else if (element.getText().equalsIgnoreCase("sign in")){
             hoverEffect = new RegionFillTransition(element, Color.TRANSPARENT,
                   Color.web("#00C681"), Duration.millis(200));
 
             exitEffect = new RegionFillTransition(element, Color.web("#00C681"),
+                  Color.TRANSPARENT, Duration.millis(200));
+         } else {
+            hoverEffect = new RegionFillTransition(element, Color.TRANSPARENT,
+                  Color.web("#EC7063"), Duration.millis(200));
+
+            exitEffect = new RegionFillTransition(element, Color.web("#EC7063"),
                   Color.TRANSPARENT, Duration.millis(200));
          }
 
@@ -89,6 +98,12 @@ public class SignIn {
    }
 
    @FXML
+   /**
+    * This method will switch to the register screen.
+    * 
+    * @throws IOException will throw an IOException if the register screen isn't
+    *                     found.
+    */
    private void switchToRegister() throws IOException {
       Parent registerScene = App.loadFXML("register");
 
@@ -115,16 +130,21 @@ public class SignIn {
    }
 
    @FXML
-   public void signIn() throws FirebaseAuthException {
+   /**
+    * This method will attempt to sign in the user bearing no errors occuring
+    */
+   public void signIn() {
       boolean error = false;
       String msg = "Success! You have been signed in, and will be redirected to the main menu.";
 
       String email = tf_email.getText();
 
+      // Try signing in user
       try {
          UserRecord userRecord = FirebaseAuth.getInstance().getUserByEmail(email);
 
-         // One might say this is not secure, I say it's innovation. Literally no other option with Firebase Admin SDK.
+         // One might say this is not secure, I say it's innovation. Literally no other
+         // option with Firebase Admin SDK.
          String password = userRecord.getPhotoUrl();
 
          password = password.replace("https://", "");
@@ -144,8 +164,10 @@ public class SignIn {
          error = true;
       }
 
+      // Update the output
       lbl_output.setText(msg);
 
+      // No error occurd
       if (!error) {
          Timeline toHome = new Timeline(new KeyFrame(Duration.seconds(2), f -> {
             try {
@@ -167,6 +189,7 @@ public class SignIn {
     * 
     * @throws IOException Will throw an exception if the fxml file is not found.
     */
+   @FXML
    private void switchToHome() throws IOException {
       Parent homeScene = App.loadFXML("startScreen");
 
@@ -185,10 +208,7 @@ public class SignIn {
       timeline.setOnFinished(f1 -> {
          sp_root.getChildren().remove(homeScene);
 
-         try {
-            App.setRoot("startScreen");
-         } catch (IOException e) {
-         }
+         App.setRoot(homeScene);
       });
    }
 }

@@ -54,6 +54,9 @@ public class Profile {
    ImageView imgv_avatar;
 
    @FXML
+   /**
+    * This method initializes the scene
+    */
    public void initialize() {
       btn_mainMenu.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, null, null)));
 
@@ -81,8 +84,6 @@ public class Profile {
 
          Image avatar = new Image(
                new ByteArrayInputStream(bucket.get("profiles/" + userRecord.getUid() + "/avatar.jpg").getContent()));
-
-         System.out.println(avatar.getWidth());
 
          imgv_avatar.setImage(avatar);
          imgv_avatar.setFitWidth(150);
@@ -131,6 +132,10 @@ public class Profile {
    }
 
    @FXML
+   /**
+    * This method will return to the home screen.
+    * @throws IOException This method will throw an IOException if the startScreen couldn't be located.
+    */
    private void switchToStartScreen() throws IOException {
       Parent startScreen = App.loadFXML("startScreen");
 
@@ -148,11 +153,7 @@ public class Profile {
 
       timeline.setOnFinished(f1 -> {
          sp_root.getChildren().remove(startScreen);
-
-         try {
-            App.setRoot("startScreen");
-         } catch (IOException e) {
-         }
+         App.setRoot(startScreen);
       });
    }
 }

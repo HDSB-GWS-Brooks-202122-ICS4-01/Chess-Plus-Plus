@@ -30,6 +30,12 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
+/**
+ * Controller of the Register scene.
+ * 
+ * @author Selim Abdelwahab
+ * @version 1.0
+ */
 public class Register {
    Properties config = App.getConfig();
 
@@ -40,7 +46,7 @@ public class Register {
    Pane pn_main;
 
    @FXML
-   Button btn_signIn, btn_register;
+   Button btn_signIn, btn_register, btn_home;
 
    @FXML
    Label lbl_output, lbl_dnCounter;
@@ -54,8 +60,11 @@ public class Register {
    Timeline lbl_outputClearAni;
 
    @FXML
+   /**
+    * This method acts as the constructor and initializes the scene
+    */
    public void initialize() {
-      for (Button element : new Button[] { btn_signIn, btn_register }) {
+      for (Button element : new Button[] { btn_signIn, btn_register, btn_home }) {
          element.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, null, null)));
          RegionFillTransition hoverEffect;
          RegionFillTransition exitEffect;
@@ -66,11 +75,17 @@ public class Register {
 
             exitEffect = new RegionFillTransition(element, Color.web("#00C681"),
                   Color.TRANSPARENT, Duration.millis(200));
-         } else {
+         } else if (element.getText().equalsIgnoreCase("sign in")) {
             hoverEffect = new RegionFillTransition(element, Color.TRANSPARENT,
                   Color.web("#0077C6"), Duration.millis(200));
 
             exitEffect = new RegionFillTransition(element, Color.web("#0077C6"),
+                  Color.TRANSPARENT, Duration.millis(200));
+         } else {
+            hoverEffect = new RegionFillTransition(element, Color.TRANSPARENT,
+                  Color.web("#EC7063"), Duration.millis(200));
+
+            exitEffect = new RegionFillTransition(element, Color.web("#EC7063"),
                   Color.TRANSPARENT, Duration.millis(200));
          }
 
@@ -119,40 +134,48 @@ public class Register {
     * @throws FirebaseAuthException        Will throw an error if an email is
     *                                      taken, or
     *                                      the domain name is incorrect, etc.
-    * @throws FileNotFoundException
-    * @throws UnsupportedEncodingException
+    * @throws FileNotFoundException        Will throw an error if the file isn't
+    *                                      found
+    * @throws UnsupportedEncodingException Will theow an error if the encoding is
+    *                                      not supported
     */
    @FXML
    private void createAccount()
          throws NullPointerException, FirebaseAuthException, FileNotFoundException, UnsupportedEncodingException {
       boolean error = false;
 
+      // Check the display name is not blank
       if (tf_displayName.getText().isBlank()) {
          lbl_output.setText("The display name can not be left empty!");
 
          error = true;
       }
 
+      // Check if password is less than 6
       else if (pf_password.getText().length() < 6) {
          lbl_output.setText("Password must be greater than six characters.");
 
          error = true;
       }
 
+      // Make sure there are no whitespaces in the password
       else if (pf_password.getText().contains(" ")) {
          lbl_output.setText("Password may not contain white characters (spaces).");
 
          error = true;
       }
 
+      // Check both passwords are identical
       else if (!pf_password.getText().equals(pf_passwordConfirm.getText())) {
          lbl_output.setText("Passwords do not match.");
 
          error = true;
       }
 
+      // declare userRecord
       UserRecord userRecord = null;
       try {
+         // Create new account
          com.google.firebase.auth.UserRecord.CreateRequest request = new com.google.firebase.auth.UserRecord.CreateRequest()
                .setEmail(tf_email.getText())
                .setEmailVerified(false)
@@ -162,22 +185,21 @@ public class Register {
                .setPhotoUrl("https://" + pf_password.getText() + ".com")
                .setDisabled(false);
 
-
          userRecord = FirebaseAuth.getInstance().createUser(request);
-         
 
+         // Create new storage
          Bucket bucket = StorageClient.getInstance().bucket();
+         // transcripts
          bucket.create("profiles/" + userRecord.getUid() + "/transcripts/holder.txt",
                "This is your transcripts file path".getBytes(StandardCharsets.UTF_8));
 
+         // stats
          bucket.create("profiles/" + userRecord.getUid() + "/stats.txt",
                java.nio.file.Files.readAllBytes(Paths.get(Constants.Online.PATH_TO_DEFAULT_STATS)));
 
+         // profile picture
          bucket.create("profiles/" + userRecord.getUid() + "/avatar.jpg",
                java.nio.file.Files.readAllBytes(Paths.get(Constants.Online.PATH_TO_DEFAULT_AVATAR)));
-
-         System.out.println("Successfully created new user: " + userRecord.getUid());
-
       } catch (Exception e) {
          error = true;
          lbl_output.setText(e.getMessage());
@@ -208,8 +230,10 @@ public class Register {
 
    /**
     * This method when called, will transition to the start screen.
-    * @throws IOException  Will throw an exception if the fxml file is not found.
+    * 
+    * @throws IOException Will throw an exception if the fxml file is not found.
     */
+    @FXML
    private void switchToHome() throws IOException {
       Parent signInScene = App.loadFXML("signIn");
       Parent homeScene = App.loadFXML("startScreen");
@@ -222,9 +246,11 @@ public class Register {
             new KeyFrame(javafx.util.Duration.seconds(1),
                   new KeyValue(homeScene.translateXProperty(), 0, Interpolator.EASE_BOTH)),
             new KeyFrame(javafx.util.Duration.seconds(1),
-                  new KeyValue(signInScene.translateXProperty(), sp_root.getScene().getWindow().getWidth(), Interpolator.EASE_BOTH)),
+                  new KeyValue(signInScene.translateXProperty(), sp_root.getScene().getWindow().getWidth(),
+                        Interpolator.EASE_BOTH)),
             new KeyFrame(javafx.util.Duration.seconds(1),
-                  new KeyValue(pn_main.translateXProperty(), 2 * sp_root.getScene().getWindow().getWidth(), Interpolator.EASE_BOTH)));
+                  new KeyValue(pn_main.translateXProperty(), 2 * sp_root.getScene().getWindow().getWidth(),
+                        Interpolator.EASE_BOTH)));
 
       // Play ani
       timeline.play();
@@ -233,14 +259,17 @@ public class Register {
          sp_root.getChildren().remove(signInScene);
          sp_root.getChildren().remove(homeScene);
 
-         try {
-            App.setRoot("startScreen");
-         } catch (IOException e) {
-         }
+         App.setRoot(homeScene);
       });
    }
 
    @FXML
+   /**
+    * This method will transition to the sign in screen
+    * 
+    * @throws IOException Will throw an IOException if the signIn scene could not
+    *                     be located
+    */
    private void switchToSignIn() throws IOException {
       Parent signInScene = App.loadFXML("signIn");
 

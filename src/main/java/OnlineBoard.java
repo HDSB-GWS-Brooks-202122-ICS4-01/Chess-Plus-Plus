@@ -1,13 +1,9 @@
-import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Properties;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -16,8 +12,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
-import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
@@ -26,7 +23,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 
 /**
- * Board class, handles the interaction of pieces and displaying them.
+ * Board class, handles the interaction of pieces and displaying for the online mode.
  * 
  * @author Selim Abdelwahab
  * @version 1.0
@@ -34,7 +31,7 @@ import javafx.scene.layout.StackPane;
 public class OnlineBoard {
    Properties config = new Properties();
 
-   private static final ArrayList<String> MATCH_TRANSCRIPT = new ArrayList<String>();
+   private final ArrayList<String> MATCH_TRANSCRIPT = new ArrayList<String>();
    private final GameController GAME;
    private final GridPane gp_CHESS_BOARD;
    private final GridPane gp_DEAD_WHITE_CELLS;
@@ -44,10 +41,12 @@ public class OnlineBoard {
    private byte cbdc = 0;
    private byte cwdc = 0;
 
+   // Grid position with the ids
    private final byte[][] GRID = new byte[8][8];
 
    private final StackPane[][] CELLS = new StackPane[8][8];
 
+   // List of game pieces
    private final Piece[] GAME_PIECES = new Piece[32];
    private final ArrayList<Piece> LIVE_PIECES = new ArrayList<Piece>();
    private final ArrayList<Piece> DEAD_PIECES = new ArrayList<Piece>();
@@ -66,7 +65,11 @@ public class OnlineBoard {
    private boolean isTurn = false;
    private byte color;
 
-   private String pushMove;
+   private int matchTranscriptIdx = 0;
+
+   private String opponentRef;
+
+   private boolean promotingPawn = false;
 
    /**
     * Constructor for the Board class
@@ -74,8 +77,9 @@ public class OnlineBoard {
     * @param game       Reference to the GameController class.
     * @param chessBoard GridPane element containing the rows, and columns of
     *                   StackPane.
+    * @throws InterruptedException Will throw an error if the thread is interrupted
     */
-   public OnlineBoard(GameController game, GridPane[] cells) {
+   public OnlineBoard(GameController game, GridPane[] cells) throws InterruptedException {
       GAME = game;
       gp_CHESS_BOARD = cells[0];
       gp_DEAD_BLACK_CELLS = cells[1];
@@ -105,98 +109,301 @@ public class OnlineBoard {
       } catch (Exception e) {
          e.printStackTrace();
       }
-      System.out.println(gameTime);
 
-      TIMERS[Constants.pieceIDs.WHITE] = new PlayerTimer(whiteLabel, gameTime, true);
-      TIMERS[Constants.pieceIDs.BLACK] = new PlayerTimer(blackLabel, gameTime, false);
+      TIMERS[Constants.pieceIDs.WHITE] = new PlayerTimer(whiteLabel, GAME.getHiddenTimeReference(Constants.pieceIDs.WHITE), gameTime, false, true, this);
+      TIMERS[Constants.pieceIDs.BLACK] = new PlayerTimer(blackLabel, GAME.getHiddenTimeReference(Constants.pieceIDs.BLACK), gameTime, false, true, this);
 
       setupBoard();
 
+      opponentRef = App.getOpponentRefId();
+
       SERVER_REF = App.getServerReference();
+
+      // Update match begun value
+      SERVER_REF.child("matchBegun").setValueAsync(true);
+
       SERVER_REF.addListenerForSingleValueEvent(new ValueEventListener() {
          @Override
+         /**
+          * This method is called when the data changes
+          * 
+          * @param snapshot DataSnapshot
+          */
          public void onDataChange(DataSnapshot dataSnapshot) {
-            isTurn = Boolean.parseBoolean(
-                  (String) dataSnapshot.child("USER " + config.getProperty("UID")).child("turn").getValue());
+            try {
+               isTurn = (Boolean) dataSnapshot.child("USER " + config.getProperty("UID")).child("turn").getValue();
 
-            color = Byte.parseByte(
-                  (String) dataSnapshot.child("USER " + config.getProperty("UID")).child("color").getValue());
+               color = Byte.parseByte(
+                     (String) dataSnapshot.child("USER " + config.getProperty("UID")).child("color").getValue());
+            } catch (Exception e) {
+               e.printStackTrace();
+            }
          }
 
          @Override
+         /**
+          * Not used
+          */
          public void onCancelled(DatabaseError error) {
          }
 
       });
 
-      SERVER_REF.child("move").addValueEventListener(new ValueEventListener() {
-         @Override
-         public void onCancelled(DatabaseError error) {
+      SERVER_REF.child("USER " + config.getProperty("UID")).child("turn")
+            .addValueEventListener(new ValueEventListener() {
 
+               @Override
+               /**
+                * This method is called when the data changes
+                * 
+                * @param snapshot DataSnapshot
+                */
+               public void onDataChange(DataSnapshot snapshot) {
+                  // Execute on JavaFX thread
+                  Platform.runLater(new Runnable() {
+                     @Override
+                     public void run() {
+                        isTurn = (Boolean) snapshot.getValue();
+
+                        if (isTurn) {
+                           TIMERS[color].playTimer();
+                        } else {
+                           TIMERS[color].pauseTimer();
+                        }
+                     }
+                  });
+               }
+
+               @Override
+               /**
+                * Not used
+                */
+               public void onCancelled(DatabaseError error) {
+
+               }
+
+            });
+
+      SERVER_REF.child("matchTranscript").addValueEventListener(new ValueEventListener() {
+
+         @Override
+         /**
+          * This method is called when the data changes
+          * 
+          * @param snapshot DataSnapshot
+          */
+         public void onDataChange(DataSnapshot snapshot) {
+            Platform.runLater(new Runnable() {
+               @Override
+               public void run() {
+                  MATCH_TRANSCRIPT.clear();
+                  for (DataSnapshot child : snapshot.getChildren()) {
+                     MATCH_TRANSCRIPT.add((String) child.getValue());
+                  }
+
+                  parseOpponentMove();
+               }
+            });
          }
 
          @Override
+         /**
+          * Not used
+          */
+         public void onCancelled(DatabaseError error) {
+         }
+
+      });
+
+      SERVER_REF.child(opponentRef).child("timer").addValueEventListener(new ValueEventListener() {
+
+         @Override
+         /**
+          * This method is called when the data changes
+          * 
+          * @param snapshot DataSnapshot
+          */
          public void onDataChange(DataSnapshot snapshot) {
-            String value = (String) snapshot.getValue();
-            System.out.println("Move Value: " + value);
+            // Update the timers on the JavaFX thread
+            Platform.runLater(new Runnable() {
+               @Override
+               public void run() {
+                  TIMERS[(color == Constants.pieceIDs.WHITE) ? Constants.pieceIDs.BLACK : Constants.pieceIDs.WHITE]
+                        .setTime((Long) snapshot.getValue());
+               }
+            });
+         }
 
-            if (value.equals(pushMove)) {
-               isTurn = false;
-               return;
+         @Override
+         /**
+          * Not used
+          */
+         public void onCancelled(DatabaseError error) {
+         }
+
+      });
+
+      GAME.getHiddenTimeReference(color).textProperty().addListener(new ChangeListener<String>() {
+
+         @Override
+         /**
+          * This method is called when the invisible text is changed.
+          * 
+          * @param observable ObservableValue object
+          * @param oldValue   String object
+          * @param newValue   String object
+          */
+         public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+            // True if the duratio is less than 0
+            if (Long.parseLong(newValue) <= 0) {
+               byte winner;
+
+               // declare the winner
+               if (color == Constants.pieceIDs.BLACK)
+                  winner = Constants.pieceIDs.WHITE;
+               else
+                  winner = Constants.pieceIDs.BLACK;
+
+               // update the winner and win message
+               SERVER_REF.child("winner").setValueAsync(Byte.toString(winner));
+               if (winner == color)
+                  SERVER_REF.child("winMsg").setValueAsync("Won by opponent running their timer down!");
+               else {
+                  SERVER_REF.child("winMsg").setValueAsync("Lost! Your timer ran out.");
+               }
+
+               // Let the users know the game has concluded.
+               SERVER_REF.child("gameover").setValueAsync(true);
             }
+         }
+      });
 
+      SERVER_REF.addChildEventListener(new ChildEventListener() {
+
+         @Override
+         /**
+          * Not used
+          */
+         public void onChildAdded(DataSnapshot snapshot, String previousChildName) {
+         }
+
+         @Override
+         /**
+          * This method is executed when a child is changed
+          * 
+          * @param snapshot          DataSnapshot object
+          * @param previousChildName String object
+          */
+         public void onChildChanged(DataSnapshot snapshot, String previousChildName) {
             Platform.runLater(new Runnable() {
 
                @Override
+               /**
+                * Run on the JavaFX thread
+                */
                public void run() {
-                  parseOpponentMove(value);
-                  isTurn = true;
+                  // Key and value of data
+                  String key = snapshot.getKey();
+                  Object value = snapshot.getValue();
+
+                  switch (key) {
+                     case "winner":
+                        App.setWinner(Byte.parseByte((String) value));
+                        break;
+                     case "winMsg":
+                        App.setWinMsg((String) value);
+                        break;
+                     case "gameover":
+                        if ((Boolean) value)
+                           try {
+                              gameover();
+                           } catch (IOException e) {
+                           }
+                        break;
+                  }
                }
             });
+         }
 
+         /**
+          * Not used
+          */
+         @Override
+         public void onChildRemoved(DataSnapshot snapshot) {
+         }
+
+         /**
+          * Not used
+          */
+         @Override
+         public void onChildMoved(DataSnapshot snapshot, String previousChildName) {
+         }
+
+         /**
+          * Not used
+          */
+         @Override
+         public void onCancelled(DatabaseError error) {
          }
 
       });
    }
 
-   protected void parseOpponentMove(String value) {
+   /**
+    * This method will parse an opponents move
+    */
+   private void parseOpponentMove() {
+      final String REG = "((?=[A-Z])|(?<=[A-Z]))|((?=[a-z])|(?<=[a-z]))";
+
       try {
-         final String REG = "((?=[A-Z])|(?<=[A-Z]))|((?=[a-z])|(?<=[a-z]))";
+         for (int i = matchTranscriptIdx; i < MATCH_TRANSCRIPT.size(); i++) {
+            String ts = MATCH_TRANSCRIPT.get(i);
 
-         MATCH_TRANSCRIPT.add(value);
+            if (ts.contains("PP") && !isTurn) { // Pawn promotion
+               ts = ts.substring(2, ts.length());
 
-         String[] data = value.split(REG);
+               String[] ids = ts.split("-");
 
-         System.out.println("Value " + value);
-         System.out.println(Arrays.toString(data));
+               Piece from = getPieceOnGrid(Byte.parseByte(ids[0]));
 
-         Piece piece = getPieceOnGrid(Byte.parseByte(data[0].trim()));
+               promotePawn(from, ids[1], true);
+            } else if (ts.contains("KILL")) { // piece killed
+               ts = ts.substring(4, ts.length());
+               String[] pos = ts.split("-");
 
-         if (piece == null)
-            return;
+               GRID[Integer.parseInt(pos[0])][Integer.parseInt(pos[1])] = Constants.pieceIDs.EMPTY_CELL;
+            } else { // Normal move
+               String[] data = ts.split(REG);
 
-         System.out.println(piece);
+               Piece piece = getPieceOnGrid(Byte.parseByte(data[0].trim()));
 
-         byte x = getBoardX(data[1]);
-         byte y = getBoardY(data[2]);
+               if (piece == null)
+                  return;
 
-         System.out.println("(" + x + ", " + y + ")");
+               byte x = getBoardX(data[1]);
+               byte y = getBoardY(data[2]);
 
-         if (x >= 0 && x < 8 && y >= 0 && y < 8) {
+               // Check move is valid
+               if (x >= 0 && x < 8 && y >= 0 && y < 8) {
 
-            movePiece(piece, piece.getGridX(), piece.getGridY(), x, y, true);
+                  movePiece(piece, piece.getGridX(), piece.getGridY(), x, y, true);
 
-            App.MOVE_COUNT++;
-
+                  App.MOVE_COUNT++;
+               }
+            }
          }
+
       } catch (Exception err) {
          err.printStackTrace();
       }
+
+      // set the idx
+      matchTranscriptIdx = MATCH_TRANSCRIPT.size();
    }
 
    /**
     * This method is called once in the constructor of the Board class.
-    * The method will setup the boeard by placing all the game pieces in the
+    * The method will setup the board by placing all the game pieces in the
     * correct starting locations, it will also initialize all the array lists.
     */
    private void setupBoard() {
@@ -249,6 +456,7 @@ public class OnlineBoard {
 
       }
 
+      // Loop through grid pieces
       for (byte x = 0; x < GRID.length; x++) {
          for (byte y = 0; y < GRID.length; y++) {
             byte id = GRID[x][y];
@@ -299,9 +507,15 @@ public class OnlineBoard {
    private void gameover() throws IOException {
       App.setMatchStats(solidifyTranscript());
 
-      GAME.gameOver(winner);
+      GAME.gameOver();
    }
 
+   /**
+    * This method will return the x position of a string for a board value
+    * 
+    * @param value String value (A -> H)
+    * @return byte value corresponding to index of location
+    */
    private byte getBoardX(String value) {
       String[] xPos = Constants.boardData.X_ID;
       for (byte i = 0; i < xPos.length; i++) {
@@ -312,6 +526,12 @@ public class OnlineBoard {
       return -1;
    }
 
+   /**
+    * This method will
+    * 
+    * @param value
+    * @return
+    */
    private byte getBoardY(String value) {
       String[] yPos = Constants.boardData.Y_ID;
       for (byte i = 0; i < yPos.length; i++) {
@@ -459,35 +679,51 @@ public class OnlineBoard {
          sp_selected.getStyleClass().remove("cell-selected");
 
       sp_selected = null;
-      boolean inCheck = true;
+      boolean checkmate = true;
       winner = getTurn();
 
       STATS[getTurn()].replace("total_moves", (int) STATS[getTurn()].get("total_moves") + 1);
-
-      TIMERS[getTurn()].pauseTimer();
-
-      TIMERS[getTurn()].playTimer();
 
       for (Piece p : LIVE_PIECES) {
          if (p.getColor() != getTurn())
             continue;
 
          if (p.getPossibleMoves(GRID).length > 0)
-            inCheck = false;
+            checkmate = false;
       }
 
-      if (inCheck) {
+      // Check mate
+      if (checkmate) {
          try {
+            SERVER_REF.child("winner").setValueAsync(Byte.toString(winner));
+            if (winner == color)
+               SERVER_REF.child("winMsg").setValueAsync("You won by checkmate!");
+            else {
+               SERVER_REF.child("winMsg").setValueAsync("You lost to a checkmate!");
+            }
+
+            SERVER_REF.child("gameOver").setValueAsync(true);
             gameover();
          } catch (IOException e) {
             e.printStackTrace();
          }
       }
 
-      SERVER_REF.child("move").setValueAsync(pushMove);
-      isTurn = false;
+      // Won't update the data if the user is promoting a pawn 
+      if (!promotingPawn) {
+         pushToServer();
+      }
+   }
 
-      System.out.println("Next turn: " + getTurn());
+   /**
+    * This method will push updated data to the server.
+    */
+   private void pushToServer() {
+      matchTranscriptIdx = MATCH_TRANSCRIPT.size();
+      SERVER_REF.child("matchTranscript").setValueAsync(MATCH_TRANSCRIPT);
+
+      SERVER_REF.child("USER " + config.getProperty("UID")).child("turn").setValueAsync(false);
+      SERVER_REF.child(opponentRef).child("turn").setValueAsync(true);
    }
 
    /**
@@ -512,11 +748,8 @@ public class OnlineBoard {
     * @param piece Target piece.
     */
    private void displayPossibleMoves(Piece piece) {
-      System.out.println("move count: " + App.MOVE_COUNT);
       // Get array of possible moves.
       byte[][] moves = piece.getPossibleMoves(GRID);
-      boolean passantLeft = false;
-      boolean passantRight = false;
       King king = null;
       Pawn pawn = null;
 
@@ -534,40 +767,58 @@ public class OnlineBoard {
             setCastleMoveMouseClicked(s_rightCastle, piece, piece.getColor(), false);
             POSSIBLE_MOVES.add(s_rightCastle);
          }
-      } else if ((piece.getId() > Constants.pieceIDs.BEGIN_BLACK_PAWNS
-            && piece.getId() < Constants.pieceIDs.END_BLACK_PAWNS)
-            || (piece.getId() > Constants.pieceIDs.BEGIN_WHITE_PAWNS
-                  && piece.getId() < Constants.pieceIDs.END_WHITE_PAWNS)) {
-            // logic for en passant
+      } else if ((piece.getId() > 7 && piece.getId() < 16) || (piece.getId() > 23 && piece.getId() < 32)) {
+         pawn = (Pawn) piece;
 
-            // if the piece is a pawn
-            pawn = (Pawn) piece;
+         // gets the id of the piece to the right and left
+         // makes sure it can check to the left
+         byte pawnLeft = (pawn.gridX - 1 > -1) ? GRID[piece.gridX - 1][piece.gridY] : -1;
+         byte pawnRight = (pawn.gridX + 1 < 8) ? GRID[piece.gridX + 1][piece.gridY] : -1;
 
-            // gets the id of the piece to the right and left
-            // makes sure it can check to the left and can check to the right
-            byte pawnLeft = (pawn.gridX - 1 > -1) ? GRID[piece.gridX - 1][piece.gridY] : -1;
-            byte pawnRight = (pawn.gridX + 1 < 8) ? GRID[piece.gridX + 1][piece.gridY] : -1;
-
-            int pawnDirection = (pawn.getColor() == Constants.pieceIDs.BLACK) ? 1 : -1;
-
-            if (pawn.canPassantRight(pawnRight, GRID)) {
-               StackPane s_rightPawn = CELLS[pawn.gridX + 1][pawn.gridY + 1 * pawnDirection];
-               s_rightPawn.getStyleClass().add("cell-enemy");
-               setPassantMoveMouseClicked(s_rightPawn, pawn, (Pawn) GAME_PIECES[pawnRight]);
-               POSSIBLE_MOVES.add(s_rightPawn);
-            }
-
-            if (pawn.canPassantLeft(pawnLeft, GRID)) {
-               StackPane s_leftPawn = CELLS[pawn.gridX - 1][pawn.gridY + 1 * pawnDirection];
-               s_leftPawn.getStyleClass().add("cell-enemy");
-               setPassantMoveMouseClicked(s_leftPawn, pawn, (Pawn) GAME_PIECES[pawnLeft]);
-               POSSIBLE_MOVES.add(s_leftPawn);
+         if ((pawnLeft > 7 && pawnLeft < 16) || (pawnLeft > 23 && pawnLeft < 32)) {
+            if (pawn.getColor() == Constants.pieceIDs.BLACK) {
+               if (pawnLeft > 23 && pawnLeft < 32
+                     && ((Pawn) GAME_PIECES[pawnLeft]).getPassant() == App.MOVE_COUNT - 1 && pawn.gridY + 1 < 8) {
+                  StackPane s_leftPawn = CELLS[pawn.gridX - 1][pawn.gridY + 1];
+                  s_leftPawn.getStyleClass().add("cell-enemy");
+                  setPassantMoveMouseClicked(s_leftPawn, pawn, (Pawn) GAME_PIECES[pawnLeft]);
+                  POSSIBLE_MOVES.add(s_leftPawn);
+               }
+            } else {
+               if (pawnLeft > 7 && pawnLeft < 16
+                     && ((Pawn) GAME_PIECES[pawnLeft]).getPassant() == App.MOVE_COUNT - 1 && pawn.gridY - 1 > -1) {
+                  StackPane s_leftPawn = CELLS[pawn.gridX - 1][pawn.gridY - 1];
+                  s_leftPawn.getStyleClass().add("cell-enemy");
+                  setPassantMoveMouseClicked(s_leftPawn, pawn, (Pawn) GAME_PIECES[pawnLeft]);
+                  POSSIBLE_MOVES.add(s_leftPawn);
+               }
 
             }
+         }
+
+         if ((pawnRight > 7 && pawnRight < 16) || (pawnRight > 23 && pawnRight < 32)) {
+            if (pawn.getColor() == Constants.pieceIDs.BLACK) {
+               if (pawnRight > 23 && pawnRight < 32
+                     && ((Pawn) GAME_PIECES[pawnRight]).getPassant() == App.MOVE_COUNT - 1 && pawn.gridY + 1 < 8) {
+                  StackPane s_rightPawn = CELLS[pawn.gridX + 1][pawn.gridY + 1];
+                  s_rightPawn.getStyleClass().add("cell-enemy");
+                  setPassantMoveMouseClicked(s_rightPawn, pawn, (Pawn) GAME_PIECES[pawnRight]);
+                  POSSIBLE_MOVES.add(s_rightPawn);
+               }
+            } else {
+               if (pawnRight > 7 && pawnRight < 16
+                     && ((Pawn) GAME_PIECES[pawnRight]).getPassant() == App.MOVE_COUNT - 1 && pawn.gridY - 1 < 8) {
+                  StackPane s_rightPawn = CELLS[pawn.gridX + 1][pawn.gridY - 1];
+                  s_rightPawn.getStyleClass().add("cell-enemy");
+                  setPassantMoveMouseClicked(s_rightPawn, pawn, (Pawn) GAME_PIECES[pawnRight]);
+                  POSSIBLE_MOVES.add(s_rightPawn);
+               }
+
+            }
+         }
 
       }
 
-      System.out.println(Arrays.toString(moves));
       // Loop through the moves
       for (byte i = 0; i < moves.length; i++) {
          final byte x = moves[i][0];
@@ -621,7 +872,6 @@ public class OnlineBoard {
 
       if (piece.getType() == Constants.pieceType.PAWN && Math.abs(toY - fromY) == 2) {
          ((Pawn) piece).setPassant(App.MOVE_COUNT);
-         System.out.println("Passant: " + ((Pawn) piece).getPassant());
       }
 
       StackPane to = CELLS[toX][toY];
@@ -649,7 +899,6 @@ public class OnlineBoard {
 
       if (!parsingTranscript) {
          String moveTranscript = piece.getId() + Constants.boardData.X_ID[toX] + Constants.boardData.Y_ID[toY];
-         pushMove = moveTranscript;
          MATCH_TRANSCRIPT.add(moveTranscript);
 
       }
@@ -657,7 +906,8 @@ public class OnlineBoard {
       if (piece.getType() == Constants.pieceType.PAWN && (piece.getGridY() == 0 || piece.getGridY() == 7)
             && !parsingTranscript) {
          try {
-            GAME.displayPawnPromotion(piece, getTurn());
+            promotingPawn = true;
+            GAME.displayPawnPromotion(piece, color);
          } catch (IOException e) {
          }
       }
@@ -800,6 +1050,8 @@ public class OnlineBoard {
     * @param enemyPawn   Pawn object of the enemy pawn.
     */
    private void setPassantMoveMouseClicked(StackPane sp, Pawn primaryPawn, Pawn enemyPawn) {
+      GRID[enemyPawn.gridX][enemyPawn.gridY] = Constants.pieceIDs.EMPTY_CELL;
+      MATCH_TRANSCRIPT.add("KILL" + enemyPawn.gridX + "-" + enemyPawn.gridY);
       sp.setOnMouseClicked(new EventHandler<MouseEvent>() {
          @Override
          public void handle(MouseEvent event) {
@@ -854,6 +1106,7 @@ public class OnlineBoard {
     * @param type  The type of piece to replace it.
     */
    public void promotePawn(Piece piece, String type, boolean parsingTranscript) {
+
       byte x = piece.getGridX();
       byte y = piece.getGridY();
 
@@ -914,12 +1167,23 @@ public class OnlineBoard {
 
       movePiece(newPiece, x, y, x, y, parsingTranscript);
       LIVE_PIECES.set(LIVE_PIECES.indexOf(piece), newPiece);
+
+      promotingPawn = false;
+      pushToServer();
    }
 
+   /**
+    * This method will complete the game transcript by including the timers and
+    * replacing useless characters.
+    * 
+    * @return Map[] containing the game stats.
+    */
    private Map[] solidifyTranscript() {
+      // Pause timers
       TIMERS[Constants.pieceIDs.WHITE].pauseTimer();
       TIMERS[Constants.pieceIDs.BLACK].pauseTimer();
 
+      // Add timer values
       MATCH_TRANSCRIPT.add("TW" + TIMERS[Constants.pieceIDs.WHITE].getTimeMillis());
       MATCH_TRANSCRIPT.add("TB" + TIMERS[Constants.pieceIDs.BLACK].getTimeMillis());
 
@@ -930,11 +1194,21 @@ public class OnlineBoard {
       ms = ms.replaceAll(",", "\n");
       ms = ms.replaceAll(" ", "");
 
+      // Set transcript
       App.setTranscript(ms);
 
       STATS[Constants.pieceIDs.WHITE].replace("remaining_time", (int) TIMERS[Constants.pieceIDs.WHITE].getTimeMillis());
       STATS[Constants.pieceIDs.BLACK].replace("remaining_time", (int) TIMERS[Constants.pieceIDs.BLACK].getTimeMillis());
 
       return STATS;
+   }
+
+   /**
+    * This method updates the remaining timer to the server
+    * 
+    * @param duration The duration remaining in millis
+    */
+   public void updateTimeToServer(long duration) {
+      SERVER_REF.child("USER " + config.getProperty("UID")).child("timer").setValueAsync(duration);
    }
 }

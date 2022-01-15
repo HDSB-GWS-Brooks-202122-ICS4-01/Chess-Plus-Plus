@@ -1,5 +1,4 @@
 import java.io.IOException;
-import java.sql.Time;
 import java.util.Properties;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -21,7 +20,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.util.Duration;
 
 /**
  * Controller of the game scene, also initializes the Board class.
@@ -42,7 +40,7 @@ public class GameController {
    Pane pn_dev;
 
    @FXML
-   Label lbl_bTimer, lbl_wTimer;
+   Label lbl_bTimer, lbl_wTimer, lbl_hbTimer, lbl_hwTimer;
 
    @FXML
    VBox vb_gameover;
@@ -51,17 +49,25 @@ public class GameController {
    private OnlineBoard oBoard = null;
 
    @FXML
-   public void initialize() throws FirebaseAuthException {
+   /**
+    * Acts as the constructor and initializes the scene
+    * @throws FirebaseAuthException General firebase exception
+    * @throws InterruptedException  Will occur when the thread is interrupted
+    */
+   public void initialize() throws FirebaseAuthException, InterruptedException {
+      // Set boards
       if (App.getGameMode() != Constants.boardData.MODE_ONLINE)
          board = new Board(this, new GridPane[] { gp_board, gp_blackDeadCells, gp_whiteDeadCells }, App.getGameMode());
       else
          oBoard = new OnlineBoard(this, new GridPane[] { gp_board, gp_blackDeadCells, gp_whiteDeadCells });
 
+      // Check if the user is signed in
       if (config.getProperty("signedIn").equalsIgnoreCase("t")) {
          UserRecord userRecord = FirebaseAuth.getInstance().getUser(config.getProperty("UID"));
 
          boolean userIsDev = false;
 
+         // Check email against developers' emails
          for (String dev : Constants.Online.DEV_EMAILS) {
             if (userRecord.getEmail().equalsIgnoreCase(dev)) {
                userIsDev = true;
@@ -69,6 +75,7 @@ public class GameController {
             }
          }
 
+         // Display invisible pane
          if (userIsDev) {
             App.getStage().setHeight(1050);
             pn_dev.setVisible(true);
@@ -76,11 +83,28 @@ public class GameController {
       }
    }
 
+   /**
+    * This method will return the lable reference to a timer
+    * @param color   The color corresponding to the timer
+    * @return  Label object
+    */
    public Label getTimeReference(byte color) {
       if (color == Constants.pieceIDs.BLACK)
          return lbl_bTimer;
       else
          return lbl_wTimer;
+   }
+
+   /**
+    * This method will return the lable reference to an invisible timer
+    * @param color   The color corresponding to the timer
+    * @return  Label object
+    */
+   public Label getHiddenTimeReference(byte color) {
+      if (color == Constants.pieceIDs.BLACK)
+         return lbl_hbTimer;
+      else
+         return lbl_hwTimer;
    }
 
    /**
@@ -106,8 +130,6 @@ public class GameController {
       timeline.setOnFinished(f -> {
          GridPane gp = (GridPane) nextScene.getScene().lookup("#gp_wPieces");
 
-         System.out.println(gp);
-
          for (Node n : gp.getChildren()) {
             n.setOnMouseEntered(new EventHandler<MouseEvent>() {
                public void handle(MouseEvent me) {
@@ -125,7 +147,11 @@ public class GameController {
                public void handle(MouseEvent me) {
                   String type = ((StackPane) n).getId();
 
-                  board.promotePawn(piece, type, false);
+                  // Promote the pawn
+                  if (App.getGameMode() == Constants.boardData.MODE_ONLINE)
+                     oBoard.promotePawn(piece, type, false);
+                  else
+                     board.promotePawn(piece, type, false);
 
                   Timeline timeline = new Timeline(
                         new KeyFrame(javafx.util.Duration.seconds(1),
@@ -135,6 +161,7 @@ public class GameController {
                               new KeyValue(nextScene.translateYProperty(), sp_root.getHeight(),
                                     Interpolator.EASE_BOTH)));
 
+                  // Play animations
                   timeline.play();
                   timeline.setOnFinished((r) -> {
                      sp_root.getChildren().remove(nextScene);
@@ -153,9 +180,8 @@ public class GameController {
     * @param piece Piece that needs to be promoted
     * @throws IOException May throw an exception if the fxml is not found.
     */
-   public void gameOver(byte winner) throws IOException {
+   public void gameOver() throws IOException {
       App.getStage().setHeight(App.getStage().getMinHeight());
-      App.setWinner(winner);
 
       vb_gameover.translateYProperty().set(sp_root.getScene().getHeight());
       vb_gameover.setVisible(true);
@@ -190,12 +216,21 @@ public class GameController {
       });
    }
 
+   /**
+    * This method will be call the dev request method with the aiMove argument.
+    */
    @FXML
    private void devGetAiMoves() {
       board.devRequest(Constants.Dev.GET_AI_MOVES);
    }
 
    @FXML
+   /**
+    * This method will pause the game --> Only allowed in offline games.
+    * 
+    * @throws IOException Will throw an exception if the pausedGame fxml file can't
+    *                     be located.
+    */
    private void pauseGame() throws IOException {
       board.pauseGame();
 
@@ -264,6 +299,12 @@ public class GameController {
       });
    }
 
+   /**
+    * This method will play an animation as it transitions to home.
+    * 
+    * @throws IOException Will throw an exception if the startScreen can't be
+    *                     located.
+    */
    public void transitionToHome() throws IOException {
       App.getStage().setHeight(App.getStage().getMinHeight());
 
@@ -284,10 +325,7 @@ public class GameController {
       timeline.setOnFinished(f1 -> {
          sp_root.getChildren().remove(homeScene);
 
-         try {
-            App.setRoot("startScreen");
-         } catch (IOException e) {
-         }
+         App.setRoot(homeScene);
       });
    }
 }

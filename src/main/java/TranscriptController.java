@@ -174,6 +174,7 @@ public class TranscriptController {
 
         playButton.setOnAction(e -> {
             App.setTranscriptPath(Constants.boardData.TRANSCRIPT_DIR_PATH + select.getText() + ".txt");
+            App.setTranscript("");
             App.setGameMode(Constants.boardData.MODE_RESUME_GAME);
             transition("game");
         });
