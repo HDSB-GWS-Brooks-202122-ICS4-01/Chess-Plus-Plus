@@ -35,7 +35,6 @@ public class King extends Piece{
 
         this.sprite.setFitWidth(Constants.SpriteSheetDimensions.PIECE_FIT_WIDTH);
         this.sprite.setFitHeight(Constants.SpriteSheetDimensions.PIECE_FIT_HEIGHT);
-        this.teamPromotedRook = (this.color == Constants.pieceIDs.BLACK) ? Constants.pieceIDs.BLACK_PROMOTED_ROOK : Constants.pieceIDs.WHITE_PROMOTED_ROOK;
     }
 
     /**
@@ -76,6 +75,12 @@ public class King extends Piece{
     }
 
 
+    /**
+     * Method for determining if the king can castle to the left.
+     * 
+     * @param boardPositions The current positions of pieces on the board.
+     * @return True if the king can castle to the left, false if not.
+     */
     public boolean canCastleLeft(byte[][] boardPositions){
         if(color == Constants.pieceIDs.WHITE){
             if(!hasMoved && !App.GAME_PIECES[Constants.pieceIDs.WHITE_QUEENS_ROOK].hasMoved && boardPositions[gridX-4][gridY] == Constants.pieceIDs.WHITE_QUEENS_ROOK){
@@ -103,6 +108,12 @@ public class King extends Piece{
         return false;
     }
 
+    /**
+     * Method for determining if the king can castle to the right.
+     * 
+     * @param boardPositions The current positions of pieces on the board.
+     * @return True if the king can castle to the right, false if not.
+     */
     public boolean canCastleRight(byte[][] boardPositions){
         if(color == Constants.pieceIDs.WHITE){
             if(!hasMoved && !App.GAME_PIECES[Constants.pieceIDs.WHITE_KINGS_ROOK].hasMoved && boardPositions[gridX+3][gridY] == Constants.pieceIDs.WHITE_KINGS_ROOK){

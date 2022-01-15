@@ -1,8 +1,27 @@
-public class Constants {
+/**
+ * Class containing any constants we use.
+ * 
+ * @author Akil Pathiranage and Selim Abdelwahab
+ * @version 1.0
+ */
+public final class Constants {
+
+        /**
+         * Class containing screen constants.
+         * 
+         * @author Akil Pathiranage and Selim Abdelwahab
+         * @version 1.0
+         */     
         public static final class Screen {
                 public static final int WIDTH = 1250, HEIGHT = 850;
         }
 
+        /**
+         * Class containing constants for board ids.
+         * 
+         * @author Akil Pathiranage and Selim Abdelwahab
+         * @version 1.0
+         */
         public static final class pieceIDs {
                 public static final byte EMPTY_CELL = -1;
 
@@ -68,11 +87,23 @@ public class Constants {
 
         }
 
-        public static class ScoringIDs {
+        /**
+         * Class containing scoring data for the bot.
+         * 
+         * @author Akil Pathiranage and Selim Abdelwahab
+         * @version 1.0
+         */
+        public static final class ScoringIDs {
                 public static final int[] scoringMap = { 0, 8, 4, 4, 5, 5, 4, 4, 4, 1, 1, 1, 1, 1, 1, 1, 1, 0, -8, -4, -4, -5, -5, -4, -4, -4, -1, -1, -1, -1, -1, -1, -1, -1 };
         }
 
-        public static class pieceType {
+        /**
+         * Class containing piece types of pieces.
+         * 
+         * @author Akil Pathiranage and Selim Abdelwahab
+         * @version 1.0
+         */
+        public static final class pieceType {
                 public static final byte KING = 0;
                 public static final byte QUEEN = 1;
                 public static final byte BISHOP = 2;
@@ -81,7 +112,14 @@ public class Constants {
                 public static final byte PAWN = 5;
         }
 
-        public static class moveTypes {
+        /**
+         * Class containing move types which are used when parsing 
+         * the bot's move.
+         * 
+         * @author Akil Pathiranage and Selim Abdelwahab
+         * @version 1.0
+         */
+        public static final class moveTypes {
                 public static final String REGULAR = "R";
                 public static final String CASTLE_LEFT = "c";
                 public static final String CASTLE_RIGHT = "C";
@@ -91,6 +129,12 @@ public class Constants {
                 public static final String NO_MOVES = "I";
         }
 
+        /**
+         * Class containing constants for board data. 
+         * 
+         * @author Akil Pathiranage and Selim Abdelwahab
+         * @version 1.0
+         */
         public static final class boardData {
                 public static final byte MODE_PASS_N_PLAY = 0;
                 public static final byte MODE_AI = 1;
@@ -182,6 +226,12 @@ public class Constants {
                 public static final String TRANSCRIPT_DIR_PATH = "src\\main\\resources\\data\\transcripts\\";
         }
 
+        /**
+         * Class containing sprite sheet dimensions
+         * 
+         * @author Akil Pathiranage and Selim Abdelwahab
+         * @version 1.0
+         */
         public static final class SpriteSheetDimensions {
                 public static final double PIECE_WIDTH = 200;
                 public static final double PIECE_HEIGHT = 200;
@@ -200,6 +250,12 @@ public class Constants {
                 public static final double PAWN_X = 1000;
         }
 
+        /**
+         * Class containing data constants for online functionality.
+         * 
+         * @author Akil Pathiranage and Selim Abdelwahab
+         * @version 1.0
+         */
         public static final class Online {
                 public static final String PATH_TO_JSON_PK = "src\\main\\resources\\priv\\chess-app-bb905-firebase-adminsdk-o32he-f6d06326b1.json";
                 public static final String PATH_TO_DEFAULT_AVATAR = "src\\main\\resources\\assets\\default_avatar.jpg";
@@ -211,6 +267,13 @@ public class Constants {
                 public static final String[] DEV_EMAILS = { "mimo280604@gmail.com", "akilpath@gmail.com" };
         }
 
+        
+        /**
+         * Class containing constants for developer mode.
+         * 
+         * @author Akil Pathiranage and Selim Abdelwahab
+         * @version 1.0
+         */
         public static final class Dev {
                 public static final byte GET_AI_MOVES = 0;
         }

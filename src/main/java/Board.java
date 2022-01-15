@@ -683,6 +683,18 @@ public class Board {
       Pawn primaryPawn;
       Pawn enemyPawn;
 
+      //The string is constructed using constants.
+      //For regular moves, the string will go in the form of
+      //R{pieceToMove}f{fromx,fromy}.{toX,toY}
+
+      //For castling moves it is either
+      //c{id}. or C{id}.
+
+      //For passant it is either
+      //e{id}f{fromX,fromY}.{enemyX,enemyY}
+      //E{id}f{fromX,fromY}.{enemyX,enemyY}
+
+      
       switch (move.substring(0, 1)) {
          case Constants.moveTypes.REGULAR:
             System.out.println("Plays regular  move");

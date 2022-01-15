@@ -35,7 +35,6 @@ public class Pawn extends Piece {
 
         this.sprite.setFitWidth(Constants.SpriteSheetDimensions.PIECE_FIT_WIDTH);
         this.sprite.setFitHeight(Constants.SpriteSheetDimensions.PIECE_FIT_HEIGHT);
-        this.teamPromotedRook = (this.color == Constants.pieceIDs.BLACK) ? Constants.pieceIDs.BLACK_PROMOTED_ROOK : Constants.pieceIDs.WHITE_PROMOTED_ROOK;
     }
 
     /**
@@ -128,6 +127,14 @@ public class Pawn extends Piece {
         return moves;
     }
 
+    /**
+     * Method for determining if a pawn can make an en passant move to the left.
+     * 
+     * 
+     * @param pawnLeft The piece to the left of the pawn.
+     * @param boardPositions The current positions on the board. 
+     * @return True if the pawn can do the move, false if not.
+     */
     public boolean canPassantLeft(byte pawnLeft, byte[][] boardPositions) {
         if (color == Constants.pieceIDs.BLACK) {
             if (pawnLeft > Constants.pieceIDs.BEGIN_WHITE_PAWNS && pawnLeft < Constants.pieceIDs.END_WHITE_PAWNS
@@ -154,6 +161,14 @@ public class Pawn extends Piece {
         return false;
     }
 
+    /**
+     * Method for determining if a pawn can make an en passant move to the right.
+     * 
+     * 
+     * @param pawnLeft The piece to the right of the pawn.
+     * @param boardPositions The current positions on the board. 
+     * @return True if the pawn can do the move, false if not.
+     */
     public boolean canPassantRight(byte pawnRight, byte[][] boardPositions) {
         if (color == Constants.pieceIDs.BLACK) {
             if (pawnRight > Constants.pieceIDs.BEGIN_WHITE_PAWNS && pawnRight < Constants.pieceIDs.END_WHITE_PAWNS

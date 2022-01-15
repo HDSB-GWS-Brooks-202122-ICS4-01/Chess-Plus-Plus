@@ -1247,7 +1247,6 @@ public class Bot {
                 newBoard = initialBoard.copy();
                 newBoard.moveCount++;
 
-                // TODO if using movepiece for optimization, make sure this is included
                 newBoard.board[x][y] = Constants.pieceIDs.EMPTY_CELL;
                 newBoard.setKingPos(color, (byte) move[0], (byte) move[1]);
                 if (isNotUnderCheck(newBoard, color)) {
@@ -1269,7 +1268,7 @@ public class Bot {
                 && initialBoard.board[x - 3][y] == Constants.pieceIDs.EMPTY_CELL) {
             // if no pieces are in the way and the king and castle have not moved
 
-            // TODO change to movepIeces here
+
             newBoard = initialBoard.copy();
             if (isNotUnderCheck(newBoard, color)) {
                 // if the king isn't currently under check
@@ -1405,7 +1404,6 @@ public class Bot {
         // if the pawn is black, the index will be from 0-7, if the pawn is white the
         // index is from 8-15
 
-        // TODO if you change the constatns these need to be changed.
         byte index = (id / Constants.pieceIDs.COLOR_DIVISOR == Constants.pieceIDs.BLACK) ? (byte) (id - 9)
                 : (byte) (id - 26 + 8);
         // System.out.println("Pawn index for id: " + id + ", is " + index);

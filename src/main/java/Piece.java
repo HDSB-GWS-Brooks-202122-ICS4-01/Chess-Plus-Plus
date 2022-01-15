@@ -17,7 +17,6 @@ public abstract class Piece {
     protected byte gridX;
     protected byte gridY;
     protected boolean hasMoved;
-    protected byte teamPromotedRook;
 
     /**
      * Method for getting the possible moves of this piece based on the positions of
@@ -160,12 +159,13 @@ public abstract class Piece {
 
         }
 
-        // position list for checking checks by other king
+        // all the possible positions the enemy king can be relative to the team king if its under check
         byte[][] kPosList = {
                 { (byte) (kingPos[0] + 1), kingPos[1] },
                 { (byte) (kingPos[0] - 1), kingPos[1] },
                 { (byte) (kingPos[0] + 1), (byte) (kingPos[1] + 1) },
                 { (byte) (kingPos[0] + 1), (byte) (kingPos[1] - 1) },
+
                 { (byte) (kingPos[0] - 1), (byte) (kingPos[1] + 1) },
                 { (byte) (kingPos[0] - 1), (byte) (kingPos[1] - 1) },
                 { kingPos[0], (byte) (kingPos[1] - 1) },
@@ -213,14 +213,11 @@ public abstract class Piece {
     }
 
     /**
-     * Method for checking if a pawn is attacking the king. NOTE: This method
-     * shouldn't exist as it can and should be implemented into the
-     * diagonal check methods. The only reason I am doing this is because there is a
-     * bug so this is a temporary fix.
+     * Method for checking if a pawn is attacking the king. 
      * 
-     * @param boardPositions
-     * @param pos
-     * @return
+     * @param boardPositions The positions of everything on the board.
+     * @param pos The position of the king. 
+     * @return True if the king is under check from a pawn, false if not.
      */
     private boolean checkPawnAttack(byte[][] boardPositions, byte[] pos) {
         if (color == Constants.pieceIDs.BLACK) {
@@ -1021,7 +1018,7 @@ public abstract class Piece {
     /**
      * Method for getting the grid x value.
      * 
-     * @return
+     * @return The x position of this piece on the grid.
      */
     public byte getGridX() {
         return this.gridX;
@@ -1030,7 +1027,7 @@ public abstract class Piece {
     /**
      * Method for getting the grid y value.
      * 
-     * @return
+     * @return The y position of this piece on the grid.
      */
     public byte getGridY() {
         return this.gridY;

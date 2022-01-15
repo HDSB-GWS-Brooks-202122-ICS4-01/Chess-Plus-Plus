@@ -202,7 +202,6 @@ public class SettingsController {
      */
     @FXML
     public void onThirty() {
-        System.out.println("chnag");
         config.setProperty("gametime", "30");
     }
 
@@ -213,16 +212,6 @@ public class SettingsController {
     @FXML
     public void onThree() {
         config.setProperty("gametime", "3");
-
-    }
-
-    /**
-     * Method for setting the time limit to ten minutes per player, called from the action event handler for
-     * the infinite menuItem.
-     */
-    @FXML
-    public void onInfinite() {
-        // TODO add this
 
     }
 
