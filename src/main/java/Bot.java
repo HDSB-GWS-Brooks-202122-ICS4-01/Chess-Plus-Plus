@@ -1374,7 +1374,7 @@ public class Bot {
      * for the int[] passant array attribute in any BoardInfo object.
      * 
      * @param id The id of the pawn.
-     * @return The indexe where the passant value is stored at.
+     * @return The index where the passant value is stored at.
      */
     private int getPassantIndex(byte id) {
         // if the pawn is black, the index will be from 0-7, if the pawn is white the
@@ -1434,7 +1434,7 @@ public class Bot {
         BoardInfo temp;
         if (color) {
             for (int i = 0; i < boards.length; i++) {
-                for (int j = 1; j < boards.length; j++) {
+                for (int j = i+1; j < boards.length; j++) {
                     if (boards[j].sortingValue > boards[i].sortingValue) {
                         temp = boards[i];
                         boards[i] = boards[j];
@@ -1444,7 +1444,7 @@ public class Bot {
             }
         } else {
             for (int i = 0; i < boards.length; i++) {
-                for (int j = 1; j < boards.length; j++) {
+                for (int j = i+1; j < boards.length; j++) {
                     if (boards[j].sortingValue < boards[i].sortingValue) {
                         temp = boards[i];
                         boards[i] = boards[j];
