@@ -217,7 +217,7 @@
                                     <Font name="Times New Roman Bold" size="35.0" />
                                  </font>
                                  <GridPane.margin>
-                                    <Insets right="15.0" />
+                                    <Insets />
                                  </GridPane.margin>
                               </Button>
                               <Button fx:id="btn_downloadTranscript" contentDisplay="CENTER" maxWidth="1.7976931348623157E308" minWidth="500.0" mnemonicParsing="false" onAction="#downloadGameTranscript" styleClass="btn-submit" text="Download Transcript" GridPane.rowIndex="1">
@@ -225,7 +225,7 @@
                                     <Font name="Times New Roman Bold" size="35.0" />
                                  </font>
                                  <GridPane.margin>
-                                    <Insets left="15.0" />
+                                    <Insets />
                                  </GridPane.margin>
                               </Button>
                            </children>
