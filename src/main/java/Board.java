@@ -101,7 +101,7 @@ public class Board {
       }
 
       TIMERS[Constants.pieceIDs.WHITE] = new PlayerTimer(whiteLabel, GAME.getHiddenTimeReference(Constants.pieceIDs.WHITE), gameTime, true, false, null);
-      TIMERS[Constants.pieceIDs.BLACK] = new PlayerTimer(blackLabel, GAME.getHiddenTimeReference(Constants.pieceIDs.WHITE), gameTime, false, false, null);
+      TIMERS[Constants.pieceIDs.BLACK] = new PlayerTimer(blackLabel, GAME.getHiddenTimeReference(Constants.pieceIDs.BLACK), gameTime, false, false, null);
 
       setupBoard();
 

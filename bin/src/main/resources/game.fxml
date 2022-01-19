@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.effect.InnerShadow?>
+<?import javafx.scene.effect.Light.Distant?>
+<?import javafx.scene.effect.Lighting?>
+<?import javafx.scene.effect.Shadow?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Font?>
+
+<StackPane fx:id="sp_root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" styleClass="root" stylesheets="@board.css" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GameController">
+   <children>
+      <VBox>
+         <children>
+            <StackPane fx:id="sp_container" styleClass="root" stylesheets="@board.css">
+               <children>
+                  <HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="850.0" prefWidth="1250.0" StackPane.alignment="TOP_CENTER">
+                     <children>
+                        <VBox HBox.hgrow="ALWAYS">
+                           <children>
+                              <HBox>
+                                 <children>
+                                    <Pane HBox.hgrow="ALWAYS">
+                                       <children>
+                                          <Rectangle fx:id="rect_pauseLeft" fill="WHITE" height="50.0" layoutX="10.0" stroke="BLACK" strokeType="INSIDE" width="10.0" />
+                                          <Rectangle fx:id="rect_pauseRight" fill="WHITE" height="50.0" layoutX="40.0" stroke="BLACK" strokeType="INSIDE" width="10.0" />
+                                          <Rectangle fx:id="rect_pauseHitBox" accessibleRole="BUTTON" fill="#ffffff00" height="50.0" layoutX="10.0" onMouseClicked="#pauseGame" stroke="BLACK" strokeType="INSIDE" width="40.0">
+                                             <cursor>
+                                                <Cursor fx:constant="HAND" />
+                                             </cursor>
+                                          </Rectangle>
+                                       </children></Pane>
+                                    <Label fx:id="lbl_bTimer" text="10:00" textFill="WHITE">
+                                       <font>
+                                          <Font name="Arial Black" size="30.0" />
+                                       </font>
+                                       <HBox.margin>
+                                          <Insets right="10.0" />
+                                       </HBox.margin>
+                                    </Label>
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets top="10.0" />
+                                 </VBox.margin>
+                              </HBox>
+                              <Pane VBox.vgrow="ALWAYS" />
+                              <HBox>
+                                 <children>
+                                    <Pane HBox.hgrow="ALWAYS" />
+                                    <Label fx:id="lbl_wTimer" text="10:00" textFill="WHITE">
+                                       <font>
+                                          <Font name="Arial Black" size="30.0" />
+                                       </font>
+                                       <HBox.margin>
+                                          <Insets right="10.0" />
+                                       </HBox.margin>
+                                    </Label>
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets bottom="10.0" />
+                                 </VBox.margin>
+                              </HBox>
+                           </children>
+                        </VBox>
+                        <VBox prefHeight="200.0" prefWidth="100.0">
+                           <children>
+                              <HBox prefHeight="100.0" prefWidth="200.0">
+                                 <children>
+                                    <VBox style="-fx-spacing: 50;">
+                                       <children>
+                                          <Label styleClass="lbl-board-coords" text="1" />
+                                          <Label styleClass="lbl-board-coords" text="2" />
+                                          <Label styleClass="lbl-board-coords" text="3" />
+                                          <Label styleClass="lbl-board-coords" text="4" />
+                                          <Label styleClass="lbl-board-coords" text="5" />
+                                          <Label styleClass="lbl-board-coords" text="6" />
+                                          <Label styleClass="lbl-board-coords" text="7" />
+                                          <Label styleClass="lbl-board-coords" text="8" />
+                                       </children>
+                                       <HBox.margin>
+                                          <Insets right="5.0" top="30.0" />
+                                       </HBox.margin>
+                                    </VBox>
+                                    <GridPane fx:id="gp_board" minHeight="800.0" minWidth="800.0" prefHeight="800.0" prefWidth="800.0">
+                                       <columnConstraints>
+                                          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                       </columnConstraints>
+                                       <rowConstraints>
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                       </rowConstraints>
+                                       <children>
+                                          <StackPane styleClass="cell-1" stylesheets="@board.css" GridPane.columnIndex="7" GridPane.rowIndex="1" />
+                                          <StackPane styleClass="cell-2" stylesheets="@board.css" GridPane.columnIndex="6" GridPane.rowIndex="1" />
+                                          <StackPane styleClass="cell-2" stylesheets="@board.css" GridPane.columnIndex="4" GridPane.rowIndex="1" />
+                                          <StackPane styleClass="cell-1" stylesheets="@board.css" GridPane.columnIndex="5" GridPane.rowIndex="1" />
+                                          <StackPane styleClass="cell-1" stylesheets="@board.css" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                                          <StackPane styleClass="cell-2" stylesheets="@board.css" GridPane.columnIndex="7" />
+                                          <StackPane styleClass="cell-1" stylesheets="@board.css" GridPane.columnIndex="6" />
+                                          <StackPane styleClass="cell-2" stylesheets="@board.css" GridPane.columnIndex="5" />
+                                          <StackPane styleClass="cell-1" stylesheets="@board.css" GridPane.columnIndex="4" />
+                                          <StackPane styleClass="cell-2" stylesheets="@board.css" GridPane.columnIndex="3" />
+                                          <StackPane styleClass="cell-2" stylesheets="@board.css" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                          <StackPane styleClass="cell-1" stylesheets="@board.css" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                          <StackPane styleClass="cell-2" stylesheets="@board.css" GridPane.rowIndex="1" />
+                                          <StackPane styleClass="cell-1" stylesheets="@board.css" GridPane.columnIndex="2" />
+                                          <StackPane styleClass="cell-2" stylesheets="@board.css" GridPane.columnIndex="1" />
+                                          <StackPane styleClass="cell-1" stylesheets="@board.css" />
+                                          <StackPane styleClass="cell-1" stylesheets="@board.css" GridPane.rowIndex="2" />
+                                          <StackPane styleClass="cell-2" stylesheets="@board.css" GridPane.rowIndex="3" />
+                                          <StackPane styleClass="cell-1" stylesheets="@board.css" GridPane.rowIndex="4" />
+                                          <StackPane styleClass="cell-2" stylesheets="@board.css" GridPane.rowIndex="5" />
+                                          <StackPane styleClass="cell-1" stylesheets="@board.css" GridPane.rowIndex="6" />
+                                          <StackPane styleClass="cell-2" stylesheets="@board.css" GridPane.rowIndex="7" />
+                                          <StackPane styleClass="cell-1" stylesheets="@board.css" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                                          <StackPane styleClass="cell-2" stylesheets="@board.css" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                          <StackPane styleClass="cell-1" stylesheets="@board.css" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                          <StackPane styleClass="cell-1" stylesheets="@board.css" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                                          <StackPane styleClass="cell-2" stylesheets="@board.css" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                          <StackPane styleClass="cell-2" stylesheets="@board.css" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                                          <StackPane styleClass="cell-1" stylesheets="@board.css" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                                          <StackPane styleClass="cell-2" stylesheets="@board.css" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+                                          <StackPane styleClass="cell-1" stylesheets="@board.css" GridPane.columnIndex="4" GridPane.rowIndex="2" />
+                                          <StackPane styleClass="cell-2" stylesheets="@board.css" GridPane.columnIndex="5" GridPane.rowIndex="2" />
+                                          <StackPane styleClass="cell-1" stylesheets="@board.css" GridPane.columnIndex="6" GridPane.rowIndex="2" />
+                                          <StackPane styleClass="cell-2" stylesheets="@board.css" GridPane.columnIndex="7" GridPane.rowIndex="2" />
+                                          <StackPane styleClass="cell-2" stylesheets="@board.css" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                                          <StackPane styleClass="cell-1" stylesheets="@board.css" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+                                          <StackPane styleClass="cell-2" stylesheets="@board.css" GridPane.columnIndex="4" GridPane.rowIndex="3" />
+                                          <StackPane styleClass="cell-1" stylesheets="@board.css" GridPane.columnIndex="5" GridPane.rowIndex="3" />
+                                          <StackPane styleClass="cell-2" stylesheets="@board.css" GridPane.columnIndex="6" GridPane.rowIndex="3" />
+                                          <StackPane styleClass="cell-1" stylesheets="@board.css" GridPane.columnIndex="7" GridPane.rowIndex="3" />
+                                          <StackPane style="-fx-translate-z: 0;" styleClass="cell-1" stylesheets="@board.css" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                                          <StackPane styleClass="cell-2" stylesheets="@board.css" GridPane.columnIndex="3" GridPane.rowIndex="4" />
+                                          <StackPane styleClass="cell-1" stylesheets="@board.css" GridPane.columnIndex="4" GridPane.rowIndex="4" />
+                                          <StackPane styleClass="cell-2" stylesheets="@board.css" GridPane.columnIndex="5" GridPane.rowIndex="4" />
+                                          <StackPane styleClass="cell-1" stylesheets="@board.css" GridPane.columnIndex="6" GridPane.rowIndex="4" />
+                                          <StackPane styleClass="cell-2" stylesheets="@board.css" GridPane.columnIndex="7" GridPane.rowIndex="4" />
+                                          <StackPane styleClass="cell-2" stylesheets="@board.css" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+                                          <StackPane styleClass="cell-1" stylesheets="@board.css" GridPane.columnIndex="3" GridPane.rowIndex="5" />
+                                          <StackPane styleClass="cell-2" stylesheets="@board.css" GridPane.columnIndex="4" GridPane.rowIndex="5" />
+                                          <StackPane styleClass="cell-1" stylesheets="@board.css" GridPane.columnIndex="5" GridPane.rowIndex="5" />
+                                          <StackPane styleClass="cell-2" stylesheets="@board.css" GridPane.columnIndex="6" GridPane.rowIndex="5" />
+                                          <StackPane styleClass="cell-1" stylesheets="@board.css" GridPane.columnIndex="7" GridPane.rowIndex="5" />
+                                          <StackPane styleClass="cell-1" stylesheets="@board.css" GridPane.columnIndex="2" GridPane.rowIndex="6" />
+                                          <StackPane styleClass="cell-2" stylesheets="@board.css" GridPane.columnIndex="3" GridPane.rowIndex="6" />
+                                          <StackPane styleClass="cell-1" stylesheets="@board.css" GridPane.columnIndex="4" GridPane.rowIndex="6" />
+                                          <StackPane styleClass="cell-2" stylesheets="@board.css" GridPane.columnIndex="5" GridPane.rowIndex="6" />
+                                          <StackPane styleClass="cell-1" stylesheets="@board.css" GridPane.columnIndex="6" GridPane.rowIndex="6" />
+                                          <StackPane styleClass="cell-2" stylesheets="@board.css" GridPane.columnIndex="7" GridPane.rowIndex="6" />
+                                          <StackPane styleClass="cell-2" stylesheets="@board.css" GridPane.columnIndex="2" GridPane.rowIndex="7" />
+                                          <StackPane styleClass="cell-1" stylesheets="@board.css" GridPane.columnIndex="3" GridPane.rowIndex="7" />
+                                          <StackPane styleClass="cell-2" stylesheets="@board.css" GridPane.columnIndex="4" GridPane.rowIndex="7" />
+                                          <StackPane styleClass="cell-1" stylesheets="@board.css" GridPane.columnIndex="5" GridPane.rowIndex="7" />
+                                          <StackPane styleClass="cell-2" stylesheets="@board.css" GridPane.columnIndex="6" GridPane.rowIndex="7" />
+                                          <StackPane styleClass="cell-1" stylesheets="@board.css" GridPane.columnIndex="7" GridPane.rowIndex="7" />
+                                       </children>
+                                       <effect>
+                                          <InnerShadow height="50.0" radius="24.5" width="50.0">
+                                             <color>
+                                                <Color red="1.0" green="1.0" blue="1.0" />
+                                             </color>
+                                          </InnerShadow>
+                                       </effect>
+                                    </GridPane>
+                                    <VBox HBox.hgrow="ALWAYS">
+                                       <children>
+                                          <GridPane fx:id="gp_blackDeadCells" hgap="5.0" vgap="5.0">
+                                             <columnConstraints>
+                                                <ColumnConstraints hgrow="NEVER" minWidth="50.0" prefWidth="50.0" />
+                                                <ColumnConstraints hgrow="NEVER" minWidth="50.0" prefWidth="50.0" />
+                                                <ColumnConstraints hgrow="NEVER" minWidth="50.0" prefWidth="50.0" />
+                                                <ColumnConstraints hgrow="NEVER" minWidth="50.0" prefWidth="50.0" />
+                                             </columnConstraints>
+                                             <rowConstraints>
+                                                <RowConstraints minHeight="50.0" prefHeight="50.0" vgrow="NEVER" />
+                                                <RowConstraints minHeight="50.0" prefHeight="50.0" vgrow="NEVER" />
+                                                <RowConstraints minHeight="50.0" prefHeight="50.0" vgrow="NEVER" />
+                                                <RowConstraints minHeight="50.0" prefHeight="50.0" vgrow="NEVER" />
+                                             </rowConstraints>
+                                             <children>
+                                                <StackPane styleClass="black-dead-piece-cell" />
+                                                <StackPane styleClass="black-dead-piece-cell" GridPane.columnIndex="1" />
+                                                <StackPane styleClass="black-dead-piece-cell" GridPane.columnIndex="2" />
+                                                <StackPane styleClass="black-dead-piece-cell" GridPane.columnIndex="3" />
+                                                <StackPane styleClass="black-dead-piece-cell" GridPane.rowIndex="1" />
+                                                <StackPane styleClass="black-dead-piece-cell" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                <StackPane styleClass="black-dead-piece-cell" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                                <StackPane styleClass="black-dead-piece-cell" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                                                <StackPane styleClass="black-dead-piece-cell" GridPane.rowIndex="2" />
+                                                <StackPane styleClass="black-dead-piece-cell" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                <StackPane styleClass="black-dead-piece-cell" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                                                <StackPane styleClass="black-dead-piece-cell" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+                                                <StackPane styleClass="black-dead-piece-cell" GridPane.rowIndex="3" />
+                                                <StackPane styleClass="black-dead-piece-cell" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                                <StackPane styleClass="black-dead-piece-cell" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                                                <StackPane styleClass="black-dead-piece-cell" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+                                             </children>
+                                          </GridPane>
+                                          <Pane prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+                                          <GridPane fx:id="gp_whiteDeadCells" hgap="5.0" vgap="5.0">
+                                             <columnConstraints>
+                                                <ColumnConstraints hgrow="NEVER" minWidth="50.0" prefWidth="50.0" />
+                                                <ColumnConstraints hgrow="NEVER" minWidth="50.0" prefWidth="50.0" />
+                                                <ColumnConstraints hgrow="NEVER" minWidth="50.0" prefWidth="50.0" />
+                                                <ColumnConstraints hgrow="NEVER" minWidth="50.0" prefWidth="50.0" />
+                                             </columnConstraints>
+                                             <rowConstraints>
+                                                <RowConstraints minHeight="50.0" prefHeight="50.0" vgrow="ALWAYS" />
+                                                <RowConstraints minHeight="50.0" prefHeight="50.0" vgrow="ALWAYS" />
+                                                <RowConstraints minHeight="50.0" prefHeight="50.0" vgrow="ALWAYS" />
+                                                <RowConstraints minHeight="50.0" prefHeight="50.0" vgrow="ALWAYS" />
+                                             </rowConstraints>
+                                             <children>
+                                                <StackPane styleClass="white-dead-piece-cell" />
+                                                <StackPane styleClass="white-dead-piece-cell" GridPane.columnIndex="1" />
+                                                <StackPane styleClass="white-dead-piece-cell" GridPane.columnIndex="2" />
+                                                <StackPane styleClass="white-dead-piece-cell" GridPane.columnIndex="3" />
+                                                <StackPane styleClass="white-dead-piece-cell" GridPane.rowIndex="1" />
+                                                <StackPane styleClass="white-dead-piece-cell" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                <StackPane styleClass="white-dead-piece-cell" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                                <StackPane styleClass="white-dead-piece-cell" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                                                <StackPane styleClass="white-dead-piece-cell" GridPane.rowIndex="2" />
+                                                <StackPane styleClass="white-dead-piece-cell" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                <StackPane styleClass="white-dead-piece-cell" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                                                <StackPane styleClass="white-dead-piece-cell" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+                                                <StackPane styleClass="white-dead-piece-cell" GridPane.rowIndex="3" />
+                                                <StackPane styleClass="white-dead-piece-cell" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                                <StackPane styleClass="white-dead-piece-cell" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                                                <StackPane styleClass="white-dead-piece-cell" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+                                             </children>
+                                          </GridPane>
+                                       </children>
+                                       <HBox.margin>
+                                          <Insets left="10.0" />
+                                       </HBox.margin>
+                                       <padding>
+                                          <Insets right="10.0" />
+                                       </padding>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                              <HBox prefHeight="100.0" prefWidth="200.0" style="-fx-spacing: 80;">
+                                 <children>
+                                    <Label styleClass="lbl-board-coords" text="A" />
+                                    <Label styleClass="lbl-board-coords" text="B" />
+                                    <Label styleClass="lbl-board-coords" text="C" />
+                                    <Label styleClass="lbl-board-coords" text="D" />
+                                    <Label styleClass="lbl-board-coords" text="E" />
+                                    <Label styleClass="lbl-board-coords" text="F" />
+                                    <Label styleClass="lbl-board-coords" text="G" />
+                                    <Label styleClass="lbl-board-coords" text="H" />
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets left="50.0" />
+                                 </VBox.margin>
+                              </HBox>
+                           </children>
+                        </VBox>
+                     </children>
+                  </HBox>
+                  <VBox fx:id="vb_gameover" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: rgba(0, 0, 0, 0.5);" visible="false" StackPane.alignment="TOP_CENTER">
+                     <children>
+                        <Pane prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+                        <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="-Infinity">
+                           <children>
+                              <Pane prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                              <Label text="Match Complete" textFill="WHITE" HBox.hgrow="ALWAYS">
+                                 <font>
+                                    <Font name="Times New Roman Bold" size="52.0" />
+                                 </font>
+                              </Label>
+                              <Pane prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                           </children>
+                        </HBox>
+                        <Pane prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+                     </children>
+                  </VBox>
+               </children>
+            </StackPane>
+            <Pane fx:id="pn_dev" maxHeight="1.7976931348623157E308" prefHeight="100.0" style="-fx-background-color: black;">
+               <children>
+                  <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#96ccff00" height="50.0" layoutX="50.0" layoutY="25.0" stroke="#808080" strokeWidth="10.0" width="200.0">
+                     <effect>
+                        <Lighting diffuseConstant="2.0" specularConstant="0.35" specularExponent="0.0" surfaceScale="10.0">
+                           <bumpInput>
+                              <Shadow radius="4.75" width="0.0" />
+                           </bumpInput>
+                           <light>
+                              <Light.Distant azimuth="360.0" elevation="40.81" />
+                           </light>
+                        </Lighting>
+                     </effect>
+                  </Rectangle>
+                  <Button layoutX="50.0" layoutY="25.0" minHeight="50.0" minWidth="200.0" mnemonicParsing="false" onAction="#devGetAiMoves" style="-fx-border-color: transparent; -fx-background-color: #007593; -fx-background-radius: 5;" text="Get Ai Moves" textFill="WHITE">
+                     <font>
+                        <Font name="Algerian" size="25.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+               </children></Pane>
+         </children>
+      </VBox>
+      <Label fx:id="lbl_hbTimer" text="Label" visible="false" />
+      <Label fx:id="lbl_hwTimer" text="Label" visible="false" />
+   </children>
+</StackPane>
