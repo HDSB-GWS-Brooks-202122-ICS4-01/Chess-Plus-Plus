@@ -716,13 +716,13 @@ public class Board {
             id = (byte) Integer.parseInt(move.substring(1, endFrom));
             castle(GAME_PIECES[id], (byte) (id / Constants.pieceIDs.COLOR_DIVISOR), false);
             // castle right
-            break;
+            return;
          case Constants.moveTypes.CASTLE_LEFT:
             endFrom = (move.charAt(2) == '.') ? 2 : 3;
             id = (byte) Integer.parseInt(move.substring(1, endFrom));
             castle(GAME_PIECES[id], (byte) (id / Constants.pieceIDs.COLOR_DIVISOR), true);
             // castle left
-            break;
+            return;
          case Constants.moveTypes.PASSANT_RIGHT:
             endFrom = (move.charAt(3) == 'f') ? 3 : 2;
             primaryPawn = (Pawn) GAME_PIECES[Byte.parseByte(move.substring(1, endFrom))];
@@ -730,7 +730,7 @@ public class Board {
             enemyY = Integer.parseInt(move.substring(endFrom + 4, endFrom + 5));
             enemyPawn = (Pawn) getPieceOnGrid(enemyX, enemyY);
             enPassant(primaryPawn, enemyPawn);
-            break;
+            return;
          case Constants.moveTypes.PASSANT_LEFT:
             endFrom = (move.charAt(3) == 'f') ? 3 : 2;
             primaryPawn = (Pawn) GAME_PIECES[Byte.parseByte(move.substring(1, endFrom))];
@@ -738,7 +738,7 @@ public class Board {
             enemyY = Integer.parseInt(move.substring(endFrom + 4, endFrom + 5));
             enemyPawn = (Pawn) getPieceOnGrid(enemyX, enemyY);
             enPassant(primaryPawn, enemyPawn);
-            break;
+            return;
          case Constants.moveTypes.PROMOTION:
             endFrom = (move.charAt(2) == '.') ? 2 : 3;
             promotePawn(GAME_PIECES[Byte.parseByte(move.substring(1, endFrom))],
