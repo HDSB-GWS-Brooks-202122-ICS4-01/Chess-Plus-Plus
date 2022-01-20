@@ -27,7 +27,6 @@
             <MenuItem fx:id="thirty" mnemonicParsing="false" onAction="#onThirty" text="30:00" />
             <MenuItem fx:id="ten" mnemonicParsing="false" onAction="#onTen" text="10:00" />
             <MenuItem fx:id="three" mnemonicParsing="false" onAction="#onThree" text="3:00" />
-            <MenuItem fx:id="infinite" mnemonicParsing="false" onAction="#onInfinite" text="Unlimited" />
         </items>
          <font>
             <Font name="System Bold" size="38.0" />

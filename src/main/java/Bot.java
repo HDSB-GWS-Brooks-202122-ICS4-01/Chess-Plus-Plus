@@ -38,7 +38,7 @@ public class Bot {
         //This number changes the depth the ai generates to.
         //Intially, it was developed for a depth of 4 but because of optimizations I've made
         // you can play a better game with a 30 minute timer on a depth of 5
-        this.depth = 5;
+        this.depth = 5; 
         this.black = black;
     }
 
