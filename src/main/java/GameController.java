@@ -37,7 +37,7 @@ public class GameController {
    GridPane gp_board, gp_blackDeadCells, gp_whiteDeadCells;
 
    @FXML
-   Pane pn_dev;
+   Pane pn_dev, pn_pause;
 
    @FXML
    Label lbl_bTimer, lbl_wTimer, lbl_hbTimer, lbl_hwTimer;
@@ -51,15 +51,18 @@ public class GameController {
    @FXML
    /**
     * Acts as the constructor and initializes the scene
+    * 
     * @throws FirebaseAuthException General firebase exception
     * @throws InterruptedException  Will occur when the thread is interrupted
     */
    public void initialize() throws FirebaseAuthException, InterruptedException {
       // Set boards
-      if (App.getGameMode() != Constants.boardData.MODE_ONLINE)
+      if (App.getGameMode() != Constants.boardData.MODE_ONLINE) {
          board = new Board(this, new GridPane[] { gp_board, gp_blackDeadCells, gp_whiteDeadCells }, App.getGameMode());
-      else
+      } else {
          oBoard = new OnlineBoard(this, new GridPane[] { gp_board, gp_blackDeadCells, gp_whiteDeadCells });
+         pn_pause.setVisible(false);
+      }
 
       // Check if the user is signed in
       if (config.getProperty("signedIn").equalsIgnoreCase("t")) {
@@ -85,8 +88,9 @@ public class GameController {
 
    /**
     * This method will return the lable reference to a timer
-    * @param color   The color corresponding to the timer
-    * @return  Label object
+    * 
+    * @param color The color corresponding to the timer
+    * @return Label object
     */
    public Label getTimeReference(byte color) {
       if (color == Constants.pieceIDs.BLACK)
@@ -97,8 +101,9 @@ public class GameController {
 
    /**
     * This method will return the lable reference to an invisible timer
-    * @param color   The color corresponding to the timer
-    * @return  Label object
+    * 
+    * @param color The color corresponding to the timer
+    * @return Label object
     */
    public Label getHiddenTimeReference(byte color) {
       if (color == Constants.pieceIDs.BLACK)
@@ -278,8 +283,7 @@ public class GameController {
             public void handle(MouseEvent me) {
                try {
                   board.saveGame();
-               } catch (IOException e) 
-               {
+               } catch (IOException e) {
                   e.printStackTrace();
                }
             }

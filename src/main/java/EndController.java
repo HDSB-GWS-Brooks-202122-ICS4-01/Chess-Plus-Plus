@@ -56,7 +56,7 @@ public class EndController {
    @FXML
    Button btn_home, btn_downloadTranscript;
 
-   Button[] SUBMIT_BUTTONS;
+   Button[] submitButtons;
 
    private boolean savedMatchTranscript = false;
 
@@ -70,9 +70,9 @@ public class EndController {
    public void initialize() {
       lbl_winnerMsg.setText(App.getWinMsg());
 
-      SUBMIT_BUTTONS = new Button[] { btn_home, btn_downloadTranscript };
+      submitButtons = new Button[] { btn_home, btn_downloadTranscript };
 
-      for (Button btn : SUBMIT_BUTTONS) {
+      for (Button btn : submitButtons) {
          btn.setBackground(new Background(new BackgroundFill(Color.web("#FC4700"), null, null)));
          btn.setOnMouseEntered(new EventHandler<MouseEvent>() {
             public void handle(MouseEvent me) {

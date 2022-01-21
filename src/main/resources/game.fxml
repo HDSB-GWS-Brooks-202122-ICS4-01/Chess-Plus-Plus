@@ -31,7 +31,7 @@
                            <children>
                               <HBox>
                                  <children>
-                                    <Pane HBox.hgrow="ALWAYS">
+                                    <Pane fx:id="pn_pause" HBox.hgrow="ALWAYS">
                                        <children>
                                           <Rectangle fx:id="rect_pauseLeft" fill="WHITE" height="50.0" layoutX="10.0" stroke="BLACK" strokeType="INSIDE" width="10.0" />
                                           <Rectangle fx:id="rect_pauseRight" fill="WHITE" height="50.0" layoutX="40.0" stroke="BLACK" strokeType="INSIDE" width="10.0" />

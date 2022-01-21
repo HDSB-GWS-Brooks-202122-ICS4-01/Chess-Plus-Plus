@@ -47,7 +47,7 @@ public class App extends Application {
     private static byte gameMode;
 
     private static DatabaseReference serverReference;
-    private static String oppenendRefId;
+    private static String opponentRefId;
     private static byte onlineColor;
 
     private static String winMsg;
@@ -340,7 +340,7 @@ public class App extends Application {
      * @param key   String object
      */
     public static void setOpponentRefId(String key) {
-        oppenendRefId = key;
+        opponentRefId = key;
     }
 
     /**
@@ -348,7 +348,7 @@ public class App extends Application {
      * @return String object
      */
     public static String getOpponentRefId() {
-        return oppenendRefId;
+        return opponentRefId;
     } 
 
     /**

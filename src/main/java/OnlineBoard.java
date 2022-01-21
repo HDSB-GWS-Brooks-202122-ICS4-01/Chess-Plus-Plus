@@ -1,11 +1,20 @@
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Properties;
+import java.util.Scanner;
 import java.util.concurrent.Executor;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.UserRecord;
+import com.google.firebase.cloud.StorageClient;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -22,6 +31,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
+import javafx.stage.WindowEvent;
 
 /**
  * OnlineBoard class, handles the interaction of pieces and displaying for the
@@ -72,6 +82,11 @@ public class OnlineBoard {
    private String opponentRef;
 
    private boolean promotingPawn = false;
+
+   protected boolean cancelledMatch = false;
+   protected boolean matchOver = false;
+
+   protected boolean matchBegun = false;
 
    /**
     * Constructor for the Board class
@@ -124,9 +139,8 @@ public class OnlineBoard {
       SERVER_REF = App.getServerReference();
 
       // Update match begun value
-      SERVER_REF.child("matchBegun").setValueAsync(true);
 
-      SERVER_REF.addListenerForSingleValueEvent(new ValueEventListener() {
+      SERVER_REF.addValueEventListener(new ValueEventListener() {
          @Override
          /**
           * This method is called when the data changes
@@ -134,13 +148,47 @@ public class OnlineBoard {
           * @param snapshot DataSnapshot
           */
          public void onDataChange(DataSnapshot dataSnapshot) {
-            try {
-               isTurn = (Boolean) dataSnapshot.child("USER " + config.getProperty("UID")).child("turn").getValue();
+            if (!matchBegun) {
+               try {
+                  isTurn = (Boolean) dataSnapshot.child("USER " + config.getProperty("UID")).child("turn").getValue();
 
-               color = Byte.parseByte(
-                     (String) dataSnapshot.child("USER " + config.getProperty("UID")).child("color").getValue());
-            } catch (Exception e) {
-               e.printStackTrace();
+                  color = Byte.parseByte(
+                        (String) dataSnapshot.child("USER " + config.getProperty("UID")).child("color").getValue());
+               } catch (Exception e) {
+                  e.printStackTrace();
+               }
+               matchBegun = true;
+            } else if (dataSnapshot.getChildrenCount() < 2) {
+               Platform.runLater(new Runnable() {
+
+                  @Override
+                  public void run() {
+                     if (cancelledMatch) {
+                        if (color == Constants.pieceIDs.WHITE)
+                           winner = Constants.pieceIDs.BLACK;
+                        else
+                           winner = Constants.pieceIDs.WHITE;
+
+                        App.setWinMsg("Match over");
+                     } else {
+                        winner = color;
+                        App.setWinMsg("You won! Opponent left the match.");
+                     }
+
+                     App.setWinner(winner);
+
+                     try {
+                        if (SERVER_REF != null)
+                           SERVER_REF.setValueAsync(null);
+
+                        gameover();
+                     } catch (IOException e) {
+                        e.printStackTrace();
+                     }
+
+                  }
+
+               });
             }
          }
 
@@ -149,9 +197,12 @@ public class OnlineBoard {
           * Not used
           */
          public void onCancelled(DatabaseError error) {
+
          }
 
       });
+
+      SERVER_REF.child("matchBegun").setValueAsync(true);
 
       SERVER_REF.child("USER " + config.getProperty("UID")).child("turn")
             .addValueEventListener(new ValueEventListener() {
@@ -164,18 +215,25 @@ public class OnlineBoard {
                 */
                public void onDataChange(DataSnapshot snapshot) {
                   // Execute on JavaFX thread
+
                   Platform.runLater(new Runnable() {
                      @Override
                      public void run() {
-                        isTurn = (Boolean) snapshot.getValue();
+                        try {
+                           isTurn = (Boolean) snapshot.getValue();
 
-                        if (isTurn) {
-                           TIMERS[color].playTimer();
-                        } else {
-                           TIMERS[color].pauseTimer();
+                           if (isTurn) {
+                              TIMERS[color].playTimer();
+                           } else {
+                              TIMERS[color].pauseTimer();
+                           }
+
+                        } catch (Exception e) {
+                           // Match is over --> do nothing.
                         }
                      }
                   });
+
                }
 
                @Override
@@ -232,8 +290,12 @@ public class OnlineBoard {
             Platform.runLater(new Runnable() {
                @Override
                public void run() {
-                  TIMERS[(color == Constants.pieceIDs.WHITE) ? Constants.pieceIDs.BLACK : Constants.pieceIDs.WHITE]
-                        .setTime((Long) snapshot.getValue());
+                  try {
+                     TIMERS[(color == Constants.pieceIDs.WHITE) ? Constants.pieceIDs.BLACK : Constants.pieceIDs.WHITE]
+                           .setTime((Long) snapshot.getValue());
+                  } catch (Exception e) {
+                     // Match is over --> do nothing.
+                  }
                }
             });
          }
@@ -315,6 +377,10 @@ public class OnlineBoard {
                      }
                   } else if (key.equalsIgnoreCase("gameover")) {
                      if ((Boolean) value) {
+                        matchOver = true;
+                        if (SERVER_REF != null)
+                           SERVER_REF.setValueAsync(null);
+
                         try {
                            gameover();
                         } catch (IOException e) {
@@ -348,6 +414,63 @@ public class OnlineBoard {
          }
 
       });
+
+      App.getStage().setOnCloseRequest(new EventHandler<WindowEvent>() {
+
+         @Override
+         public void handle(WindowEvent event) {
+            // Cancel match, credited with a loss
+
+            try {
+               com.google.cloud.storage.Bucket bucket = StorageClient.getInstance().bucket();
+
+               // Get user's stats
+               FileOutputStream fos = new FileOutputStream(Constants.Online.PATH_TO_STATS);
+               fos.close();
+
+               Scanner statsReader = new Scanner(new FileReader(Constants.Online.PATH_TO_STATS));
+
+               int wins = 0;
+               int losses = 0;
+               int score = 0;
+
+               // Read the data
+               while (statsReader.hasNextLine()) {
+                  String line = statsReader.nextLine();
+
+                  if (line.contains("wins")) {
+                     wins = Integer.parseInt(line.replace("wins=", ""));
+                  } else if (line.contains("losses")) {
+                     losses = Integer.parseInt(line.replace("losses=", ""));
+                  } else if (line.contains("score")) {
+                     score = Integer.parseInt(line.replace("score=", ""));
+                  }
+               }
+
+               // Add wins or losses and update score
+               losses++;
+
+               if (score - 50 > 0)
+                  score -= 50;
+
+               String statsPush = "wins=" + wins + "\nlosses=" + losses + "\nplayTime=0\nscore=" + score;
+
+               FileWriter writer = new FileWriter(new File(Constants.Online.PATH_TO_STATS));
+               // write data
+               writer.write(statsPush);
+               writer.close();
+               // Push data to server
+               bucket.create("profiles/" + config.getProperty("UID") + "/stats.txt",
+                     java.nio.file.Files.readAllBytes(Paths.get(Constants.Online.PATH_TO_STATS)));
+
+            } catch (Exception e) {
+
+            }
+
+            App.getServerReference().setValueAsync(null);
+            System.exit(0);
+         }
+      });
    }
 
    /**
@@ -356,27 +479,38 @@ public class OnlineBoard {
    private void parseOpponentMove() {
       final String REG = "((?=[A-Z])|(?<=[A-Z]))|((?=[a-z])|(?<=[a-z]))";
 
-      try {
-         for (int i = matchTranscriptIdx; i < MATCH_TRANSCRIPT.size(); i++) {
+      for (int i = matchTranscriptIdx; i < MATCH_TRANSCRIPT.size(); i++) {
+         try {
+
             String ts = MATCH_TRANSCRIPT.get(i);
 
             if (ts.contains("PP") && !isTurn) { // Pawn promotion
                ts = ts.substring(2, ts.length());
-
+               
                String[] ids = ts.split("-");
+               Piece from = getPieceOnGrid(Byte.parseByte(ids[0]), true);
 
-               Piece from = getPieceOnGrid(Byte.parseByte(ids[0]));
-
-               promotePawn(from, ids[1], true);
+               if (from != null)
+                  promotePawn(from, ids[1], true);
             } else if (ts.contains("KILL")) { // piece killed
+               System.out.println("KILL FOUND");
                ts = ts.substring(4, ts.length());
-               String[] pos = ts.split("-");
+               byte id = Byte.parseByte(ts);
 
-               GRID[Integer.parseInt(pos[0])][Integer.parseInt(pos[1])] = Constants.pieceIDs.EMPTY_CELL;
+               Piece piece = getPieceOnGrid(id, false);
+
+               LIVE_PIECES.remove(piece);
+               DEAD_PIECES.add(piece);
+
+               GRID[piece.getGridX()][piece.getGridY()] = Constants.pieceIDs.EMPTY_CELL;
+               displayDeadPiece(piece);
+
+               StackPane sp = CELLS[piece.getGridX()][piece.getGridY()];
+               sp.getChildren().clear();
             } else { // Normal move
                String[] data = ts.split(REG);
 
-               Piece piece = getPieceOnGrid(Byte.parseByte(data[0].trim()));
+               Piece piece = getPieceOnGrid(Byte.parseByte(data[0].trim()), false);
 
                if (piece == null)
                   return;
@@ -387,18 +521,16 @@ public class OnlineBoard {
                // Check move is valid
                if (x >= 0 && x < 8 && y >= 0 && y < 8) {
 
-                  movePiece(piece, piece.getGridX(), piece.getGridY(), x, y, true);
+                  movePiece(piece, piece.getGridX(), piece.getGridY(), x, y, true, false);
 
                   App.MOVE_COUNT++;
                }
             }
+         } catch (Exception err) {
+            err.printStackTrace();
          }
-
-      } catch (Exception err) {
-         err.printStackTrace();
       }
 
-      // set the idx
       matchTranscriptIdx = MATCH_TRANSCRIPT.size();
    }
 
@@ -599,10 +731,30 @@ public class OnlineBoard {
     * @param id The byte identification of a game piece
     * @return Piece object or null.
     */
-   private Piece getPieceOnGrid(byte id) {
+   private Piece getPieceOnGrid(byte id, boolean promoted) {
       for (Piece piece : LIVE_PIECES) {
-         if (piece.getId() == id)
+         if ((piece.getId() == id && !promoted) || (promoted && piece.getId() == id
+               && piece.getGridY() == ((piece.getColor() == Constants.pieceIDs.WHITE) ? 0 : 7)))
             return piece;
+      }
+
+      return null;
+   }
+
+   /**
+    * This method will return the piece on the inputed board coordinates.
+    * 
+    * @param id The byte identification of a game piece
+    * @return Piece object or null.
+    */
+   private Piece getAwaitingPawnPromotion(byte color) {
+      int y = (color == Constants.pieceIDs.WHITE) ? 0 : 7;
+
+      for (Piece piece : LIVE_PIECES) {
+         if (piece.getColor() == color) {
+            if (piece.getGridY() == y)
+               return piece;
+         }
       }
 
       return null;
@@ -676,6 +828,7 @@ public class OnlineBoard {
    public void nextTurn() {
       App.MOVE_COUNT++;
       resetPossibleMoves();
+
       if (sp_selected != null)
          sp_selected.getStyleClass().remove("cell-selected");
 
@@ -695,23 +848,30 @@ public class OnlineBoard {
 
       // Check mate
       if (checkmate) {
-         SERVER_REF.child("winner").setValueAsync(Byte.toString(winner)).addListener(new Runnable() {
+         Platform.runLater(new Runnable() {
 
             @Override
             public void run() {
-               SERVER_REF.child("gameover").setValueAsync(true);
-               try {
-                  gameover();
-               } catch (IOException e) {
-               }
+               SERVER_REF.child("winner").setValueAsync(Byte.toString(winner)).addListener(new Runnable() {
 
-            }
+                  @Override
+                  public void run() {
+                     SERVER_REF.child("gameover").setValueAsync(true);
+                     try {
+                        gameover();
+                     } catch (IOException e) {
+                     }
 
-         }, new Executor() {
+                  }
 
-            @Override
-            public void execute(Runnable command) {
-               command.run();
+               }, new Executor() {
+
+                  @Override
+                  public void execute(Runnable command) {
+                     command.run();
+                  }
+
+               });
             }
 
          });
@@ -883,7 +1043,8 @@ public class OnlineBoard {
     * @param toX   Final board x value.
     * @param toY   final board y value.
     */
-   private void movePiece(Piece piece, byte fromX, byte fromY, byte toX, byte toY, boolean parsingTranscript) {
+   private void movePiece(Piece piece, byte fromX, byte fromY, byte toX, byte toY, boolean parsingTranscript,
+         boolean promoted) {
       StackPane from = CELLS[fromX][fromY];
       from.getChildren().clear();
 
@@ -920,7 +1081,7 @@ public class OnlineBoard {
 
       }
 
-      if (piece.getType() == Constants.pieceType.PAWN && (piece.getGridY() == 0 || piece.getGridY() == 7)
+      if (!promoted && piece.getType() == Constants.pieceType.PAWN && (piece.getGridY() == 0 || piece.getGridY() == 7)
             && !parsingTranscript) {
          try {
             promotingPawn = true;
@@ -998,7 +1159,7 @@ public class OnlineBoard {
          public void handle(MouseEvent me) {
             // When clicked move the piece.
             piece.hasMoved = true;
-            movePiece(piece, piece.getGridX(), piece.getGridY(), x, y, false);
+            movePiece(piece, piece.getGridX(), piece.getGridY(), x, y, false, false);
             nextTurn();
          }
       });
@@ -1023,31 +1184,31 @@ public class OnlineBoard {
             piece.hasMoved = true;
             if (left) {
                movePiece(piece, piece.getGridX(), piece.getGridY(), (byte) (piece.getGridX() - 2), piece.getGridY(),
-                     false);
+                     false, false);
                if (color == Constants.pieceIDs.BLACK) {
                   Piece rook = GAME_PIECES[Constants.pieceIDs.BLACK_QUEENS_ROOK];
                   rook.hasMoved = true;
                   movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX() + 1), piece.getGridY(),
-                        false);
+                        false, false);
                } else {
                   Piece rook = GAME_PIECES[Constants.pieceIDs.WHITE_QUEENS_ROOK];
                   rook.hasMoved = true;
                   movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX() + 1), piece.getGridY(),
-                        false);
+                        false, false);
                }
             } else {
                movePiece(piece, piece.getGridX(), piece.getGridY(), (byte) (piece.getGridX() + 2), piece.getGridY(),
-                     false);
+                     false, false);
                if (color == Constants.pieceIDs.BLACK) {
                   Piece rook = GAME_PIECES[Constants.pieceIDs.BLACK_KINGS_ROOK];
                   rook.hasMoved = true;
                   movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX() - 1), piece.getGridY(),
-                        false);
+                        false, false);
                } else {
                   Piece rook = GAME_PIECES[Constants.pieceIDs.WHITE_KINGS_ROOK];
                   rook.hasMoved = true;
                   movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX() - 1), piece.getGridY(),
-                        false);
+                        false, false);
                }
             }
             nextTurn();
@@ -1068,7 +1229,7 @@ public class OnlineBoard {
     */
    private void setPassantMoveMouseClicked(StackPane sp, Pawn primaryPawn, Pawn enemyPawn) {
       GRID[enemyPawn.gridX][enemyPawn.gridY] = Constants.pieceIDs.EMPTY_CELL;
-      MATCH_TRANSCRIPT.add("KILL" + enemyPawn.gridX + "-" + enemyPawn.gridY);
+
       sp.setOnMouseClicked(new EventHandler<MouseEvent>() {
          @Override
          public void handle(MouseEvent event) {
@@ -1078,28 +1239,30 @@ public class OnlineBoard {
                if (enemyPawn.getGridX() < primaryPawn.getGridX()) {
                   // pawn is to the left
                   movePiece(primaryPawn, primaryPawn.gridX, primaryPawn.gridY, (byte) (primaryPawn.gridX - 1),
-                        (byte) (primaryPawn.gridY + 1), false);
+                        (byte) (primaryPawn.gridY + 1), false, false);
 
                } else {
                   // pawn is to the right
                   movePiece(primaryPawn, primaryPawn.gridX, primaryPawn.gridY, (byte) (primaryPawn.gridX + 1),
-                        (byte) (primaryPawn.gridY + 1), false);
+                        (byte) (primaryPawn.gridY + 1), false, false);
                }
             } else {
                if (enemyPawn.getGridX() < primaryPawn.getGridX()) {
                   // pawn to the left
                   movePiece(primaryPawn, primaryPawn.gridX, primaryPawn.gridY, (byte) (primaryPawn.gridX - 1),
-                        (byte) (primaryPawn.gridY - 1), false);
+                        (byte) (primaryPawn.gridY - 1), false, false);
                } else {
                   // pawn is to the right
                   movePiece(primaryPawn, primaryPawn.gridX, primaryPawn.gridY, (byte) (primaryPawn.gridX + 1),
-                        (byte) (primaryPawn.gridY - 1), false);
+                        (byte) (primaryPawn.gridY - 1), false, false);
                }
 
             }
 
             // Removes enemyPawn from the game.
             GRID[enemyPawn.gridX][enemyPawn.gridY] = Constants.pieceIDs.EMPTY_CELL;
+            MATCH_TRANSCRIPT.add("KILL" + enemyPawn.getId());
+
             StackPane enemyPane = CELLS[enemyPawn.gridX][enemyPawn.gridY];
             enemyPane.getChildren().clear();
             LIVE_PIECES.remove(enemyPawn);
@@ -1180,13 +1343,15 @@ public class OnlineBoard {
          newPiece = new Rook(id);
       }
 
-      MATCH_TRANSCRIPT.add("PP" + piece.getId() + "-" + type);
-
-      movePiece(newPiece, x, y, x, y, parsingTranscript);
       LIVE_PIECES.set(LIVE_PIECES.indexOf(piece), newPiece);
 
+      movePiece(newPiece, x, y, x, y, parsingTranscript, true);
+
       promotingPawn = false;
-      pushToServer();
+      if (!parsingTranscript) {
+         MATCH_TRANSCRIPT.add("PP" + piece.getId() + "-" + type);
+         pushToServer();
+      }
    }
 
    /**
