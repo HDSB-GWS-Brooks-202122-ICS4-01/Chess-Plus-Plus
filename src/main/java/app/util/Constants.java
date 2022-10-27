@@ -1,3 +1,4 @@
+package app.util;
 /**
  * Class containing any constants we use.
  * 
@@ -22,7 +23,7 @@ public final class Constants {
          * @author Akil Pathiranage and Selim Abdelwahab
          * @version 1.0
          */
-        public static final class pieceIDs {
+        public static final class PieceIDs {
                 public static final byte EMPTY_CELL = -1;
 
                 public static final byte BLACK = 0;
@@ -103,7 +104,7 @@ public final class Constants {
          * @author Akil Pathiranage and Selim Abdelwahab
          * @version 1.0
          */
-        public static final class pieceType {
+        public static final class PieceType {
                 public static final byte KING = 0;
                 public static final byte QUEEN = 1;
                 public static final byte BISHOP = 2;
@@ -119,7 +120,7 @@ public final class Constants {
          * @author Akil Pathiranage and Selim Abdelwahab
          * @version 1.0
          */
-        public static final class moveTypes {
+        public static final class MoveTypes {
                 public static final String REGULAR = "R";
                 public static final String CASTLE_LEFT = "c";
                 public static final String CASTLE_RIGHT = "C";
@@ -135,45 +136,45 @@ public final class Constants {
          * @author Akil Pathiranage and Selim Abdelwahab
          * @version 1.0
          */
-        public static final class boardData {
+        public static final class BoardData {
                 public static final byte MODE_PASS_N_PLAY = 0;
                 public static final byte MODE_AI = 1;
                 public static final byte MODE_RESUME_GAME = 2;
                 public static final byte MODE_ONLINE = 3;
 
                 public static final byte[][] DEFAULT_GAME_SETUP = {
-                                { pieceIDs.BLACK_QUEENS_ROOK, pieceIDs.BLACK_PAWN_ZERO, pieceIDs.EMPTY_CELL,
-                                                pieceIDs.EMPTY_CELL,
-                                                pieceIDs.EMPTY_CELL, pieceIDs.EMPTY_CELL, pieceIDs.WHITE_PAWN_ZERO,
-                                                pieceIDs.WHITE_QUEENS_ROOK },
-                                { pieceIDs.BLACK_QUEENS_KNIGHT, pieceIDs.BLACK_PAWN_ONE, pieceIDs.EMPTY_CELL,
-                                                pieceIDs.EMPTY_CELL,
-                                                pieceIDs.EMPTY_CELL, pieceIDs.EMPTY_CELL, pieceIDs.WHITE_PAWN_ONE,
-                                                pieceIDs.WHITE_QUEENS_KNIGHT },
-                                { pieceIDs.BLACK_QUEENS_BISHOP, pieceIDs.BLACK_PAWN_TWO, pieceIDs.EMPTY_CELL,
-                                                pieceIDs.EMPTY_CELL,
-                                                pieceIDs.EMPTY_CELL, pieceIDs.EMPTY_CELL, pieceIDs.WHITE_PAWN_TWO,
-                                                pieceIDs.WHITE_QUEENS_BISHOP },
-                                { pieceIDs.BLACK_QUEEN, pieceIDs.BLACK_PAWN_THREE, pieceIDs.EMPTY_CELL,
-                                                pieceIDs.EMPTY_CELL,
-                                                pieceIDs.EMPTY_CELL, pieceIDs.EMPTY_CELL, pieceIDs.WHITE_PAWN_THREE,
-                                                pieceIDs.WHITE_QUEEN },
-                                { pieceIDs.BLACK_KING, pieceIDs.BLACK_PAWN_FOUR, pieceIDs.EMPTY_CELL,
-                                                pieceIDs.EMPTY_CELL,
-                                                pieceIDs.EMPTY_CELL, pieceIDs.EMPTY_CELL, pieceIDs.WHITE_PAWN_FOUR,
-                                                pieceIDs.WHITE_KING },
-                                { pieceIDs.BLACK_KINGS_BISHOP, pieceIDs.BLACK_PAWN_FIVE, pieceIDs.EMPTY_CELL,
-                                                pieceIDs.EMPTY_CELL,
-                                                pieceIDs.EMPTY_CELL, pieceIDs.EMPTY_CELL, pieceIDs.WHITE_PAWN_FIVE,
-                                                pieceIDs.WHITE_KINGS_BISHOP },
-                                { pieceIDs.BLACK_KINGS_KNIGHT, pieceIDs.BLACK_PAWN_SIX, pieceIDs.EMPTY_CELL,
-                                                pieceIDs.EMPTY_CELL,
-                                                pieceIDs.EMPTY_CELL, pieceIDs.EMPTY_CELL, pieceIDs.WHITE_PAWN_SIX,
-                                                pieceIDs.WHITE_KINGS_KNIGHT },
-                                { pieceIDs.BLACK_KINGS_ROOK, pieceIDs.BLACK_PAWN_SEVEN, pieceIDs.EMPTY_CELL,
-                                                pieceIDs.EMPTY_CELL,
-                                                pieceIDs.EMPTY_CELL, pieceIDs.EMPTY_CELL, pieceIDs.WHITE_PAWN_SEVEN,
-                                                pieceIDs.WHITE_KINGS_ROOK }
+                                { PieceIDs.BLACK_QUEENS_ROOK, PieceIDs.BLACK_PAWN_ZERO, PieceIDs.EMPTY_CELL,
+                                                PieceIDs.EMPTY_CELL,
+                                                PieceIDs.EMPTY_CELL, PieceIDs.EMPTY_CELL, PieceIDs.WHITE_PAWN_ZERO,
+                                                PieceIDs.WHITE_QUEENS_ROOK },
+                                { PieceIDs.BLACK_QUEENS_KNIGHT, PieceIDs.BLACK_PAWN_ONE, PieceIDs.EMPTY_CELL,
+                                                PieceIDs.EMPTY_CELL,
+                                                PieceIDs.EMPTY_CELL, PieceIDs.EMPTY_CELL, PieceIDs.WHITE_PAWN_ONE,
+                                                PieceIDs.WHITE_QUEENS_KNIGHT },
+                                { PieceIDs.BLACK_QUEENS_BISHOP, PieceIDs.BLACK_PAWN_TWO, PieceIDs.EMPTY_CELL,
+                                                PieceIDs.EMPTY_CELL,
+                                                PieceIDs.EMPTY_CELL, PieceIDs.EMPTY_CELL, PieceIDs.WHITE_PAWN_TWO,
+                                                PieceIDs.WHITE_QUEENS_BISHOP },
+                                { PieceIDs.BLACK_QUEEN, PieceIDs.BLACK_PAWN_THREE, PieceIDs.EMPTY_CELL,
+                                                PieceIDs.EMPTY_CELL,
+                                                PieceIDs.EMPTY_CELL, PieceIDs.EMPTY_CELL, PieceIDs.WHITE_PAWN_THREE,
+                                                PieceIDs.WHITE_QUEEN },
+                                { PieceIDs.BLACK_KING, PieceIDs.BLACK_PAWN_FOUR, PieceIDs.EMPTY_CELL,
+                                                PieceIDs.EMPTY_CELL,
+                                                PieceIDs.EMPTY_CELL, PieceIDs.EMPTY_CELL, PieceIDs.WHITE_PAWN_FOUR,
+                                                PieceIDs.WHITE_KING },
+                                { PieceIDs.BLACK_KINGS_BISHOP, PieceIDs.BLACK_PAWN_FIVE, PieceIDs.EMPTY_CELL,
+                                                PieceIDs.EMPTY_CELL,
+                                                PieceIDs.EMPTY_CELL, PieceIDs.EMPTY_CELL, PieceIDs.WHITE_PAWN_FIVE,
+                                                PieceIDs.WHITE_KINGS_BISHOP },
+                                { PieceIDs.BLACK_KINGS_KNIGHT, PieceIDs.BLACK_PAWN_SIX, PieceIDs.EMPTY_CELL,
+                                                PieceIDs.EMPTY_CELL,
+                                                PieceIDs.EMPTY_CELL, PieceIDs.EMPTY_CELL, PieceIDs.WHITE_PAWN_SIX,
+                                                PieceIDs.WHITE_KINGS_KNIGHT },
+                                { PieceIDs.BLACK_KINGS_ROOK, PieceIDs.BLACK_PAWN_SEVEN, PieceIDs.EMPTY_CELL,
+                                                PieceIDs.EMPTY_CELL,
+                                                PieceIDs.EMPTY_CELL, PieceIDs.EMPTY_CELL, PieceIDs.WHITE_PAWN_SEVEN,
+                                                PieceIDs.WHITE_KINGS_ROOK }
 
                 };
 

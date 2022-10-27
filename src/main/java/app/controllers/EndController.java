@@ -1,3 +1,4 @@
+package app.controllers;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -12,6 +13,12 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.UserRecord;
 import com.google.firebase.cloud.StorageClient;
 
+import app.App;
+import app.game.PlayerTimer;
+import app.util.Constants.PieceIDs;
+import app.util.Constants.BoardData;
+import app.util.Constants.Online;
+import app.util.RegionFillTransition;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -122,18 +129,18 @@ public class EndController {
       // Set labels
       if (stats != null) {
          lbl_w_rt.setText(PlayerTimer
-               .getStringFormat(Long.parseLong(stats[Constants.pieceIDs.WHITE].get("remaining_time").toString())));
-         lbl_w_tm.setText(stats[Constants.pieceIDs.WHITE].get("total_moves").toString());
-         lbl_w_pk.setText(stats[Constants.pieceIDs.WHITE].get("pieces_killed").toString());
+               .getStringFormat(Long.parseLong(stats[PieceIDs.WHITE].get("remaining_time").toString())));
+         lbl_w_tm.setText(stats[PieceIDs.WHITE].get("total_moves").toString());
+         lbl_w_pk.setText(stats[PieceIDs.WHITE].get("pieces_killed").toString());
 
          lbl_b_rt.setText(PlayerTimer
-               .getStringFormat(Long.parseLong(stats[Constants.pieceIDs.BLACK].get("remaining_time").toString())));
-         lbl_b_tm.setText(stats[Constants.pieceIDs.BLACK].get("total_moves").toString());
-         lbl_b_pk.setText(stats[Constants.pieceIDs.BLACK].get("pieces_killed").toString());
+               .getStringFormat(Long.parseLong(stats[PieceIDs.BLACK].get("remaining_time").toString())));
+         lbl_b_tm.setText(stats[PieceIDs.BLACK].get("total_moves").toString());
+         lbl_b_pk.setText(stats[PieceIDs.BLACK].get("pieces_killed").toString());
       }
 
       try {
-         if (App.getGameMode() == Constants.boardData.MODE_ONLINE) {
+         if (App.getGameMode() == BoardData.MODE_ONLINE) {
             String UID = config.getProperty("UID");
 
             // User is signed in
@@ -144,12 +151,12 @@ public class EndController {
                com.google.cloud.storage.Bucket bucket = StorageClient.getInstance().bucket();
 
                // Get user's stats
-               try (FileOutputStream fos = new FileOutputStream(Constants.Online.PATH_TO_STATS)) {
+               try (FileOutputStream fos = new FileOutputStream(Online.PATH_TO_STATS)) {
                   fos.write(bucket.get("profiles/" + userRecord.getUid() + "/stats.txt").getContent());
                   fos.close();
                }
 
-               Scanner statsReader = new Scanner(new FileReader(Constants.Online.PATH_TO_STATS));
+               Scanner statsReader = new Scanner(new FileReader(Online.PATH_TO_STATS));
 
                boolean won = App.getWinner() == App.getOnlineColor();
                int wins = 0;
@@ -184,19 +191,19 @@ public class EndController {
 
                System.out.println(statsPush);
 
-               FileWriter writer = new FileWriter(new File(Constants.Online.PATH_TO_STATS));
+               FileWriter writer = new FileWriter(new File(Online.PATH_TO_STATS));
                // write data
                writer.write(statsPush);
                writer.close();
 
                // Push data to server
                bucket.create("profiles/" + UID + "/stats.txt",
-                     java.nio.file.Files.readAllBytes(Paths.get(Constants.Online.PATH_TO_STATS)));
+                     java.nio.file.Files.readAllBytes(Paths.get(Online.PATH_TO_STATS)));
             }
          }
       } catch (Exception e) { // Most likely the user was deleted
-         config.setProperty(Constants.Online.CONFIG_SIGNED_IN, "f");
-         config.setProperty(Constants.Online.CONFIG_UID, "null");
+         config.setProperty(Online.CONFIG_SIGNED_IN, "f");
+         config.setProperty(Online.CONFIG_UID, "null");
 
          try {
             goToHome();

@@ -1,5 +1,10 @@
+package app.pieces;
 
 import java.util.ArrayList;
+
+import app.App;
+import app.util.Constants;
+import app.util.Constants.PieceIDs;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.image.ImageView;
 
@@ -17,7 +22,7 @@ public class Bishop extends Piece{
     public Bishop(Byte id) {
         this.id = id;
         setType();
-        this.color = (byte) (id / Constants.pieceIDs.COLOR_DIVISOR);
+        this.color = (byte) (id / PieceIDs.COLOR_DIVISOR);
         this.sprite = new ImageView(App.getSpritesheet());
         if (this.color == 0) {
             // if the colour is black put a black pawn

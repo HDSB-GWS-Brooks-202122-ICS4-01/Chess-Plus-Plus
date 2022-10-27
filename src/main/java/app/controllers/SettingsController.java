@@ -1,3 +1,4 @@
+package app.controllers;
 import javafx.animation.FadeTransition;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -11,6 +12,10 @@ import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
 import java.util.Properties;
+
+import app.App;
+import app.util.RegionFillTransition;
+
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;

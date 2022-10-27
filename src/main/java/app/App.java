@@ -1,4 +1,4 @@
-
+package app;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
@@ -7,6 +7,9 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import app.pieces.Piece;
+import app.util.Constants.Online;
+import app.util.Constants.PieceIDs;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -32,7 +35,7 @@ public class App extends Application {
     private static Scene scene;
     private static Stage stage;
 
-    private static Image SPRITESHEET = new Image(App.class.getResource("assets\\chess_spritesheet.png").toString());
+    private static Image SPRITESHEET = new Image(App.class.getResource("..\\assets\\chess_spritesheet.png").toString());
 
     private static byte winner = -1;
 
@@ -78,7 +81,7 @@ public class App extends Application {
      * 
      * @return Properties object containing configuration data
      */
-    static Properties getConfig() {
+    public static Properties getConfig() {
         Properties config = null;
 
         try {
@@ -122,7 +125,7 @@ public class App extends Application {
      * 
      * @param config The Properties object containing the configuration data.
      */
-    static void saveConfig(Properties config) {
+    public static void saveConfig(Properties config) {
         try {
             FileWriter writer = new FileWriter("src\\main\\resources\\data\\config.properties");
             config.store(writer, "Config saved");
@@ -137,7 +140,7 @@ public class App extends Application {
      * 
      * @param parent Parent object
      */
-    static void setRoot(Parent parent) {
+    public static void setRoot(Parent parent) {
         scene.setRoot(parent);
     }
 
@@ -149,7 +152,7 @@ public class App extends Application {
      * @throws IOException Will throw and IOException if the file name could not be
      *                     resolved
      */
-    static void setRoot(String fxml) throws IOException {
+    public static void setRoot(String fxml) throws IOException {
         scene.setRoot(loadFXML(fxml));
     }
 
@@ -162,7 +165,7 @@ public class App extends Application {
      *                     resolved
      */
     public static Parent loadFXML(String fxml) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(fxml + ".fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("..\\" + fxml + ".fxml"));
         return fxmlLoader.load();
     }
 
@@ -187,7 +190,7 @@ public class App extends Application {
      * @return String value of the winner
      */
     public static String getWinnerColor() {
-        if (winner == Constants.pieceIDs.BLACK)
+        if (winner == PieceIDs.BLACK)
             return "Black";
         else
             return "White";
@@ -199,7 +202,7 @@ public class App extends Application {
      * @throws IOException  Will throw and IOException if the JSON firebase data file could not be located.
      */
     public static void main(String[] args) throws IOException {
-        FileInputStream serviceAccount = new FileInputStream(Constants.Online.PATH_TO_JSON_PK);
+        FileInputStream serviceAccount = new FileInputStream(Online.PATH_TO_JSON_PK);
 
         FirebaseOptions options = new FirebaseOptions.Builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))

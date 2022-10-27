@@ -1,6 +1,10 @@
+package app.pieces;
 
 import java.util.ArrayList;
 
+import app.App;
+import app.util.Constants.PieceIDs;
+import app.util.Constants.SpriteSheetDimensions;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.image.ImageView;
 
@@ -20,21 +24,21 @@ public class King extends Piece{
     public King(Byte id) {
         this.id = id;
         setType();
-        this.color = (byte) (id / Constants.pieceIDs.COLOR_DIVISOR);
+        this.color = (byte) (id / PieceIDs.COLOR_DIVISOR);
         this.sprite = new ImageView(App.getSpritesheet());
         if (this.color == 0) {
             // if the colour is black put a black pawn
-            this.sprite.setViewport(new Rectangle2D(Constants.SpriteSheetDimensions.KING_X,
-                    Constants.SpriteSheetDimensions.BLACK_PIECE_Y, Constants.SpriteSheetDimensions.PIECE_WIDTH,
-                    Constants.SpriteSheetDimensions.PIECE_HEIGHT));
+            this.sprite.setViewport(new Rectangle2D(SpriteSheetDimensions.KING_X,
+                    SpriteSheetDimensions.BLACK_PIECE_Y, SpriteSheetDimensions.PIECE_WIDTH,
+                    SpriteSheetDimensions.PIECE_HEIGHT));
         } else {
-            this.sprite.setViewport(new Rectangle2D(Constants.SpriteSheetDimensions.KING_X,
-                    Constants.SpriteSheetDimensions.WHITE_PIECE_Y, Constants.SpriteSheetDimensions.PIECE_WIDTH,
-                    Constants.SpriteSheetDimensions.PIECE_HEIGHT));
+            this.sprite.setViewport(new Rectangle2D(SpriteSheetDimensions.KING_X,
+                    SpriteSheetDimensions.WHITE_PIECE_Y, SpriteSheetDimensions.PIECE_WIDTH,
+                    SpriteSheetDimensions.PIECE_HEIGHT));
         }
 
-        this.sprite.setFitWidth(Constants.SpriteSheetDimensions.PIECE_FIT_WIDTH);
-        this.sprite.setFitHeight(Constants.SpriteSheetDimensions.PIECE_FIT_HEIGHT);
+        this.sprite.setFitWidth(SpriteSheetDimensions.PIECE_FIT_WIDTH);
+        this.sprite.setFitHeight(SpriteSheetDimensions.PIECE_FIT_HEIGHT);
     }
 
     /**
@@ -56,7 +60,7 @@ public class King extends Piece{
         };
 
         for(byte[] move : moveList){
-            if(inBoardRange(move) && (boardPositions[move[0]][move[1]] == Constants.pieceIDs.EMPTY_CELL || boardPositions[move[0]][move[1]]/Constants.pieceIDs.COLOR_DIVISOR != color)){
+            if(inBoardRange(move) && (boardPositions[move[0]][move[1]] == PieceIDs.EMPTY_CELL || boardPositions[move[0]][move[1]]/PieceIDs.COLOR_DIVISOR != color)){
                 if(isNotUnderCheck(boardPositions, move, true)){
                     possibleMoves.add(move);
                 }
@@ -82,9 +86,9 @@ public class King extends Piece{
      * @return True if the king can castle to the left, false if not.
      */
     public boolean canCastleLeft(byte[][] boardPositions){
-        if(color == Constants.pieceIDs.WHITE){
-            if(!hasMoved && !App.GAME_PIECES[Constants.pieceIDs.WHITE_QUEENS_ROOK].hasMoved && boardPositions[gridX-4][gridY] == Constants.pieceIDs.WHITE_QUEENS_ROOK){
-                if(boardPositions[gridX-1][gridY] == Constants.pieceIDs.EMPTY_CELL && boardPositions[gridX-2][gridY] == Constants.pieceIDs.EMPTY_CELL && boardPositions[gridX-3][gridY] == Constants.pieceIDs.EMPTY_CELL){
+        if(color == PieceIDs.WHITE){
+            if(!hasMoved && !App.GAME_PIECES[PieceIDs.WHITE_QUEENS_ROOK].hasMoved && boardPositions[gridX-4][gridY] == PieceIDs.WHITE_QUEENS_ROOK){
+                if(boardPositions[gridX-1][gridY] == PieceIDs.EMPTY_CELL && boardPositions[gridX-2][gridY] == PieceIDs.EMPTY_CELL && boardPositions[gridX-3][gridY] == PieceIDs.EMPTY_CELL){
                     byte[] posRightNow = {gridX, gridY};
                     byte[] squareOne = {(byte) (gridX-1), gridY};
                     byte[] squareTwo = {(byte) (gridX-2), gridY};
@@ -94,8 +98,8 @@ public class King extends Piece{
                 }
             }
         } else {
-            if(!hasMoved && !App.GAME_PIECES[Constants.pieceIDs.BLACK_QUEENS_ROOK].hasMoved && boardPositions[gridX-4][gridY] == Constants.pieceIDs.BLACK_QUEENS_ROOK){
-                if(boardPositions[gridX-1][gridY] == Constants.pieceIDs.EMPTY_CELL && boardPositions[gridX-2][gridY] == Constants.pieceIDs.EMPTY_CELL && boardPositions[gridX-3][gridY] == Constants.pieceIDs.EMPTY_CELL){
+            if(!hasMoved && !App.GAME_PIECES[PieceIDs.BLACK_QUEENS_ROOK].hasMoved && boardPositions[gridX-4][gridY] == PieceIDs.BLACK_QUEENS_ROOK){
+                if(boardPositions[gridX-1][gridY] == PieceIDs.EMPTY_CELL && boardPositions[gridX-2][gridY] == PieceIDs.EMPTY_CELL && boardPositions[gridX-3][gridY] == PieceIDs.EMPTY_CELL){
                     byte[] posRightNow = {gridX, gridY};
                     byte[] squareOne = {(byte) (gridX-1), gridY};
                     byte[] squareTwo = {(byte) (gridX-2), gridY};
@@ -115,9 +119,9 @@ public class King extends Piece{
      * @return True if the king can castle to the right, false if not.
      */
     public boolean canCastleRight(byte[][] boardPositions){
-        if(color == Constants.pieceIDs.WHITE){
-            if(!hasMoved && !App.GAME_PIECES[Constants.pieceIDs.WHITE_KINGS_ROOK].hasMoved && boardPositions[gridX+3][gridY] == Constants.pieceIDs.WHITE_KINGS_ROOK){
-                if(boardPositions[gridX+1][gridY] == Constants.pieceIDs.EMPTY_CELL && boardPositions[gridX+2][gridY] == Constants.pieceIDs.EMPTY_CELL){
+        if(color == PieceIDs.WHITE){
+            if(!hasMoved && !App.GAME_PIECES[PieceIDs.WHITE_KINGS_ROOK].hasMoved && boardPositions[gridX+3][gridY] == PieceIDs.WHITE_KINGS_ROOK){
+                if(boardPositions[gridX+1][gridY] == PieceIDs.EMPTY_CELL && boardPositions[gridX+2][gridY] == PieceIDs.EMPTY_CELL){
                     byte[] posRightNow = {gridX, gridY};
                     byte[] squareOne = {(byte) (gridX+1), gridY};
                     byte[] squareTwo = {(byte) (gridX+2), gridY};
@@ -127,8 +131,8 @@ public class King extends Piece{
                 }
             }
         } else {
-            if(!hasMoved && !App.GAME_PIECES[Constants.pieceIDs.BLACK_KINGS_ROOK].hasMoved  && boardPositions[gridX+3][gridY] == Constants.pieceIDs.BLACK_KINGS_ROOK){
-                if(boardPositions[gridX+1][gridY] == Constants.pieceIDs.EMPTY_CELL && boardPositions[gridX+2][gridY] == Constants.pieceIDs.EMPTY_CELL){
+            if(!hasMoved && !App.GAME_PIECES[PieceIDs.BLACK_KINGS_ROOK].hasMoved  && boardPositions[gridX+3][gridY] == PieceIDs.BLACK_KINGS_ROOK){
+                if(boardPositions[gridX+1][gridY] == PieceIDs.EMPTY_CELL && boardPositions[gridX+2][gridY] == PieceIDs.EMPTY_CELL){
                     byte[] posRightNow = {gridX, gridY};
                     byte[] squareOne = {(byte) (gridX+1), gridY};
                     byte[] squareTwo = {(byte) (gridX+2), gridY};

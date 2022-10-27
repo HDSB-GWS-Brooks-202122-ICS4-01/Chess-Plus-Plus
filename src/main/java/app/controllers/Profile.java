@@ -1,3 +1,4 @@
+package app.controllers;
 import java.io.ByteArrayInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -9,6 +10,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.UserRecord;
 import com.google.firebase.cloud.StorageClient;
 
+import app.App;
+import app.util.Constants;
+import app.util.RegionFillTransition;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;

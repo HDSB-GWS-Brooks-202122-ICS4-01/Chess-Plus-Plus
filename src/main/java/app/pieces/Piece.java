@@ -1,6 +1,10 @@
+package app.pieces;
 
 import java.util.ArrayList;
 
+import app.App;
+import app.util.Constants.PieceIDs;
+import app.util.Constants.PieceType;
 import javafx.scene.image.ImageView;
 
 /**
@@ -32,22 +36,22 @@ public abstract class Piece {
      * Method for setting the type of a piece when it is instantiated.
      */
     protected void setType() {
-        if (id == Constants.pieceIDs.BLACK_KING || id == Constants.pieceIDs.WHITE_KING) {
-            this.pieceType = Constants.pieceType.KING;
-        } else if (id == Constants.pieceIDs.BLACK_QUEEN || id == Constants.pieceIDs.WHITE_QUEEN) {
-            this.pieceType = Constants.pieceType.QUEEN;
-        } else if (id == Constants.pieceIDs.BLACK_KINGS_BISHOP || id == Constants.pieceIDs.BLACK_QUEENS_BISHOP
-                || id == Constants.pieceIDs.WHITE_KINGS_BISHOP || id == Constants.pieceIDs.WHITE_QUEENS_BISHOP) {
-            this.pieceType = Constants.pieceType.BISHOP;
-        } else if (id == Constants.pieceIDs.BLACK_KINGS_KNIGHT || id == Constants.pieceIDs.BLACK_QUEENS_KNIGHT
-                || id == Constants.pieceIDs.WHITE_KINGS_KNIGHT || id == Constants.pieceIDs.WHITE_QUEENS_KNIGHT) {
-            this.pieceType = Constants.pieceType.KNIGHT;
-        } else if (id == Constants.pieceIDs.BLACK_KINGS_ROOK || id == Constants.pieceIDs.BLACK_QUEENS_ROOK
-                || id == Constants.pieceIDs.WHITE_KINGS_ROOK || id == Constants.pieceIDs.WHITE_QUEENS_ROOK
-                || id == Constants.pieceIDs.BLACK_PROMOTED_ROOK || id == Constants.pieceIDs.WHITE_PROMOTED_ROOK) {
-            this.pieceType = Constants.pieceType.ROOK;
+        if (id == PieceIDs.BLACK_KING || id == PieceIDs.WHITE_KING) {
+            this.pieceType = PieceType.KING;
+        } else if (id == PieceIDs.BLACK_QUEEN || id == PieceIDs.WHITE_QUEEN) {
+            this.pieceType = PieceType.QUEEN;
+        } else if (id == PieceIDs.BLACK_KINGS_BISHOP || id == PieceIDs.BLACK_QUEENS_BISHOP
+                || id == PieceIDs.WHITE_KINGS_BISHOP || id == PieceIDs.WHITE_QUEENS_BISHOP) {
+            this.pieceType = PieceType.BISHOP;
+        } else if (id == PieceIDs.BLACK_KINGS_KNIGHT || id == PieceIDs.BLACK_QUEENS_KNIGHT
+                || id == PieceIDs.WHITE_KINGS_KNIGHT || id == PieceIDs.WHITE_QUEENS_KNIGHT) {
+            this.pieceType = PieceType.KNIGHT;
+        } else if (id == PieceIDs.BLACK_KINGS_ROOK || id == PieceIDs.BLACK_QUEENS_ROOK
+                || id == PieceIDs.WHITE_KINGS_ROOK || id == PieceIDs.WHITE_QUEENS_ROOK
+                || id == PieceIDs.BLACK_PROMOTED_ROOK || id == PieceIDs.WHITE_PROMOTED_ROOK) {
+            this.pieceType = PieceType.ROOK;
         } else {
-            this.pieceType = Constants.pieceType.PAWN;
+            this.pieceType = PieceType.PAWN;
         }
 
     }
@@ -83,7 +87,7 @@ public abstract class Piece {
             kingPos = getKingPos();
         }
         newBoardPositions[possibleMove[0]][possibleMove[1]] = id;
-        newBoardPositions[gridX][gridY] = Constants.pieceIDs.EMPTY_CELL;
+        newBoardPositions[gridX][gridY] = PieceIDs.EMPTY_CELL;
 
         if (checkPawnAttack(newBoardPositions, kingPos)) {
             System.out.println("Check from a pawn");
@@ -136,13 +140,13 @@ public abstract class Piece {
                 { (byte) (kingPos[0] - 1), (byte) (kingPos[1] + 2) }
         };
 
-        if (color == Constants.pieceIDs.BLACK) {
+        if (color == PieceIDs.BLACK) {
             for (byte[] position : positionList) {
                 if (!inBoardRange(position)) {
                     continue;
                 }
                 byte id = newBoardPositions[position[0]][position[1]];
-                if (id == Constants.pieceIDs.WHITE_KINGS_KNIGHT || id == Constants.pieceIDs.WHITE_QUEENS_KNIGHT) {
+                if (id == PieceIDs.WHITE_KINGS_KNIGHT || id == PieceIDs.WHITE_QUEENS_KNIGHT) {
                     return false;
                 }
             }
@@ -152,7 +156,7 @@ public abstract class Piece {
                     continue;
                 }
                 byte id = newBoardPositions[position[0]][position[1]];
-                if (id == Constants.pieceIDs.BLACK_KINGS_KNIGHT || id == Constants.pieceIDs.BLACK_QUEENS_KNIGHT) {
+                if (id == PieceIDs.BLACK_KINGS_KNIGHT || id == PieceIDs.BLACK_QUEENS_KNIGHT) {
                     return false;
                 }
             }
@@ -173,9 +177,9 @@ public abstract class Piece {
 
         };
 
-        if (color == Constants.pieceIDs.WHITE) {
+        if (color == PieceIDs.WHITE) {
             for (byte[] kPos : kPosList) {
-                if (inBoardRange(kPos) && newBoardPositions[kPos[0]][kPos[1]] == Constants.pieceIDs.BLACK_KING) {
+                if (inBoardRange(kPos) && newBoardPositions[kPos[0]][kPos[1]] == PieceIDs.BLACK_KING) {
                     System.out.println("Check by black king");
                     return false;
                 }
@@ -183,7 +187,7 @@ public abstract class Piece {
             }
         } else {
             for (byte[] kPos : kPosList) {
-                if (inBoardRange(kPos) && newBoardPositions[kPos[0]][kPos[1]] == Constants.pieceIDs.WHITE_KING) {
+                if (inBoardRange(kPos) && newBoardPositions[kPos[0]][kPos[1]] == PieceIDs.WHITE_KING) {
                     System.out.println("Check by white king");
                     return false;
                 }
@@ -202,12 +206,12 @@ public abstract class Piece {
      */
     protected byte[] getKingPos() {
         byte[] pos = new byte[2];
-        if (color == Constants.pieceIDs.BLACK) {
-            pos[0] = App.GAME_PIECES[Constants.pieceIDs.BLACK_KING].getGridX();
-            pos[1] = App.GAME_PIECES[Constants.pieceIDs.BLACK_KING].getGridY();
+        if (color == PieceIDs.BLACK) {
+            pos[0] = App.GAME_PIECES[PieceIDs.BLACK_KING].getGridX();
+            pos[1] = App.GAME_PIECES[PieceIDs.BLACK_KING].getGridY();
         } else {
-            pos[0] = App.GAME_PIECES[Constants.pieceIDs.WHITE_KING].getGridX();
-            pos[1] = App.GAME_PIECES[Constants.pieceIDs.WHITE_KING].getGridY();
+            pos[0] = App.GAME_PIECES[PieceIDs.WHITE_KING].getGridX();
+            pos[1] = App.GAME_PIECES[PieceIDs.WHITE_KING].getGridY();
         }
         return pos;
     }
@@ -220,7 +224,7 @@ public abstract class Piece {
      * @return True if the king is under check from a pawn, false if not.
      */
     private boolean checkPawnAttack(byte[][] boardPositions, byte[] pos) {
-        if (color == Constants.pieceIDs.BLACK) {
+        if (color == PieceIDs.BLACK) {
             // for black
 
             // if the postion is within the range
@@ -230,10 +234,10 @@ public abstract class Piece {
             byte pieceToTheLeft = (inBoardRange((byte) (pos[0] - 1), (byte) (pos[1] + 1)))
                     ? boardPositions[pos[0] - 1][pos[1] + 1]
                     : -1;
-            if ((pieceToTheRight > Constants.pieceIDs.BEGIN_WHITE_PAWNS
-                    && pieceToTheRight < Constants.pieceIDs.END_WHITE_PAWNS)
-                    || (pieceToTheLeft > Constants.pieceIDs.BEGIN_WHITE_PAWNS
-                            && pieceToTheLeft < Constants.pieceIDs.END_WHITE_PAWNS)) {
+            if ((pieceToTheRight > PieceIDs.BEGIN_WHITE_PAWNS
+                    && pieceToTheRight < PieceIDs.END_WHITE_PAWNS)
+                    || (pieceToTheLeft > PieceIDs.BEGIN_WHITE_PAWNS
+                            && pieceToTheLeft < PieceIDs.END_WHITE_PAWNS)) {
                 // if the piece is an enemy pawn
                 return true;
             } else {
@@ -249,10 +253,10 @@ public abstract class Piece {
             byte pieceToTheLeft = (inBoardRange((byte) (pos[0] - 1), (byte) (pos[1] - 1)))
                     ? boardPositions[pos[0] - 1][pos[1] - 1]
                     : -1;
-            if ((pieceToTheRight > Constants.pieceIDs.BEGIN_BLACK_PAWNS
-                    && pieceToTheRight < Constants.pieceIDs.END_BLACK_PAWNS)
-                    || (pieceToTheLeft > Constants.pieceIDs.BEGIN_BLACK_PAWNS
-                            && pieceToTheLeft < Constants.pieceIDs.END_BLACK_PAWNS)) {
+            if ((pieceToTheRight > PieceIDs.BEGIN_BLACK_PAWNS
+                    && pieceToTheRight < PieceIDs.END_BLACK_PAWNS)
+                    || (pieceToTheLeft > PieceIDs.BEGIN_BLACK_PAWNS
+                            && pieceToTheLeft < PieceIDs.END_BLACK_PAWNS)) {
                 // if the piece is an enemy pawn
                 return true;
             } else {
@@ -277,27 +281,27 @@ public abstract class Piece {
             byte pieceAtSquare = boardPositions[i][pos[1]];
 
             // if the piece to the left is an enemy piece
-            if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL
-                    && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
+            if (pieceAtSquare != PieceIDs.EMPTY_CELL
+                    && pieceAtSquare / PieceIDs.COLOR_DIVISOR != color) {
 
                 // if the color is black, else white
-                if (color == Constants.pieceIDs.BLACK) {
+                if (color == PieceIDs.BLACK) {
 
                     // if the piece is a rook or promoted rook.
-                    if (pieceAtSquare == Constants.pieceIDs.WHITE_KINGS_ROOK
-                            || pieceAtSquare == Constants.pieceIDs.WHITE_QUEENS_ROOK
-                            || pieceAtSquare == Constants.pieceIDs.WHITE_QUEEN
-                            || pieceAtSquare == Constants.pieceIDs.WHITE_PROMOTED_ROOK) {
+                    if (pieceAtSquare == PieceIDs.WHITE_KINGS_ROOK
+                            || pieceAtSquare == PieceIDs.WHITE_QUEENS_ROOK
+                            || pieceAtSquare == PieceIDs.WHITE_QUEEN
+                            || pieceAtSquare == PieceIDs.WHITE_PROMOTED_ROOK) {
                         return true;
                     } else {
                         // if its not return
                         return false;
                     }
                 } else {
-                    if (pieceAtSquare == Constants.pieceIDs.BLACK_KINGS_ROOK
-                            || pieceAtSquare == Constants.pieceIDs.BLACK_QUEENS_ROOK
-                            || pieceAtSquare == Constants.pieceIDs.BLACK_QUEEN
-                            || pieceAtSquare == Constants.pieceIDs.BLACK_PROMOTED_ROOK) {
+                    if (pieceAtSquare == PieceIDs.BLACK_KINGS_ROOK
+                            || pieceAtSquare == PieceIDs.BLACK_QUEENS_ROOK
+                            || pieceAtSquare == PieceIDs.BLACK_QUEEN
+                            || pieceAtSquare == PieceIDs.BLACK_PROMOTED_ROOK) {
 
                         return true;
                     } else {
@@ -305,8 +309,8 @@ public abstract class Piece {
                     }
 
                 }
-            } else if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL
-                    && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR == color) {
+            } else if (pieceAtSquare != PieceIDs.EMPTY_CELL
+                    && pieceAtSquare / PieceIDs.COLOR_DIVISOR == color) {
                 // stops checking if the piece that is there is a teammate.
                 return false;
             } else {
@@ -333,30 +337,30 @@ public abstract class Piece {
 
         for (int i = pos[0] + 1; i < 8; i++) {
             byte pieceAtSquare = boardPositions[i][pos[1]];
-            if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL
-                    && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
-                if (color == Constants.pieceIDs.BLACK) {
-                    if (pieceAtSquare == Constants.pieceIDs.WHITE_KINGS_ROOK
-                            || pieceAtSquare == Constants.pieceIDs.WHITE_QUEENS_ROOK
-                            || pieceAtSquare == Constants.pieceIDs.WHITE_QUEEN
-                            || pieceAtSquare == Constants.pieceIDs.WHITE_PROMOTED_ROOK) {
+            if (pieceAtSquare != PieceIDs.EMPTY_CELL
+                    && pieceAtSquare / PieceIDs.COLOR_DIVISOR != color) {
+                if (color == PieceIDs.BLACK) {
+                    if (pieceAtSquare == PieceIDs.WHITE_KINGS_ROOK
+                            || pieceAtSquare == PieceIDs.WHITE_QUEENS_ROOK
+                            || pieceAtSquare == PieceIDs.WHITE_QUEEN
+                            || pieceAtSquare == PieceIDs.WHITE_PROMOTED_ROOK) {
                         return true;
                     } else {
                         return false;
                     }
                 } else {
-                    if (pieceAtSquare == Constants.pieceIDs.BLACK_KINGS_ROOK
-                            || pieceAtSquare == Constants.pieceIDs.BLACK_QUEENS_ROOK
-                            || pieceAtSquare == Constants.pieceIDs.BLACK_QUEEN
-                            || pieceAtSquare == Constants.pieceIDs.BLACK_PROMOTED_ROOK) {
+                    if (pieceAtSquare == PieceIDs.BLACK_KINGS_ROOK
+                            || pieceAtSquare == PieceIDs.BLACK_QUEENS_ROOK
+                            || pieceAtSquare == PieceIDs.BLACK_QUEEN
+                            || pieceAtSquare == PieceIDs.BLACK_PROMOTED_ROOK) {
                         return true;
                     } else {
                         return false;
                     }
 
                 }
-            } else if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL
-                    && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR == color) {
+            } else if (pieceAtSquare != PieceIDs.EMPTY_CELL
+                    && pieceAtSquare / PieceIDs.COLOR_DIVISOR == color) {
                 return false;
             } else {
                 continue;
@@ -379,31 +383,31 @@ public abstract class Piece {
 
         for (int i = pos[1] - 1; i > -1; i--) {
             byte pieceAtSquare = boardPositions[pos[0]][i];
-            if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL
-                    && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
+            if (pieceAtSquare != PieceIDs.EMPTY_CELL
+                    && pieceAtSquare / PieceIDs.COLOR_DIVISOR != color) {
                 // if the piece is an enemy piece
-                if (color == Constants.pieceIDs.BLACK) {
-                    if (pieceAtSquare == Constants.pieceIDs.WHITE_KINGS_ROOK
-                            || pieceAtSquare == Constants.pieceIDs.WHITE_QUEENS_ROOK
-                            || pieceAtSquare == Constants.pieceIDs.WHITE_QUEEN
-                            || pieceAtSquare == Constants.pieceIDs.WHITE_PROMOTED_ROOK) {
+                if (color == PieceIDs.BLACK) {
+                    if (pieceAtSquare == PieceIDs.WHITE_KINGS_ROOK
+                            || pieceAtSquare == PieceIDs.WHITE_QUEENS_ROOK
+                            || pieceAtSquare == PieceIDs.WHITE_QUEEN
+                            || pieceAtSquare == PieceIDs.WHITE_PROMOTED_ROOK) {
                         return true;
                     } else {
                         return false;
                     }
                 } else {
-                    if (pieceAtSquare == Constants.pieceIDs.BLACK_KINGS_ROOK
-                            || pieceAtSquare == Constants.pieceIDs.BLACK_QUEENS_ROOK
-                            || pieceAtSquare == Constants.pieceIDs.BLACK_QUEEN
-                            || pieceAtSquare == Constants.pieceIDs.BLACK_PROMOTED_ROOK) {
+                    if (pieceAtSquare == PieceIDs.BLACK_KINGS_ROOK
+                            || pieceAtSquare == PieceIDs.BLACK_QUEENS_ROOK
+                            || pieceAtSquare == PieceIDs.BLACK_QUEEN
+                            || pieceAtSquare == PieceIDs.BLACK_PROMOTED_ROOK) {
                         return true;
                     } else {
                         return false;
                     }
 
                 }
-            } else if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL
-                    && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR == color) {
+            } else if (pieceAtSquare != PieceIDs.EMPTY_CELL
+                    && pieceAtSquare / PieceIDs.COLOR_DIVISOR == color) {
                 return false;
             } else {
                 continue;
@@ -425,31 +429,31 @@ public abstract class Piece {
         for (int i = pos[1] + 1; i < 8; i++) {
             byte pieceAtSquare = boardPositions[pos[0]][i];
 
-            if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL
-                    && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
+            if (pieceAtSquare != PieceIDs.EMPTY_CELL
+                    && pieceAtSquare / PieceIDs.COLOR_DIVISOR != color) {
                 // if the piece at the square is an enemy piece
-                if (color == Constants.pieceIDs.BLACK) {
-                    if (pieceAtSquare == Constants.pieceIDs.WHITE_KINGS_ROOK
-                            || pieceAtSquare == Constants.pieceIDs.WHITE_QUEENS_ROOK
-                            || pieceAtSquare == Constants.pieceIDs.WHITE_QUEEN
-                            || pieceAtSquare == Constants.pieceIDs.WHITE_PROMOTED_ROOK) {
+                if (color == PieceIDs.BLACK) {
+                    if (pieceAtSquare == PieceIDs.WHITE_KINGS_ROOK
+                            || pieceAtSquare == PieceIDs.WHITE_QUEENS_ROOK
+                            || pieceAtSquare == PieceIDs.WHITE_QUEEN
+                            || pieceAtSquare == PieceIDs.WHITE_PROMOTED_ROOK) {
                         return true;
                     } else {
                         return false;
                     }
                 } else {
-                    if (pieceAtSquare == Constants.pieceIDs.BLACK_KINGS_ROOK
-                            || pieceAtSquare == Constants.pieceIDs.BLACK_QUEENS_ROOK
-                            || pieceAtSquare == Constants.pieceIDs.BLACK_QUEEN
-                            || pieceAtSquare == Constants.pieceIDs.BLACK_PROMOTED_ROOK) {
+                    if (pieceAtSquare == PieceIDs.BLACK_KINGS_ROOK
+                            || pieceAtSquare == PieceIDs.BLACK_QUEENS_ROOK
+                            || pieceAtSquare == PieceIDs.BLACK_QUEEN
+                            || pieceAtSquare == PieceIDs.BLACK_PROMOTED_ROOK) {
                         return true;
                     } else {
                         return false;
                     }
 
                 }
-            } else if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL
-                    && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR == color) {
+            } else if (pieceAtSquare != PieceIDs.EMPTY_CELL
+                    && pieceAtSquare / PieceIDs.COLOR_DIVISOR == color) {
                 return false;
             } else {
                 continue;
@@ -477,30 +481,30 @@ public abstract class Piece {
             }
             byte pieceAtSquare = boardPositions[i][j];
 
-            if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL
-                    && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
+            if (pieceAtSquare != PieceIDs.EMPTY_CELL
+                    && pieceAtSquare / PieceIDs.COLOR_DIVISOR != color) {
                 // if the piece at the square is an enemy piece
-                if (color == Constants.pieceIDs.BLACK) {
-                    if (pieceAtSquare == Constants.pieceIDs.WHITE_KINGS_BISHOP
-                            || pieceAtSquare == Constants.pieceIDs.WHITE_QUEENS_BISHOP
-                            || pieceAtSquare == Constants.pieceIDs.WHITE_QUEEN) {
+                if (color == PieceIDs.BLACK) {
+                    if (pieceAtSquare == PieceIDs.WHITE_KINGS_BISHOP
+                            || pieceAtSquare == PieceIDs.WHITE_QUEENS_BISHOP
+                            || pieceAtSquare == PieceIDs.WHITE_QUEEN) {
                         // if the piece is a bishop or queen.
                         return true;
                     } else {
                         break;
                     }
                 } else {
-                    if (pieceAtSquare == Constants.pieceIDs.BLACK_KINGS_BISHOP
-                            || pieceAtSquare == Constants.pieceIDs.BLACK_QUEENS_BISHOP
-                            || pieceAtSquare == Constants.pieceIDs.BLACK_QUEEN) {
+                    if (pieceAtSquare == PieceIDs.BLACK_KINGS_BISHOP
+                            || pieceAtSquare == PieceIDs.BLACK_QUEENS_BISHOP
+                            || pieceAtSquare == PieceIDs.BLACK_QUEEN) {
                         return true;
                     } else {
                         break;
                     }
 
                 }
-            } else if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL
-                    && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR == color) {
+            } else if (pieceAtSquare != PieceIDs.EMPTY_CELL
+                    && pieceAtSquare / PieceIDs.COLOR_DIVISOR == color) {
                 return false;
             } else {
                 j--;
@@ -527,28 +531,28 @@ public abstract class Piece {
                 break;
             }
             byte pieceAtSquare = boardPositions[i][j];
-            if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL
-                    && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
-                if (color == Constants.pieceIDs.BLACK) {
-                    if (pieceAtSquare == Constants.pieceIDs.WHITE_KINGS_BISHOP
-                            || pieceAtSquare == Constants.pieceIDs.WHITE_QUEENS_BISHOP
-                            || pieceAtSquare == Constants.pieceIDs.WHITE_QUEEN) {
+            if (pieceAtSquare != PieceIDs.EMPTY_CELL
+                    && pieceAtSquare / PieceIDs.COLOR_DIVISOR != color) {
+                if (color == PieceIDs.BLACK) {
+                    if (pieceAtSquare == PieceIDs.WHITE_KINGS_BISHOP
+                            || pieceAtSquare == PieceIDs.WHITE_QUEENS_BISHOP
+                            || pieceAtSquare == PieceIDs.WHITE_QUEEN) {
                         return true;
                     } else {
                         break;
                     }
                 } else {
-                    if (pieceAtSquare == Constants.pieceIDs.BLACK_KINGS_BISHOP
-                            || pieceAtSquare == Constants.pieceIDs.BLACK_QUEENS_BISHOP
-                            || pieceAtSquare == Constants.pieceIDs.BLACK_QUEEN) {
+                    if (pieceAtSquare == PieceIDs.BLACK_KINGS_BISHOP
+                            || pieceAtSquare == PieceIDs.BLACK_QUEENS_BISHOP
+                            || pieceAtSquare == PieceIDs.BLACK_QUEEN) {
                         return true;
                     } else {
                         break;
                     }
 
                 }
-            } else if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL
-                    && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR == color) {
+            } else if (pieceAtSquare != PieceIDs.EMPTY_CELL
+                    && pieceAtSquare / PieceIDs.COLOR_DIVISOR == color) {
                 return false;
             } else {
                 j--;
@@ -575,28 +579,28 @@ public abstract class Piece {
                 break;
             }
             byte pieceAtSquare = boardPositions[i][j];
-            if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL
-                    && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
-                if (color == Constants.pieceIDs.BLACK) {
-                    if (pieceAtSquare == Constants.pieceIDs.WHITE_KINGS_BISHOP
-                            || pieceAtSquare == Constants.pieceIDs.WHITE_QUEENS_BISHOP
-                            || pieceAtSquare == Constants.pieceIDs.WHITE_QUEEN) {
+            if (pieceAtSquare != PieceIDs.EMPTY_CELL
+                    && pieceAtSquare / PieceIDs.COLOR_DIVISOR != color) {
+                if (color == PieceIDs.BLACK) {
+                    if (pieceAtSquare == PieceIDs.WHITE_KINGS_BISHOP
+                            || pieceAtSquare == PieceIDs.WHITE_QUEENS_BISHOP
+                            || pieceAtSquare == PieceIDs.WHITE_QUEEN) {
                         return true;
                     } else {
                         break;
                     }
                 } else {
-                    if (pieceAtSquare == Constants.pieceIDs.BLACK_KINGS_BISHOP
-                            || pieceAtSquare == Constants.pieceIDs.BLACK_QUEENS_BISHOP
-                            || pieceAtSquare == Constants.pieceIDs.BLACK_QUEEN) {
+                    if (pieceAtSquare == PieceIDs.BLACK_KINGS_BISHOP
+                            || pieceAtSquare == PieceIDs.BLACK_QUEENS_BISHOP
+                            || pieceAtSquare == PieceIDs.BLACK_QUEEN) {
                         return true;
                     } else {
                         break;
                     }
 
                 }
-            } else if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL
-                    && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR == color) {
+            } else if (pieceAtSquare != PieceIDs.EMPTY_CELL
+                    && pieceAtSquare / PieceIDs.COLOR_DIVISOR == color) {
                 return false;
             } else {
                 j++;
@@ -623,30 +627,30 @@ public abstract class Piece {
             }
             byte pieceAtSquare = boardPositions[i][j];
 
-            if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL
-                    && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
+            if (pieceAtSquare != PieceIDs.EMPTY_CELL
+                    && pieceAtSquare / PieceIDs.COLOR_DIVISOR != color) {
 
-                if (color == Constants.pieceIDs.BLACK) {
-                    if (pieceAtSquare == Constants.pieceIDs.WHITE_KINGS_BISHOP
-                            || pieceAtSquare == Constants.pieceIDs.WHITE_QUEENS_BISHOP
-                            || pieceAtSquare == Constants.pieceIDs.WHITE_QUEEN) {
+                if (color == PieceIDs.BLACK) {
+                    if (pieceAtSquare == PieceIDs.WHITE_KINGS_BISHOP
+                            || pieceAtSquare == PieceIDs.WHITE_QUEENS_BISHOP
+                            || pieceAtSquare == PieceIDs.WHITE_QUEEN) {
                         return true;
                     } else {
                         break;
                     }
                 } else {
 
-                    if (pieceAtSquare == Constants.pieceIDs.BLACK_KINGS_BISHOP
-                            || pieceAtSquare == Constants.pieceIDs.BLACK_QUEENS_BISHOP
-                            || pieceAtSquare == Constants.pieceIDs.BLACK_QUEEN) {
+                    if (pieceAtSquare == PieceIDs.BLACK_KINGS_BISHOP
+                            || pieceAtSquare == PieceIDs.BLACK_QUEENS_BISHOP
+                            || pieceAtSquare == PieceIDs.BLACK_QUEEN) {
                         return true;
                     } else {
                         break;
                     }
 
                 }
-            } else if (pieceAtSquare != Constants.pieceIDs.EMPTY_CELL
-                    && pieceAtSquare / Constants.pieceIDs.COLOR_DIVISOR == color) {
+            } else if (pieceAtSquare != PieceIDs.EMPTY_CELL
+                    && pieceAtSquare / PieceIDs.COLOR_DIVISOR == color) {
                 return false;
             } else {
                 j++;
@@ -677,7 +681,7 @@ public abstract class Piece {
             byte upRightSquare = boardPositions[currentLoc[0] + 1][currentLoc[1] - 1];
             byte[] possibleMove = { (byte) (currentLoc[0] + 1), (byte) (currentLoc[1] - 1) };
 
-            if (upRightSquare == Constants.pieceIDs.EMPTY_CELL) {
+            if (upRightSquare == PieceIDs.EMPTY_CELL) {
                 // if the square one up and to the right is empty, add that square and repeat
                 // process for that square
                 if (isNotUnderCheck(boardPositions, possibleMove, false)) {
@@ -685,7 +689,7 @@ public abstract class Piece {
                 }
                 return upRightDiagonalMoves(possibleMoves, boardPositions, possibleMove);
             } else {
-                if (upRightSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
+                if (upRightSquare / PieceIDs.COLOR_DIVISOR != color) {
                     if (isNotUnderCheck(boardPositions, possibleMove, false)) {
                         possibleMoves.add(possibleMove);
                     }
@@ -716,7 +720,7 @@ public abstract class Piece {
             byte upRightSquare = boardPositions[currentLoc[0] - 1][currentLoc[1] - 1];
             byte[] possibleMove = { (byte) (currentLoc[0] - 1), (byte) (currentLoc[1] - 1) };
 
-            if (upRightSquare == Constants.pieceIDs.EMPTY_CELL) {
+            if (upRightSquare == PieceIDs.EMPTY_CELL) {
                 // if the square one up and to the right is empty, add that square and repeat
                 // process for that square
                 if (isNotUnderCheck(boardPositions, possibleMove, false)) {
@@ -724,7 +728,7 @@ public abstract class Piece {
                 }
                 return upLeftDiagonalMoves(possibleMoves, boardPositions, possibleMove);
             } else {
-                if (upRightSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
+                if (upRightSquare / PieceIDs.COLOR_DIVISOR != color) {
                     if (isNotUnderCheck(boardPositions, possibleMove, false)) {
                         possibleMoves.add(possibleMove);
                     }
@@ -754,7 +758,7 @@ public abstract class Piece {
             byte upRightSquare = boardPositions[currentLoc[0] + 1][currentLoc[1] + 1];
             byte[] possibleMove = { (byte) (currentLoc[0] + 1), (byte) (currentLoc[1] + 1) };
 
-            if (upRightSquare == Constants.pieceIDs.EMPTY_CELL) {
+            if (upRightSquare == PieceIDs.EMPTY_CELL) {
                 // if the square one up and to the right is empty, add that square and repeat
                 // process for that square
                 if (isNotUnderCheck(boardPositions, possibleMove, false)) {
@@ -762,7 +766,7 @@ public abstract class Piece {
                 }
                 return downRightDiagonalMoves(possibleMoves, boardPositions, possibleMove);
             } else {
-                if (upRightSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
+                if (upRightSquare / PieceIDs.COLOR_DIVISOR != color) {
                     if (isNotUnderCheck(boardPositions, possibleMove, false)) {
                         possibleMoves.add(possibleMove);
                     }
@@ -793,7 +797,7 @@ public abstract class Piece {
             byte upRightSquare = boardPositions[currentLoc[0] - 1][currentLoc[1] + 1];
             byte[] possibleMove = { (byte) (currentLoc[0] - 1), (byte) (currentLoc[1] + 1) };
 
-            if (upRightSquare == Constants.pieceIDs.EMPTY_CELL) {
+            if (upRightSquare == PieceIDs.EMPTY_CELL) {
                 // if the square one up and to the right is empty, add that square and repeat
                 // process for that square
                 if (isNotUnderCheck(boardPositions, possibleMove, false)) {
@@ -801,7 +805,7 @@ public abstract class Piece {
                 }
                 return downLeftDiagonalMoves(possibleMoves, boardPositions, possibleMove);
             } else {
-                if (upRightSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
+                if (upRightSquare / PieceIDs.COLOR_DIVISOR != color) {
                     if (isNotUnderCheck(boardPositions, possibleMove, false)) {
                         possibleMoves.add(possibleMove);
                     }
@@ -836,13 +840,13 @@ public abstract class Piece {
             // the piece located directly above.
             byte upSquare = boardPositions[possibleMove[0]][possibleMove[1]];
 
-            if (upSquare == Constants.pieceIDs.EMPTY_CELL) {
+            if (upSquare == PieceIDs.EMPTY_CELL) {
                 if (isNotUnderCheck(boardPositions, possibleMove, false)) {
                     possibleMoves.add(possibleMove);
                 }
                 return upMoves(possibleMoves, boardPositions, possibleMove);
             } else {
-                if (upSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
+                if (upSquare / PieceIDs.COLOR_DIVISOR != color) {
                     if (isNotUnderCheck(boardPositions, possibleMove, false)) {
                         possibleMoves.add(possibleMove);
                     }
@@ -870,13 +874,13 @@ public abstract class Piece {
             byte[] possibleMove = { currentLoc[0], (byte) (currentLoc[1] + 1) };
             byte upSquare = boardPositions[possibleMove[0]][possibleMove[1]];
 
-            if (upSquare == Constants.pieceIDs.EMPTY_CELL) {
+            if (upSquare == PieceIDs.EMPTY_CELL) {
                 if (isNotUnderCheck(boardPositions, possibleMove, false)) {
                     possibleMoves.add(possibleMove);
                 }
                 return downMoves(possibleMoves, boardPositions, possibleMove);
             } else {
-                if (upSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
+                if (upSquare / PieceIDs.COLOR_DIVISOR != color) {
                     if (isNotUnderCheck(boardPositions, possibleMove, false)) {
                         possibleMoves.add(possibleMove);
                     }
@@ -904,13 +908,13 @@ public abstract class Piece {
             byte[] possibleMove = { (byte) (currentLoc[0] - 1), currentLoc[1] };
             byte upSquare = boardPositions[possibleMove[0]][possibleMove[1]];
 
-            if (upSquare == Constants.pieceIDs.EMPTY_CELL) {
+            if (upSquare == PieceIDs.EMPTY_CELL) {
                 if (isNotUnderCheck(boardPositions, possibleMove, false)) {
                     possibleMoves.add(possibleMove);
                 }
                 return leftMoves(possibleMoves, boardPositions, possibleMove);
             } else {
-                if (upSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
+                if (upSquare / PieceIDs.COLOR_DIVISOR != color) {
                     if (isNotUnderCheck(boardPositions, possibleMove, false)) {
                         possibleMoves.add(possibleMove);
                     }
@@ -940,13 +944,13 @@ public abstract class Piece {
             byte[] possibleMove = { (byte) (currentLoc[0] + 1), currentLoc[1] };
             byte upSquare = boardPositions[possibleMove[0]][possibleMove[1]];
 
-            if (upSquare == Constants.pieceIDs.EMPTY_CELL) {
+            if (upSquare == PieceIDs.EMPTY_CELL) {
                 if (isNotUnderCheck(boardPositions, possibleMove, false)) {
                     possibleMoves.add(possibleMove);
                 }
                 return rightMoves(possibleMoves, boardPositions, possibleMove);
             } else {
-                if (upSquare / Constants.pieceIDs.COLOR_DIVISOR != color) {
+                if (upSquare / PieceIDs.COLOR_DIVISOR != color) {
                     if (isNotUnderCheck(boardPositions, possibleMove, false)) {
                         possibleMoves.add(possibleMove);
                     }
@@ -1042,6 +1046,22 @@ public abstract class Piece {
     public void setGridPos(byte x, byte y) {
         this.gridX = x;
         this.gridY = y;
+    }
+
+    /**
+     * Returns whether the piece has moved
+     * @return
+     */
+    public boolean getHasMoved(){
+        return hasMoved;
+    }
+
+    /**
+     * Sets hasMoved attribute
+     * @param b 
+     */
+    public void setHasMoved(boolean b) {
+        hasMoved = b;
     }
 
 }

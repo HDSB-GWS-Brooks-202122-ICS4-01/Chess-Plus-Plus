@@ -1,5 +1,10 @@
+package app.bot;
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import app.App;
+import app.util.Constants;
+import app.util.Constants.PieceIDs;
 
 /**
  * Class for board data that is used by the A.I.
@@ -49,13 +54,13 @@ public class BoardInfo {
      * @param toY Y location to place the piece at.
      */
     public void movePiece(byte id, int fromX, int fromY, int toX, int toY){
-        if(board[toX][toY] != Constants.pieceIDs.EMPTY_CELL){
+        if(board[toX][toY] != PieceIDs.EMPTY_CELL){
             sortingValue = Constants.ScoringIDs.scoringMap[board[toX][toY]]*-1;
             board[toX][toY] = id;
-            board[fromX][fromY] = Constants.pieceIDs.EMPTY_CELL;
+            board[fromX][fromY] = PieceIDs.EMPTY_CELL;
         } else {
             board[toX][toY] = id;
-            board[fromX][fromY] = Constants.pieceIDs.EMPTY_CELL;
+            board[fromX][fromY] = PieceIDs.EMPTY_CELL;
         }
 
     }
@@ -95,11 +100,11 @@ public class BoardInfo {
         if(black){
             blackKingX = x;
             blackKingY = y;
-            board[x][y] = Constants.pieceIDs.BLACK_KING;
+            board[x][y] = PieceIDs.BLACK_KING;
         } else {
             whiteKingX = x;
             whiteKingY = y;
-            board[x][y] = Constants.pieceIDs.WHITE_KING;
+            board[x][y] = PieceIDs.WHITE_KING;
         }
     }
 

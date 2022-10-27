@@ -1,3 +1,4 @@
+package app.controllers;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -13,6 +14,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import app.App;
+import app.util.RegionFillTransition;
+import app.util.Constants.BoardData;
+import app.util.Constants.Online;
+import app.util.Constants.PieceIDs;
 import javafx.animation.FadeTransition;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
@@ -101,7 +107,7 @@ public class StartScreenController {
         mainPane.setOnMouseEntered(this::animateStartUp);
 
         // Check if the user is signed in
-        if (config.getProperty(Constants.Online.CONFIG_SIGNED_IN).equals("t")) { // Signed in
+        if (config.getProperty(Online.CONFIG_SIGNED_IN).equals("t")) { // Signed in
             try {
                 pn_signedIn.setVisible(true);
                 pn_notSignedIn.setVisible(false);
@@ -129,8 +135,8 @@ public class StartScreenController {
                 pn_signedIn.setVisible(false);
                 pn_notSignedIn.setVisible(true);
 
-                config.setProperty(Constants.Online.CONFIG_SIGNED_IN, "f");
-                config.setProperty(Constants.Online.CONFIG_UID, "null");
+                config.setProperty(Online.CONFIG_SIGNED_IN, "f");
+                config.setProperty(Online.CONFIG_UID, "null");
 
                 App.saveConfig(config);
             }
@@ -173,7 +179,7 @@ public class StartScreenController {
      */
     @FXML
     public void switchToGame() {
-        App.setGameMode(Constants.boardData.MODE_PASS_N_PLAY);
+        App.setGameMode(BoardData.MODE_PASS_N_PLAY);
         App.setTranscript("");
         App.setTranscriptPath(null);
 
@@ -193,7 +199,7 @@ public class StartScreenController {
      */
     @FXML
     public void switchToAi() {
-        App.setGameMode(Constants.boardData.MODE_AI);
+        App.setGameMode(BoardData.MODE_AI);
         App.setTranscript("");
         App.setTranscriptPath(null);
 
@@ -230,8 +236,8 @@ public class StartScreenController {
                     DatabaseReference user1 = newRef.child("USER " + config.getProperty("UID"));
                     user1.child("turn").setValueAsync(true);
                     user1.child("timer").setValueAsync(600000);
-                    user1.child("color").setValueAsync(Byte.toString(Constants.pieceIDs.WHITE));
-                    App.setOnlineColor(Constants.pieceIDs.WHITE);
+                    user1.child("color").setValueAsync(Byte.toString(PieceIDs.WHITE));
+                    App.setOnlineColor(PieceIDs.WHITE);
 
                     newRef.child("matchBegun").setValueAsync(false);
                     newRef.child("winner").setValueAsync(-1);
@@ -262,7 +268,7 @@ public class StartScreenController {
                             if (key.contains("USER") && !key.contains(config.getProperty("UID"))) {
                                 App.setOpponentRefId(key);
                                 App.setServerReference(newRef);
-                                App.setGameMode(Constants.boardData.MODE_ONLINE);
+                                App.setGameMode(BoardData.MODE_ONLINE);
                                 transition("game");
                             }
                         }
@@ -325,11 +331,11 @@ public class StartScreenController {
 
                         user2.child("turn").setValueAsync(false);
                         user2.child("timer").setValueAsync(600000);
-                        user2.child("color").setValueAsync(Byte.toString(Constants.pieceIDs.BLACK));
-                        App.setOnlineColor(Constants.pieceIDs.BLACK);
+                        user2.child("color").setValueAsync(Byte.toString(PieceIDs.BLACK));
+                        App.setOnlineColor(PieceIDs.BLACK);
 
                         App.setServerReference(server.getRef());
-                        App.setGameMode(Constants.boardData.MODE_ONLINE);
+                        App.setGameMode(BoardData.MODE_ONLINE);
                         transition("game");
                     }
                 }
@@ -449,7 +455,7 @@ public class StartScreenController {
      */
     private void signOut() throws IOException {
         config.setProperty("UID", "null");
-        config.setProperty(Constants.Online.CONFIG_SIGNED_IN, "f");
+        config.setProperty(Online.CONFIG_SIGNED_IN, "f");
 
         App.saveConfig(config);
         App.setRoot("startScreen");

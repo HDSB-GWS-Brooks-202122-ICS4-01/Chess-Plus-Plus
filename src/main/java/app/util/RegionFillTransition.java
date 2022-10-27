@@ -1,3 +1,4 @@
+package app.util;
 import javafx.util.Duration;
 import javafx.animation.Transition;
 import javafx.scene.layout.Background;

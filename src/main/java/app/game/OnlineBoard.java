@@ -1,3 +1,4 @@
+package app.game;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -5,15 +6,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Properties;
 import java.util.Scanner;
 import java.util.concurrent.Executor;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.UserRecord;
 import com.google.firebase.cloud.StorageClient;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -32,6 +30,13 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.WindowEvent;
+import app.App;
+import app.controllers.GameController;
+import app.pieces.*;
+import app.util.Constants.BoardData;
+import app.util.Constants.Online;
+import app.util.Constants.PieceIDs;
+import app.util.Constants.PieceType;
 
 /**
  * OnlineBoard class, handles the interaction of pieces and displaying for the
@@ -103,8 +108,8 @@ public class OnlineBoard {
       gp_DEAD_WHITE_CELLS = cells[2];
 
       int gameTime = 600000;
-      Label blackLabel = GAME.getTimeReference(Constants.pieceIDs.BLACK);
-      Label whiteLabel = GAME.getTimeReference(Constants.pieceIDs.WHITE);
+      Label blackLabel = GAME.getTimeReference(PieceIDs.BLACK);
+      Label whiteLabel = GAME.getTimeReference(PieceIDs.WHITE);
 
       try {
          FileReader r = new FileReader("src\\main\\resources\\data\\config.properties");
@@ -127,10 +132,10 @@ public class OnlineBoard {
          e.printStackTrace();
       }
 
-      TIMERS[Constants.pieceIDs.WHITE] = new PlayerTimer(whiteLabel,
-            GAME.getHiddenTimeReference(Constants.pieceIDs.WHITE), gameTime, false, true, this);
-      TIMERS[Constants.pieceIDs.BLACK] = new PlayerTimer(blackLabel,
-            GAME.getHiddenTimeReference(Constants.pieceIDs.BLACK), gameTime, false, true, this);
+      TIMERS[PieceIDs.WHITE] = new PlayerTimer(whiteLabel,
+            GAME.getHiddenTimeReference(PieceIDs.WHITE), gameTime, false, true, this);
+      TIMERS[PieceIDs.BLACK] = new PlayerTimer(blackLabel,
+            GAME.getHiddenTimeReference(PieceIDs.BLACK), gameTime, false, true, this);
 
       setupBoard();
 
@@ -164,10 +169,10 @@ public class OnlineBoard {
                   @Override
                   public void run() {
                      if (cancelledMatch) {
-                        if (color == Constants.pieceIDs.WHITE)
-                           winner = Constants.pieceIDs.BLACK;
+                        if (color == PieceIDs.WHITE)
+                           winner = PieceIDs.BLACK;
                         else
-                           winner = Constants.pieceIDs.WHITE;
+                           winner = PieceIDs.WHITE;
 
                         App.setWinMsg("Match over");
                      } else {
@@ -291,7 +296,7 @@ public class OnlineBoard {
                @Override
                public void run() {
                   try {
-                     TIMERS[(color == Constants.pieceIDs.WHITE) ? Constants.pieceIDs.BLACK : Constants.pieceIDs.WHITE]
+                     TIMERS[(color == PieceIDs.WHITE) ? PieceIDs.BLACK : PieceIDs.WHITE]
                            .setTime((Long) snapshot.getValue());
                   } catch (Exception e) {
                      // Match is over --> do nothing.
@@ -325,10 +330,10 @@ public class OnlineBoard {
                byte winner;
 
                // declare the winner
-               if (color == Constants.pieceIDs.BLACK)
-                  winner = Constants.pieceIDs.WHITE;
+               if (color == PieceIDs.BLACK)
+                  winner = PieceIDs.WHITE;
                else
-                  winner = Constants.pieceIDs.BLACK;
+                  winner = PieceIDs.BLACK;
 
                // update the winner and win message
                SERVER_REF.child("winner").setValueAsync(Byte.toString(winner));
@@ -425,10 +430,10 @@ public class OnlineBoard {
                com.google.cloud.storage.Bucket bucket = StorageClient.getInstance().bucket();
 
                // Get user's stats
-               FileOutputStream fos = new FileOutputStream(Constants.Online.PATH_TO_STATS);
+               FileOutputStream fos = new FileOutputStream(Online.PATH_TO_STATS);
                fos.close();
 
-               Scanner statsReader = new Scanner(new FileReader(Constants.Online.PATH_TO_STATS));
+               Scanner statsReader = new Scanner(new FileReader(Online.PATH_TO_STATS));
 
                int wins = 0;
                int losses = 0;
@@ -455,13 +460,13 @@ public class OnlineBoard {
 
                String statsPush = "wins=" + wins + "\nlosses=" + losses + "\nplayTime=0\nscore=" + score;
 
-               FileWriter writer = new FileWriter(new File(Constants.Online.PATH_TO_STATS));
+               FileWriter writer = new FileWriter(new File(Online.PATH_TO_STATS));
                // write data
                writer.write(statsPush);
                writer.close();
                // Push data to server
                bucket.create("profiles/" + config.getProperty("UID") + "/stats.txt",
-                     java.nio.file.Files.readAllBytes(Paths.get(Constants.Online.PATH_TO_STATS)));
+                     java.nio.file.Files.readAllBytes(Paths.get(Online.PATH_TO_STATS)));
 
             } catch (Exception e) {
 
@@ -502,7 +507,7 @@ public class OnlineBoard {
                LIVE_PIECES.remove(piece);
                DEAD_PIECES.add(piece);
 
-               GRID[piece.getGridX()][piece.getGridY()] = Constants.pieceIDs.EMPTY_CELL;
+               GRID[piece.getGridX()][piece.getGridY()] = PieceIDs.EMPTY_CELL;
                displayDeadPiece(piece);
 
                StackPane sp = CELLS[piece.getGridX()][piece.getGridY()];
@@ -542,7 +547,7 @@ public class OnlineBoard {
    private void setupBoard() {
       for (byte x = 0; x < 8; x++) {
          for (byte y = 0; y < 8; y++) {
-            GRID[x][y] = Constants.boardData.DEFAULT_GAME_SETUP[x][y];
+            GRID[x][y] = BoardData.DEFAULT_GAME_SETUP[x][y];
          }
       }
 
@@ -594,23 +599,23 @@ public class OnlineBoard {
          for (byte y = 0; y < GRID.length; y++) {
             byte id = GRID[x][y];
 
-            if (id == Constants.pieceIDs.EMPTY_CELL)
+            if (id == PieceIDs.EMPTY_CELL)
                continue;
 
             Piece piece = null;
 
-            if (id == Constants.pieceIDs.BLACK_KING || id == Constants.pieceIDs.WHITE_KING) {
+            if (id == PieceIDs.BLACK_KING || id == PieceIDs.WHITE_KING) {
                piece = new King(id);
-            } else if (id == Constants.pieceIDs.BLACK_QUEEN || id == Constants.pieceIDs.WHITE_QUEEN) {
+            } else if (id == PieceIDs.BLACK_QUEEN || id == PieceIDs.WHITE_QUEEN) {
                piece = new Queen(id);
-            } else if (id == Constants.pieceIDs.BLACK_KINGS_BISHOP || id == Constants.pieceIDs.BLACK_QUEENS_BISHOP
-                  || id == Constants.pieceIDs.WHITE_KINGS_BISHOP || id == Constants.pieceIDs.WHITE_QUEENS_BISHOP) {
+            } else if (id == PieceIDs.BLACK_KINGS_BISHOP || id == PieceIDs.BLACK_QUEENS_BISHOP
+                  || id == PieceIDs.WHITE_KINGS_BISHOP || id == PieceIDs.WHITE_QUEENS_BISHOP) {
                piece = new Bishop(id);
-            } else if (id == Constants.pieceIDs.BLACK_KINGS_KNIGHT || id == Constants.pieceIDs.BLACK_QUEENS_KNIGHT
-                  || id == Constants.pieceIDs.WHITE_KINGS_KNIGHT || id == Constants.pieceIDs.WHITE_QUEENS_KNIGHT) {
+            } else if (id == PieceIDs.BLACK_KINGS_KNIGHT || id == PieceIDs.BLACK_QUEENS_KNIGHT
+                  || id == PieceIDs.WHITE_KINGS_KNIGHT || id == PieceIDs.WHITE_QUEENS_KNIGHT) {
                piece = new Knight(id);
-            } else if (id == Constants.pieceIDs.BLACK_KINGS_ROOK || id == Constants.pieceIDs.BLACK_QUEENS_ROOK
-                  || id == Constants.pieceIDs.WHITE_KINGS_ROOK || id == Constants.pieceIDs.WHITE_QUEENS_ROOK) {
+            } else if (id == PieceIDs.BLACK_KINGS_ROOK || id == PieceIDs.BLACK_QUEENS_ROOK
+                  || id == PieceIDs.WHITE_KINGS_ROOK || id == PieceIDs.WHITE_QUEENS_ROOK) {
                piece = new Rook(id);
             } else {
                piece = new Pawn(id);
@@ -625,13 +630,13 @@ public class OnlineBoard {
 
       App.GAME_PIECES = GAME_PIECES.clone();
 
-      STATS[Constants.pieceIDs.WHITE].put("remaining_time", (int) TIMERS[Constants.pieceIDs.WHITE].getTimeMillis());
-      STATS[Constants.pieceIDs.WHITE].put("total_moves", 0);
-      STATS[Constants.pieceIDs.WHITE].put("pieces_killed", 0);
+      STATS[PieceIDs.WHITE].put("remaining_time", (int) TIMERS[PieceIDs.WHITE].getTimeMillis());
+      STATS[PieceIDs.WHITE].put("total_moves", 0);
+      STATS[PieceIDs.WHITE].put("pieces_killed", 0);
 
-      STATS[Constants.pieceIDs.BLACK].put("remaining_time", (int) TIMERS[Constants.pieceIDs.BLACK].getTimeMillis());
-      STATS[Constants.pieceIDs.BLACK].put("total_moves", 0);
-      STATS[Constants.pieceIDs.BLACK].put("pieces_killed", 0);
+      STATS[PieceIDs.BLACK].put("remaining_time", (int) TIMERS[PieceIDs.BLACK].getTimeMillis());
+      STATS[PieceIDs.BLACK].put("total_moves", 0);
+      STATS[PieceIDs.BLACK].put("pieces_killed", 0);
    }
 
    /**
@@ -650,7 +655,7 @@ public class OnlineBoard {
     * @return byte value corresponding to index of location
     */
    private byte getBoardX(String value) {
-      String[] xPos = Constants.boardData.X_ID;
+      String[] xPos = BoardData.X_ID;
       for (byte i = 0; i < xPos.length; i++) {
          if (xPos[i].equalsIgnoreCase(value))
             return i;
@@ -666,7 +671,7 @@ public class OnlineBoard {
     * @return
     */
    private byte getBoardY(String value) {
-      String[] yPos = Constants.boardData.Y_ID;
+      String[] yPos = BoardData.Y_ID;
       for (byte i = 0; i < yPos.length; i++) {
          if (yPos[i].equalsIgnoreCase(value))
             return i;
@@ -686,7 +691,7 @@ public class OnlineBoard {
     */
    private boolean getAllowInteract(StackPane target, int x, int y) {
       // Check that the X, Y coordinates contain a game piece.
-      if (GRID[x][y] == Constants.pieceIDs.EMPTY_CELL)
+      if (GRID[x][y] == PieceIDs.EMPTY_CELL)
          return false;
 
       // Loop through children of StackPane target
@@ -734,7 +739,7 @@ public class OnlineBoard {
    private Piece getPieceOnGrid(byte id, boolean promoted) {
       for (Piece piece : LIVE_PIECES) {
          if ((piece.getId() == id && !promoted) || (promoted && piece.getId() == id
-               && piece.getGridY() == ((piece.getColor() == Constants.pieceIDs.WHITE) ? 0 : 7)))
+               && piece.getGridY() == ((piece.getColor() == PieceIDs.WHITE) ? 0 : 7)))
             return piece;
       }
 
@@ -748,7 +753,7 @@ public class OnlineBoard {
     * @return Piece object or null.
     */
    private Piece getAwaitingPawnPromotion(byte color) {
-      int y = (color == Constants.pieceIDs.WHITE) ? 0 : 7;
+      int y = (color == PieceIDs.WHITE) ? 0 : 7;
 
       for (Piece piece : LIVE_PIECES) {
          if (piece.getColor() == color) {
@@ -789,7 +794,7 @@ public class OnlineBoard {
     * @return byet
     */
    public byte getTurn() {
-      return (isTurn) ? Constants.pieceIDs.WHITE : Constants.pieceIDs.BLACK;
+      return (isTurn) ? PieceIDs.WHITE : PieceIDs.BLACK;
    }
 
    /**
@@ -949,7 +954,7 @@ public class OnlineBoard {
       King king = null;
       Pawn pawn = null;
 
-      if (piece.getId() == Constants.pieceIDs.BLACK_KING || piece.getId() == Constants.pieceIDs.WHITE_KING) {
+      if (piece.getId() == PieceIDs.BLACK_KING || piece.getId() == PieceIDs.WHITE_KING) {
          king = (King) piece;
          if (king.canCastleLeft(GRID)) {
             StackPane s_leftCastle = CELLS[king.getGridX() - 2][king.getGridY()];
@@ -963,10 +968,10 @@ public class OnlineBoard {
             setCastleMoveMouseClicked(s_rightCastle, piece, piece.getColor(), false);
             POSSIBLE_MOVES.add(s_rightCastle);
          }
-      } else if ((piece.getId() > Constants.pieceIDs.BEGIN_BLACK_PAWNS
-            && piece.getId() < Constants.pieceIDs.END_BLACK_PAWNS)
-            || (piece.getId() > Constants.pieceIDs.BEGIN_WHITE_PAWNS
-                  && piece.getId() < Constants.pieceIDs.END_WHITE_PAWNS)) {
+      } else if ((piece.getId() > PieceIDs.BEGIN_BLACK_PAWNS
+            && piece.getId() < PieceIDs.END_BLACK_PAWNS)
+            || (piece.getId() > PieceIDs.BEGIN_WHITE_PAWNS
+                  && piece.getId() < PieceIDs.END_WHITE_PAWNS)) {
          // logic for en passant
 
          // if the piece is a pawn
@@ -974,20 +979,20 @@ public class OnlineBoard {
 
          // gets the id of the piece to the right and left
          // makes sure it can check to the left and can check to the right
-         byte pawnLeft = (pawn.gridX - 1 > -1) ? GRID[piece.gridX - 1][piece.gridY] : -1;
-         byte pawnRight = (pawn.gridX + 1 < 8) ? GRID[piece.gridX + 1][piece.gridY] : -1;
+         byte pawnLeft = (pawn.getGridX() - 1 > -1) ? GRID[piece.getGridX() - 1][piece.getGridY()] : -1;
+         byte pawnRight = (pawn.getGridX() + 1 < 8) ? GRID[piece.getGridX() + 1][piece.getGridY()] : -1;
 
-         int pawnDirection = (pawn.getColor() == Constants.pieceIDs.BLACK) ? 1 : -1;
+         int pawnDirection = (pawn.getColor() == PieceIDs.BLACK) ? 1 : -1;
 
          if (pawn.canPassantRight(pawnRight, GRID)) {
-            StackPane s_rightPawn = CELLS[pawn.gridX + 1][pawn.gridY + 1 * pawnDirection];
+            StackPane s_rightPawn = CELLS[pawn.getGridX() + 1][pawn.getGridY() + 1 * pawnDirection];
             s_rightPawn.getStyleClass().add("cell-enemy");
             setPassantMoveMouseClicked(s_rightPawn, pawn, (Pawn) GAME_PIECES[pawnRight]);
             POSSIBLE_MOVES.add(s_rightPawn);
          }
 
          if (pawn.canPassantLeft(pawnLeft, GRID)) {
-            StackPane s_leftPawn = CELLS[pawn.gridX - 1][pawn.gridY + 1 * pawnDirection];
+            StackPane s_leftPawn = CELLS[pawn.getGridX() - 1][pawn.getGridY() + 1 * pawnDirection];
             s_leftPawn.getStyleClass().add("cell-enemy");
             setPassantMoveMouseClicked(s_leftPawn, pawn, (Pawn) GAME_PIECES[pawnLeft]);
             POSSIBLE_MOVES.add(s_leftPawn);
@@ -1048,7 +1053,7 @@ public class OnlineBoard {
       StackPane from = CELLS[fromX][fromY];
       from.getChildren().clear();
 
-      if (piece.getType() == Constants.pieceType.PAWN && Math.abs(toY - fromY) == 2) {
+      if (piece.getType() == PieceType.PAWN && Math.abs(toY - fromY) == 2) {
          ((Pawn) piece).setPassant(App.MOVE_COUNT);
       }
 
@@ -1072,16 +1077,16 @@ public class OnlineBoard {
 
       piece.setGridPos(toX, toY);
 
-      GRID[fromX][fromY] = Constants.pieceIDs.EMPTY_CELL;
+      GRID[fromX][fromY] = PieceIDs.EMPTY_CELL;
       GRID[toX][toY] = piece.getId();
 
       if (!parsingTranscript) {
-         String moveTranscript = piece.getId() + Constants.boardData.X_ID[toX] + Constants.boardData.Y_ID[toY];
+         String moveTranscript = piece.getId() + BoardData.X_ID[toX] + BoardData.Y_ID[toY];
          MATCH_TRANSCRIPT.add(moveTranscript);
 
       }
 
-      if (!promoted && piece.getType() == Constants.pieceType.PAWN && (piece.getGridY() == 0 || piece.getGridY() == 7)
+      if (!promoted && piece.getType() == PieceType.PAWN && (piece.getGridY() == 0 || piece.getGridY() == 7)
             && !parsingTranscript) {
          try {
             promotingPawn = true;
@@ -1103,7 +1108,7 @@ public class OnlineBoard {
 
       StackPane sp;
 
-      if (target.getColor() == Constants.pieceIDs.BLACK) {
+      if (target.getColor() == PieceIDs.BLACK) {
          sp = (StackPane) gp_DEAD_BLACK_CELLS.getChildren().get(cbdc);
          cbdc++;
       } else {
@@ -1158,7 +1163,7 @@ public class OnlineBoard {
       sp.setOnMouseClicked(new EventHandler<MouseEvent>() {
          public void handle(MouseEvent me) {
             // When clicked move the piece.
-            piece.hasMoved = true;
+            piece.setHasMoved(true);
             movePiece(piece, piece.getGridX(), piece.getGridY(), x, y, false, false);
             nextTurn();
          }
@@ -1181,32 +1186,32 @@ public class OnlineBoard {
       sp.setOnMouseClicked(new EventHandler<MouseEvent>() {
          public void handle(MouseEvent me) {
             // When clicked move the piece.
-            piece.hasMoved = true;
+            piece.setHasMoved(true);
             if (left) {
                movePiece(piece, piece.getGridX(), piece.getGridY(), (byte) (piece.getGridX() - 2), piece.getGridY(),
                      false, false);
-               if (color == Constants.pieceIDs.BLACK) {
-                  Piece rook = GAME_PIECES[Constants.pieceIDs.BLACK_QUEENS_ROOK];
-                  rook.hasMoved = true;
+               if (color == PieceIDs.BLACK) {
+                  Piece rook = GAME_PIECES[PieceIDs.BLACK_QUEENS_ROOK];
+                  rook.setHasMoved(true);
                   movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX() + 1), piece.getGridY(),
                         false, false);
                } else {
-                  Piece rook = GAME_PIECES[Constants.pieceIDs.WHITE_QUEENS_ROOK];
-                  rook.hasMoved = true;
+                  Piece rook = GAME_PIECES[PieceIDs.WHITE_QUEENS_ROOK];
+                  rook.setHasMoved(true);
                   movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX() + 1), piece.getGridY(),
                         false, false);
                }
             } else {
                movePiece(piece, piece.getGridX(), piece.getGridY(), (byte) (piece.getGridX() + 2), piece.getGridY(),
                      false, false);
-               if (color == Constants.pieceIDs.BLACK) {
-                  Piece rook = GAME_PIECES[Constants.pieceIDs.BLACK_KINGS_ROOK];
-                  rook.hasMoved = true;
+               if (color == PieceIDs.BLACK) {
+                  Piece rook = GAME_PIECES[PieceIDs.BLACK_KINGS_ROOK];
+                  rook.setHasMoved(true);
                   movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX() - 1), piece.getGridY(),
                         false, false);
                } else {
-                  Piece rook = GAME_PIECES[Constants.pieceIDs.WHITE_KINGS_ROOK];
-                  rook.hasMoved = true;
+                  Piece rook = GAME_PIECES[PieceIDs.WHITE_KINGS_ROOK];
+                  rook.setHasMoved(true);
                   movePiece(rook, rook.getGridX(), rook.getGridY(), (byte) (piece.getGridX() - 1), piece.getGridY(),
                         false, false);
                }
@@ -1228,42 +1233,42 @@ public class OnlineBoard {
     * @param enemyPawn   Pawn object of the enemy pawn.
     */
    private void setPassantMoveMouseClicked(StackPane sp, Pawn primaryPawn, Pawn enemyPawn) {
-      GRID[enemyPawn.gridX][enemyPawn.gridY] = Constants.pieceIDs.EMPTY_CELL;
+      GRID[enemyPawn.getGridX()][enemyPawn.getGridY()] = PieceIDs.EMPTY_CELL;
 
       sp.setOnMouseClicked(new EventHandler<MouseEvent>() {
          @Override
          public void handle(MouseEvent event) {
 
             // Moves the primary pawn to its new spot.
-            if (primaryPawn.getColor() == Constants.pieceIDs.BLACK) {
+            if (primaryPawn.getColor() == PieceIDs.BLACK) {
                if (enemyPawn.getGridX() < primaryPawn.getGridX()) {
                   // pawn is to the left
-                  movePiece(primaryPawn, primaryPawn.gridX, primaryPawn.gridY, (byte) (primaryPawn.gridX - 1),
-                        (byte) (primaryPawn.gridY + 1), false, false);
+                  movePiece(primaryPawn, primaryPawn.getGridX(), primaryPawn.getGridY(), (byte) (primaryPawn.getGridX() - 1),
+                        (byte) (primaryPawn.getGridY() + 1), false, false);
 
                } else {
                   // pawn is to the right
-                  movePiece(primaryPawn, primaryPawn.gridX, primaryPawn.gridY, (byte) (primaryPawn.gridX + 1),
-                        (byte) (primaryPawn.gridY + 1), false, false);
+                  movePiece(primaryPawn, primaryPawn.getGridX(), primaryPawn.getGridY(), (byte) (primaryPawn.getGridX() + 1),
+                        (byte) (primaryPawn.getGridY() + 1), false, false);
                }
             } else {
                if (enemyPawn.getGridX() < primaryPawn.getGridX()) {
                   // pawn to the left
-                  movePiece(primaryPawn, primaryPawn.gridX, primaryPawn.gridY, (byte) (primaryPawn.gridX - 1),
-                        (byte) (primaryPawn.gridY - 1), false, false);
+                  movePiece(primaryPawn, primaryPawn.getGridX(), primaryPawn.getGridY(), (byte) (primaryPawn.getGridX() - 1),
+                        (byte) (primaryPawn.getGridY() - 1), false, false);
                } else {
                   // pawn is to the right
-                  movePiece(primaryPawn, primaryPawn.gridX, primaryPawn.gridY, (byte) (primaryPawn.gridX + 1),
-                        (byte) (primaryPawn.gridY - 1), false, false);
+                  movePiece(primaryPawn, primaryPawn.getGridX(), primaryPawn.getGridY(), (byte) (primaryPawn.getGridX() + 1),
+                        (byte) (primaryPawn.getGridY() - 1), false, false);
                }
 
             }
 
             // Removes enemyPawn from the game.
-            GRID[enemyPawn.gridX][enemyPawn.gridY] = Constants.pieceIDs.EMPTY_CELL;
+            GRID[enemyPawn.getGridX()][enemyPawn.getGridY()] = PieceIDs.EMPTY_CELL;
             MATCH_TRANSCRIPT.add("KILL" + enemyPawn.getId());
 
-            StackPane enemyPane = CELLS[enemyPawn.gridX][enemyPawn.gridY];
+            StackPane enemyPane = CELLS[enemyPawn.getGridX()][enemyPawn.getGridY()];
             enemyPane.getChildren().clear();
             LIVE_PIECES.remove(enemyPawn);
             DEAD_PIECES.add(enemyPawn);
@@ -1295,49 +1300,49 @@ public class OnlineBoard {
       Piece newPiece;
 
       if (type.equalsIgnoreCase("QUEEN")) {
-         if (piece.getColor() == Constants.pieceIDs.BLACK)
-            id = Constants.pieceIDs.BLACK_QUEEN;
+         if (piece.getColor() == PieceIDs.BLACK)
+            id = PieceIDs.BLACK_QUEEN;
          else
-            id = Constants.pieceIDs.WHITE_QUEEN;
+            id = PieceIDs.WHITE_QUEEN;
 
          newPiece = new Queen(id);
       } else if (type.equalsIgnoreCase("BISHOP")) {
-         if (piece.getColor() == Constants.pieceIDs.BLACK) {
+         if (piece.getColor() == PieceIDs.BLACK) {
             if (x % 2 == 0)
-               id = Constants.pieceIDs.BLACK_QUEENS_BISHOP;
+               id = PieceIDs.BLACK_QUEENS_BISHOP;
             else
-               id = Constants.pieceIDs.BLACK_KINGS_BISHOP;
+               id = PieceIDs.BLACK_KINGS_BISHOP;
          }
 
          else {
             if (x % 2 == 0)
-               id = Constants.pieceIDs.WHITE_QUEENS_BISHOP;
+               id = PieceIDs.WHITE_QUEENS_BISHOP;
             else
-               id = Constants.pieceIDs.WHITE_KINGS_BISHOP;
+               id = PieceIDs.WHITE_KINGS_BISHOP;
          }
 
          newPiece = new Bishop(id);
       } else if (type.equalsIgnoreCase("KNIGHT")) {
-         if (piece.getColor() == Constants.pieceIDs.BLACK) {
+         if (piece.getColor() == PieceIDs.BLACK) {
             if (x % 2 == 0)
-               id = Constants.pieceIDs.BLACK_QUEENS_BISHOP;
+               id = PieceIDs.BLACK_QUEENS_BISHOP;
             else
-               id = Constants.pieceIDs.BLACK_KINGS_BISHOP;
+               id = PieceIDs.BLACK_KINGS_BISHOP;
          }
 
          else {
             if (x % 2 == 0)
-               id = Constants.pieceIDs.WHITE_QUEENS_KNIGHT;
+               id = PieceIDs.WHITE_QUEENS_KNIGHT;
             else
-               id = Constants.pieceIDs.WHITE_KINGS_KNIGHT;
+               id = PieceIDs.WHITE_KINGS_KNIGHT;
          }
 
          newPiece = new Knight(id);
       } else {
-         if (piece.getColor() == Constants.pieceIDs.BLACK) {
-            id = Constants.pieceIDs.BLACK_PROMOTED_ROOK;
+         if (piece.getColor() == PieceIDs.BLACK) {
+            id = PieceIDs.BLACK_PROMOTED_ROOK;
          } else {
-            id = Constants.pieceIDs.WHITE_PROMOTED_ROOK;
+            id = PieceIDs.WHITE_PROMOTED_ROOK;
          }
 
          newPiece = new Rook(id);
@@ -1362,12 +1367,12 @@ public class OnlineBoard {
     */
    private Map[] solidifyTranscript() {
       // Pause timers
-      TIMERS[Constants.pieceIDs.WHITE].pauseTimer();
-      TIMERS[Constants.pieceIDs.BLACK].pauseTimer();
+      TIMERS[PieceIDs.WHITE].pauseTimer();
+      TIMERS[PieceIDs.BLACK].pauseTimer();
 
       // Add timer values
-      MATCH_TRANSCRIPT.add("TW" + TIMERS[Constants.pieceIDs.WHITE].getTimeMillis());
-      MATCH_TRANSCRIPT.add("TB" + TIMERS[Constants.pieceIDs.BLACK].getTimeMillis());
+      MATCH_TRANSCRIPT.add("TW" + TIMERS[PieceIDs.WHITE].getTimeMillis());
+      MATCH_TRANSCRIPT.add("TB" + TIMERS[PieceIDs.BLACK].getTimeMillis());
 
       String ms = MATCH_TRANSCRIPT.toString();
 
@@ -1379,8 +1384,8 @@ public class OnlineBoard {
       // Set transcript
       App.setTranscript(ms);
 
-      STATS[Constants.pieceIDs.WHITE].replace("remaining_time", (int) TIMERS[Constants.pieceIDs.WHITE].getTimeMillis());
-      STATS[Constants.pieceIDs.BLACK].replace("remaining_time", (int) TIMERS[Constants.pieceIDs.BLACK].getTimeMillis());
+      STATS[PieceIDs.WHITE].replace("remaining_time", (int) TIMERS[PieceIDs.WHITE].getTimeMillis());
+      STATS[PieceIDs.BLACK].replace("remaining_time", (int) TIMERS[PieceIDs.BLACK].getTimeMillis());
 
       return STATS;
    }

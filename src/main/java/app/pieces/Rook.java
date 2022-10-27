@@ -1,5 +1,9 @@
+package app.pieces;
 import java.util.ArrayList;
 
+import app.App;
+import app.util.Constants.PieceIDs;
+import app.util.Constants.SpriteSheetDimensions;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.image.ImageView;
 
@@ -18,27 +22,27 @@ public class Rook extends Piece {
     public Rook(Byte id) {
         this.id = id;
         setType();
-        if(this.id == Constants.pieceIDs.BLACK_PROMOTED_ROOK){
+        if(this.id == PieceIDs.BLACK_PROMOTED_ROOK){
             this.color = 0;
-        }else if(this.id == Constants.pieceIDs.WHITE_PROMOTED_ROOK){
+        }else if(this.id == PieceIDs.WHITE_PROMOTED_ROOK){
             this.color = 1;
         }else {
-            this.color = (byte) (id / Constants.pieceIDs.COLOR_DIVISOR);
+            this.color = (byte) (id / PieceIDs.COLOR_DIVISOR);
         }
         this.sprite = new ImageView(App.getSpritesheet());
         if (this.color == 0) {
             // if the colour is black put a black pawn
-            this.sprite.setViewport(new Rectangle2D(Constants.SpriteSheetDimensions.ROOK_X,
-                    Constants.SpriteSheetDimensions.BLACK_PIECE_Y, Constants.SpriteSheetDimensions.PIECE_WIDTH,
-                    Constants.SpriteSheetDimensions.PIECE_HEIGHT));
+            this.sprite.setViewport(new Rectangle2D(SpriteSheetDimensions.ROOK_X,
+                    SpriteSheetDimensions.BLACK_PIECE_Y, SpriteSheetDimensions.PIECE_WIDTH,
+                    SpriteSheetDimensions.PIECE_HEIGHT));
         } else {
-            this.sprite.setViewport(new Rectangle2D(Constants.SpriteSheetDimensions.ROOK_X,
-                    Constants.SpriteSheetDimensions.WHITE_PIECE_Y, Constants.SpriteSheetDimensions.PIECE_WIDTH,
-                    Constants.SpriteSheetDimensions.PIECE_HEIGHT));
+            this.sprite.setViewport(new Rectangle2D(SpriteSheetDimensions.ROOK_X,
+                    SpriteSheetDimensions.WHITE_PIECE_Y, SpriteSheetDimensions.PIECE_WIDTH,
+                    SpriteSheetDimensions.PIECE_HEIGHT));
         }
 
-        this.sprite.setFitWidth(Constants.SpriteSheetDimensions.PIECE_FIT_WIDTH);
-        this.sprite.setFitHeight(Constants.SpriteSheetDimensions.PIECE_FIT_HEIGHT);
+        this.sprite.setFitWidth(SpriteSheetDimensions.PIECE_FIT_WIDTH);
+        this.sprite.setFitHeight(SpriteSheetDimensions.PIECE_FIT_HEIGHT);
     }
 
     /**

@@ -1,7 +1,11 @@
+package app.controllers;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 
+import app.App;
+import app.util.RegionFillTransition;
+import app.util.Constants.BoardData;
 import javafx.animation.FadeTransition;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -174,15 +178,15 @@ public class TranscriptController {
         });
 
         playButton.setOnAction(e -> {
-            App.setTranscriptPath(Constants.boardData.TRANSCRIPT_DIR_PATH + select.getText() + ".txt");
+            App.setTranscriptPath(BoardData.TRANSCRIPT_DIR_PATH + select.getText() + ".txt");
             App.setTranscript("");
-            App.setGameMode(Constants.boardData.MODE_RESUME_GAME);
+            App.setGameMode(BoardData.MODE_RESUME_GAME);
             transition("game");
         });
 
         deleteButton.setOnAction(e -> {
             // File to delete.
-            File fileToDel = new File(Constants.boardData.TRANSCRIPT_DIR_PATH + select.getText() + ".txt");
+            File fileToDel = new File(BoardData.TRANSCRIPT_DIR_PATH + select.getText() + ".txt");
             // If it successfully deletes the file.
             if (fileToDel.delete()) {
                 transcriptContainer.getChildren().remove(select);

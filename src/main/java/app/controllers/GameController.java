@@ -1,3 +1,4 @@
+package app.controllers;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -20,6 +21,15 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import app.App;
+import app.game.Board;
+import app.game.OnlineBoard;
+import app.pieces.Piece;
+import app.util.Constants;
+import app.util.Constants.BoardData;
+import app.util.Constants.Dev;
+import app.util.Constants.Online;
+import app.util.Constants.PieceIDs;
 
 /**
  * Controller of the game scene, also initializes the Board class.
@@ -57,7 +67,7 @@ public class GameController {
     */
    public void initialize() throws FirebaseAuthException, InterruptedException {
       // Set boards
-      if (App.getGameMode() != Constants.boardData.MODE_ONLINE) {
+      if (App.getGameMode() != BoardData.MODE_ONLINE) {
          board = new Board(this, new GridPane[] { gp_board, gp_blackDeadCells, gp_whiteDeadCells }, App.getGameMode());
       } else {
          oBoard = new OnlineBoard(this, new GridPane[] { gp_board, gp_blackDeadCells, gp_whiteDeadCells });
@@ -71,7 +81,7 @@ public class GameController {
          boolean userIsDev = false;
 
          // Check email against developers' emails
-         for (String dev : Constants.Online.DEV_EMAILS) {
+         for (String dev : Online.DEV_EMAILS) {
             if (userRecord.getEmail().equalsIgnoreCase(dev)) {
                userIsDev = true;
                break;
@@ -93,7 +103,7 @@ public class GameController {
     * @return Label object
     */
    public Label getTimeReference(byte color) {
-      if (color == Constants.pieceIDs.BLACK)
+      if (color == PieceIDs.BLACK)
          return lbl_bTimer;
       else
          return lbl_wTimer;
@@ -106,7 +116,7 @@ public class GameController {
     * @return Label object
     */
    public Label getHiddenTimeReference(byte color) {
-      if (color == Constants.pieceIDs.BLACK)
+      if (color == PieceIDs.BLACK)
          return lbl_hbTimer;
       else
          return lbl_hwTimer;
@@ -119,7 +129,7 @@ public class GameController {
     * @throws IOException May throw an exception if the fxml is not found.
     */
    public void displayPawnPromotion(Piece piece, byte type) throws IOException {
-      Parent nextScene = App.loadFXML((type == Constants.pieceIDs.WHITE) ? "white-pawn-end" : "black-pawn-end");
+      Parent nextScene = App.loadFXML((type == PieceIDs.WHITE) ? "white-pawn-end" : "black-pawn-end");
       sp_root.getChildren().add(nextScene);
       nextScene.translateYProperty().set(sp_root.getScene().getHeight());
 
@@ -153,7 +163,7 @@ public class GameController {
                   String type = ((StackPane) n).getId();
 
                   // Promote the pawn
-                  if (App.getGameMode() == Constants.boardData.MODE_ONLINE)
+                  if (App.getGameMode() == BoardData.MODE_ONLINE)
                      oBoard.promotePawn(piece, type, false);
                   else
                      board.promotePawn(piece, type, false);
@@ -226,7 +236,7 @@ public class GameController {
     */
    @FXML
    private void devGetAiMoves() {
-      board.devRequest(Constants.Dev.GET_AI_MOVES);
+      board.devRequest(Dev.GET_AI_MOVES);
    }
 
    @FXML
